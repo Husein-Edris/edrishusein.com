@@ -1,0 +1,40 @@
+// src/styles/variables.scss
+$primary-color: #007bff;
+$secondary-color: #6c757d;
+$background-color: #ffffff;
+$text-color: #333333;
+
+// Breakpoints
+$mobile: 576px;
+$tablet: 768px;
+$desktop: 1024px;
+
+// src/styles/mixins.scss
+@mixin respond-to($breakpoint) {
+  @if $breakpoint == mobile {
+    @media (max-width: $mobile) { @content; }
+  }
+  @if $breakpoint == tablet {
+    @media (min-width: $mobile + 1) and (max-width: $tablet) { @content; }
+  }
+  @if $breakpoint == desktop {
+    @media (min-width: $tablet + 1) { @content; }
+  }
+}
+
+// src/styles/globals.scss
+@import 'variables';
+@import 'mixins';
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  color: $text-color;
+  background-color: $background-color;
+}
