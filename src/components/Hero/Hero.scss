@@ -1,0 +1,94 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.hero {
+  background-color: $primary-color;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: calc($spacing-unit * 8) 0;
+
+  .container {
+    max-width: $desktop;
+    margin: 0 auto;
+    padding: 0 $container-padding;
+    display: flex;
+    align-items: center;
+    gap: calc($spacing-unit * 4);
+
+    @include mobile {
+      flex-direction: column;
+      text-align: center;
+      gap: calc($spacing-unit * 2);
+    }
+  }
+
+  .profile-wrapper {
+    flex-shrink: 0;
+    width: 450px;
+    height: 450px;
+    background: transparent;
+    border-radius: 50%;
+    overflow: hidden;
+
+    @include mobile {
+      width: 300px;
+      height: 300px;
+    }
+
+    .profile-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .content {
+    flex: 1;
+
+    .title {
+      color: $white;
+      font-family: $font-family-syncopate;
+      font-size: $font-size-h1;
+      font-weight: 700;
+      margin-bottom: $spacing-unit;
+      display: flex;
+      align-items: center;
+      gap: $spacing-unit;
+
+      @include mobile {
+        @include flex-center;
+      }
+
+      .wave {
+        animation: wave 2s infinite;
+        display: inline-block;
+        transform-origin: 70% 70%;
+      }
+    }
+
+    .description {
+      color: $white;
+      font-family: $font-family-base;
+      font-size: calc($font-size-base * 1.1);
+      line-height: $line-height-base;
+      max-width: 600px;
+      opacity: 0.8;
+
+      @include mobile {
+        margin: 0 auto;
+      }
+    }
+  }
+}
+
+@keyframes wave {
+  0% { transform: rotate(0deg); }
+  10% { transform: rotate(14deg); }
+  20% { transform: rotate(-8deg); }
+  30% { transform: rotate(14deg); }
+  40% { transform: rotate(-4deg); }
+  50% { transform: rotate(10deg); }
+  60% { transform: rotate(0deg); }
+  100% { transform: rotate(0deg); }
+}
