@@ -33,7 +33,7 @@
     }
   }
 
-  .nav {
+  nav {
     flex: 1;
     margin: 0 calc($spacing-unit * 2);
 
@@ -41,51 +41,75 @@
       width: 100%;
       margin: $spacing-unit 0;
     }
-  }
 
-  .nav-list {
-    display: flex;
-    justify-content: center;
-    gap: calc($spacing-unit * 2);
-    list-style: none;
-    margin: 0;
-    padding: 0;
+    .navList {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+  
+      @include mobile {
+        flex-direction: column;
+        align-items: center;
+        gap: $spacing-unit;
+      }
 
-    @include mobile {
-      flex-direction: column;
-      align-items: center;
-      gap: $spacing-unit;
+    .navItem {
+      position: relative;
+  
+      &:hover *,
+      &:focus *,
+      &:active *{
+        color: $color-beige !important;
+      }
+  
+      .navLink {
+        font-family: $font-family-syncopate;
+        text-decoration: none;
+        color: white;
+        font-family: $font-family-syncopate;
+        font-weight: bold;
+        font-size: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+  
+        &::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        top: 45%;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background-color: white;
+        opacity: 0.3;
+        transform-origin: center;
+        transition: all 0.3s ease;
+      }
+
+        &:active {
+          color: $secondary-color;
+        }
+  
+        .navNumber {
+          font-size: 14px;
+          color: #b3b3b3;
+          margin-bottom: 5px;
+        }
+  
+        .navText {
+          position: relative;
+        }
+  
+      }
     }
   }
+}
 
-  .nav-item {
-    position: relative;
-  }
-
-  .nav-link {
-    display: flex;
-    align-items: center;
-    gap: calc($spacing-unit / 2);
-    color: $white;
-    text-decoration: none;
-    font-family: $font-family-syncopate;
-    font-size: $font-size-base;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    transition: color 0.3s ease;
-
-    &:hover {
-      color: $secondary-color;
-    }
-  }
-
-  .nav-number {
-    color: $text-light-gray;
-    font-size: calc($font-size-base * 0.875);
-  }
-
-  .social-links {
+  .socialLinks {
     display: flex;
     gap: $spacing-unit;
     align-items: center;
@@ -95,7 +119,7 @@
     }
   }
 
-  .social-link {
+  .socialLink {
     color: $white;
     transition: opacity 0.3s ease;
 

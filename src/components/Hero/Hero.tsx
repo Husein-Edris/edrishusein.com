@@ -20,8 +20,7 @@ const Hero = () => {
             <span className="subTitle">I'm</span>EDRIS <span className="wave">👋</span>
           </h1>
           <p className="description">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed libero metus, vehicula
-            sit amet orci at, consequat lobortis ex. Etiam fermentum lacinia viverra.
+           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed libero metus, vehicula sit amet orci at, consequat lobortis ex. Etiam fermentum lacinia viverra.
           </p>
         </div>
       </div>
