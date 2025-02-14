@@ -3,11 +3,14 @@
 
 .hero {
   background-color: $primary-color;
-  min-height: 100vh;
+  min-height: 70vh;
   display: flex;
   align-items: center;
-  padding: calc($spacing-unit * 8) 0;
-
+  padding-top: calc($container-padding * 2);
+  
+  .subTitle {
+    color: $secondary-color;
+  }
   .container {
     max-width: $desktop;
     margin: 0 auto;
@@ -70,7 +73,7 @@
     .description {
       color: $white;
       font-family: $font-family-base;
-      font-size: calc($font-size-base * 1.1);
+      font-size: calc($font-size-base * 1.5);
       line-height: $line-height-base;
       max-width: 600px;
       opacity: 0.8;

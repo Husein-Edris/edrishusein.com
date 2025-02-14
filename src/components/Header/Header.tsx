@@ -8,10 +8,10 @@ const Header: FC = () => {
     <header className="header">
       <div className="container">
         <Link href="/" className="logo">
-          <Image 
-            src="/logo.png" 
-            alt="Edris Husein Logo" 
-            width={80} 
+          <Image
+            src="/logo.png"
+            alt="Edris Husein Logo"
+            width={80}
             height={40}
             priority
           />
@@ -22,67 +22,69 @@ const Header: FC = () => {
             <li className="navItem">
               <Link href="/projects" className="navLink">
                 <span className="navNumber">01</span>
-                PROJECTS
+                <span className="navText">PROJECTS</span>
+
               </Link>
             </li>
             <li className="navItem">
               <Link href="/contact" className="navLink">
                 <span className="navNumber">02</span>
-                ABOUT
+                <span className="navText">ABOUT</span>
               </Link>
             </li>
             <li className="navItem">
               <Link href="/contact" className="navLink">
-            <span className="navNumber">03</span>
-                BLOG
+                <span className="navNumber">03</span>
+                <span className="navText">BLOG</span>
+
               </Link>
             </li>
             <li className="navItem">
               <Link href="/contact" className="navLink">
                 <span className="navNumber">04</span>
-                CONTACT
+                <span className="navText">CONTACT</span>
               </Link>
             </li>
           </ul>
         </nav>
 
         <div className="socialLinks">
-          <a 
-            href="https://linkedin.com" 
-            target="_blank" 
+          <a
+            href="https://linkedin.com"
+            target="_blank"
             rel="noopener noreferrer"
             className="socialLink linkedin"
           >
-            <Image 
-              src="/icons/linkedin.svg" 
-              alt="LinkedIn" 
-              width={24} 
+            <Image
+              src="/icons/linkedin.svg"
+              alt="LinkedIn"
+              width={24}
               height={24}
             />
           </a>
-          <a 
-            href="https://twitter.com" 
-            target="_blank" 
+          <a
+            href="https://twitter.com"
+            target="_blank"
             rel="noopener noreferrer"
             className="socialLink twitter"
           >
-            <Image 
-              src="/icons/twitter.svg" 
-              alt="Twitter" 
-              width={24} 
+            <Image
+              src="/icons/x.svg"
+              alt="Twitter"
+              width={24}
               height={24}
             />
           </a>
-          <a 
-            href="https://github.com" 
-            target="_blank" 
+          <a
+            href="https://github.com"
+            target="_blank"
             rel="noopener noreferrer"
             className="socialLink github"
           >
-            <Image 
-              src="/icons/github.svg" 
-              alt="GitHub" 
-              width={24} 
+            <Image
+              src="/icons/github.svg"
+              alt="GitHub"
+              width={24}
               height={24}
             />
           </a>

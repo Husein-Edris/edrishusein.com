@@ -1,0 +1,185 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.projects {
+  background-color: $primary-color;
+  padding: calc($spacing-unit * 12) 0;
+  overflow-x: hidden;
+
+  .container {
+    max-width: $desktop;
+    margin: 0 auto;
+    padding: 0 $container-padding;
+  }
+
+  .projects-header {
+    margin-bottom: calc($spacing-unit * 8);
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 30px;
+      left: 120px;
+      width: 100px;
+      height: 2px;
+      background-color: $white;
+    }
+  }
+
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: calc($spacing-unit * 3);
+    margin-bottom: calc($spacing-unit * 8);
+
+    @include mobile {
+      grid-template-columns: 1fr;
+      gap: calc($spacing-unit * 4);
+    }
+
+    // Hover effects only on desktop
+    @media (min-width: $mobile) {
+      &:hover .project-card:not(:hover) {
+        transform: scale(0.9);
+        opacity: 0.5;
+        filter: grayscale(100%);
+        transition: all 0.3s ease;
+      }
+    }
+  }
+
+  .project-card {
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: rgba($text-light-gray, 0.1);
+    position: relative;
+    width: 100%;
+    
+    // Desktop-only effects
+    @media (min-width: $mobile) {
+      filter: grayscale(100%);
+      transition: all 0.3s ease;
+      cursor: pointer;
+
+      &:hover {
+        filter: grayscale(0%);
+        transform: scale(1.1);
+        z-index: 2;
+        background-color: #1a1a1a;
+        width: 115%;
+
+        .project-content {
+          background-color: #1a1a1a;
+        }
+
+        .project-title {
+          color: $white;
+        }
+
+        .project-description {
+          opacity: 1;
+        }
+
+        .project-link {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    }
+  }
+
+  .project-image {
+    width: 100%;
+    height: 250px;
+    position: relative;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .project-content {
+    padding: calc($spacing-unit * 3);
+    transition: all 0.3s ease;
+  }
+
+  .project-title {
+    font-family: $font-family-syncopate;
+    font-size: calc($font-size-base * 1.5);
+    margin-bottom: $spacing-unit;
+    color: rgba($white, 0.7);
+    transition: all 0.3s ease;
+  }
+
+  .project-description {
+    font-family: $font-family-base;
+    font-size: $font-size-base;
+    line-height: $line-height-base;
+    margin-bottom: calc($spacing-unit * 2);
+    color: $white;
+    opacity: 0.6;
+    transition: all 0.3s ease;
+  }
+
+  .project-links {
+    display: flex;
+    gap: $spacing-unit;
+  }
+
+  .project-link {
+    font-family: $font-family-syncopate;
+    font-size: calc($font-size-base * 0.875);
+    color: $white;
+    text-decoration: none;
+    padding: calc($spacing-unit * 0.75) calc($spacing-unit * 1.5);
+    border: 1px solid $white;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    opacity: 0.6;
+    transform: translateY(10px);
+
+    &:hover {
+      background-color: $white;
+      color: $primary-color;
+    }
+  }
+
+  .view-more {
+    text-align: center;
+    margin-top: calc($spacing-unit * 6);
+  }
+
+  .view-more-link {
+    font-family: $font-family-syncopate;
+    color: $white;
+    text-decoration: none;
+    font-size: calc($font-size-base * 1.25);
+    position: relative;
+
+    &:hover {
+      color: $color-beige;
+    }
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background-color: $white;
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+      transform-origin: right;
+    }
+
+    &:hover::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+  }
+}
