@@ -3,17 +3,17 @@
 
 .header {
   background-color: $primary-color;
-  padding: calc($spacing-unit * 2) 0;
+  padding: calc($spacing-unit * 2) $container-padding;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
+  
 
   .container {
     max-width: $desktop;
     margin: 0 auto;
-    padding: 0 $container-padding;
     display: flex;
     justify-content: space-between;
     align-items: center;
