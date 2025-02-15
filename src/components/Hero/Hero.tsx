@@ -7,7 +7,7 @@ const Hero = () => {
       <div className="container">
         <div className="profile-wrapper">
           <Image
-            src="/EdrisHusein-Hero.png"
+            src="/images/Edris-Husein-Hero.png"
             alt="Edris Profile"
             width={450}
             height={450}
