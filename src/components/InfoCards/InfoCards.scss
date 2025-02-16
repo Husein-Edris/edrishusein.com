@@ -2,47 +2,20 @@
 @use '../../styles/mixins' as *;
 
 .info-cards {
-  background-color: $primary-color;
   padding: $container-padding;
+  display: flex;
+  justify-content: center;
 
   .container {
     max-width: $desktop;
-    margin: 0 auto;
+    width: 100%;
   }
 
-  .section-header {
-    margin-bottom: calc($spacing-unit * 8);
-    position: relative;
-
-    &::after {
-      content: '';
-      position: absolute;
-      top: 30px;
-      left: 120px;
-      width: 100px;
-      height: 2px;
-      background-color: $white;
-    }
-
-    .section-number {
-      color: $text-light-gray;
-      font-family: $font-family-syncopate;
-      font-size: calc($font-size-h1 * 0.8);
-      margin-bottom: $spacing-unit;
-    }
-
-    .section-title {
-      color: $white;
-      font-family: $font-family-syncopate;
-      font-size: $font-size-h1;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-  }
-
+  // Grid styles
   .cards-grid {
     display: grid;
     gap: calc($spacing-unit * 3);
+    margin-bottom: calc($spacing-unit * 8);
 
     &.columns-1 {
       grid-template-columns: 1fr;
@@ -62,49 +35,326 @@
     }
   }
 
-  .card {
-    background-color: rgb(18, 18, 18);
-    border-radius: 12px;
-    overflow: hidden;
-    text-decoration: none;
-    transition: transform 0.3s ease;
+  // Default skin styles
+  &.default {
+    &.default-dark {
+      background-color: $primary-color;
 
-    &:hover {
-      .card-arrow {
-        .arrow-disabled {
-          opacity: 0;
+      .card {
+        background-color: $white;
+
+        .card-info {
+          background-color: $white;
         }
 
-        .arrow-active {
-          opacity: 1;
-          transform: translateX(0);
+        .card-title {
+          color: $primary-color;
+          width: 80%;
         }
+
+        .card-description {
+          color: $text-light-gray;
+        }
+      }
+    }
+
+    &.default-light {
+      background-color: $white;
+
+      .card {
+        background-color: $primary-color;
+
+        .card-info {
+          background-color: $primary-color;
+        }
+
+        .card-title {
+          color: $white;
+          width: 80%;
+        }
+
+        .card-description {
+          color: $text-light-gray;
+        }
+      }
+    }
+
+    .card-arrow {
+      width: 20%;
+      display: flex;
+      justify-content: flex-end;
+      align-items: flex-start;
+
+      img {
+        width: 40px;
+        height: 40px;
+        transition: all 0.3s ease;
+      }
+
+      .arrow-disabled {
+        opacity: 1;
+      }
+
+      .arrow-active {
+        opacity: 0;
+        transform: translateX(-5px);
+        position: absolute;
+      }
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+
+      .arrow-disabled {
+        opacity: 0;
+      }
+
+      .arrow-active {
+        opacity: 1;
+        transform: translateX(0);
       }
 
       .card-image img {
         transform: scale(1.05);
       }
     }
+  }
 
-    &.light {
-      background-color: #f5f5f5;
+  // Projects skin styles
+  &.projects {
+    background-color: $primary-color;
+    overflow-x: hidden;
 
-      .card-info {
-        background-color: #f5f5f5;
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: calc($spacing-unit * 3);
+      margin-bottom: calc($spacing-unit * 8);
+
+      @include mobile {
+        grid-template-columns: 1fr;
+        gap: calc($spacing-unit * 4);
       }
 
-      .card-title {
+      @media (min-width: $mobile) {
+        &:hover .card:not(:hover) {
+          transform: scale(0.9);
+          opacity: 0.5;
+          filter: grayscale(100%);
+          transition: all 0.3s ease;
+        }
+      }
+    }
+
+    .card {
+      border-radius: 12px;
+      overflow: hidden;
+      background-color: rgba($text-light-gray, 0.1);
+      position: relative;
+      width: 100%;
+      cursor: pointer;
+      filter: grayscale(100%);
+      transition: all 0.3s ease;
+
+      @media (min-width: $mobile) {
+        &:hover {
+          filter: grayscale(0%);
+          transform: scale(1.1);
+          z-index: 2;
+          width: 115%;
+          background-color: #1a1a1a;
+
+          .card-info {
+            background-color: #1a1a1a;
+          }
+
+          .card-title {
+            color: $white;
+          }
+
+          .card-description {
+            opacity: 1;
+          }
+
+          .project-links {
+            opacity: 1;
+            transform: translateY(0);
+          }
+
+          .card-image img {
+            transform: scale(1.05);
+          }
+        }
+      }
+
+      &.light {
+        background-color: $white;
+
+        .card-info {
+          background-color: $white;
+        }
+
+        .card-title {
+          color: $primary-color;
+        }
+
+        .card-description {
+          color: $text-light-gray;
+        }
+
+        .project-link {
+          color: $primary-color;
+          border-color: $primary-color;
+
+          &:hover {
+            background-color: $primary-color;
+            color: $white;
+          }
+        }
+      }
+    }
+
+    .card-image {
+      width: 100%;
+      height: 250px;
+      position: relative;
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+      }
+    }
+
+    .card-info {
+      padding: calc($spacing-unit * 3);
+      background-color: rgba($text-light-gray, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .card-title {
+      font-size: calc($font-size-base * 1.5);
+      margin-bottom: $spacing-unit;
+      color: rgba($white, 0.7);
+      transition: all 0.3s ease;
+    }
+
+    .card-description {
+      font-size: $font-size-base;
+      line-height: $line-height-base;
+      margin-bottom: calc($spacing-unit * 2);
+      color: $white;
+      opacity: 0.6;
+      transition: all 0.3s ease;
+    }
+
+    .project-links {
+      display: flex;
+      gap: $spacing-unit;
+      opacity: 0.6;
+      transform: translateY(10px);
+      transition: all 0.3s ease;
+    }
+
+    .project-link {
+      font-size: calc($font-size-base * 0.875);
+      color: $white;
+      text-decoration: none;
+      padding: calc($spacing-unit * 0.75) calc($spacing-unit * 1.5);
+      border: 1px solid $white;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background-color: $white;
         color: $primary-color;
       }
+    }
 
-      .card-description {
-        color: rgba($primary-color, 0.7);
+    .view-more {
+      text-align: center;
+      margin-top: calc($spacing-unit * 6);
+    }
+
+    .view-more-link {
+      color: $white;
+      text-decoration: none;
+      font-size: calc($font-size-base * 1.25);
+      position: relative;
+
+      &:hover {
+        color: $color-beige;
+      }
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background-color: $white;
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+        transform-origin: right;
+      }
+
+      &:hover::after {
+        transform: scaleX(1);
+        transform-origin: left;
       }
     }
   }
 
-  .card-content {
-    position: relative;
+  // Blog skin styles
+  &.blog {
+    &.blog-light {
+      background-color: $white;
+      border-radius: 16px;
+      margin: 0 16px;
+
+      .card {
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        background-color: $white;
+
+        .card-info {
+          background-color: $white;
+        }
+
+        .card-title {
+          color: $primary-color;
+        }
+
+        .card-description {
+          color: $text-light-gray;
+        }
+
+        &:hover {
+          transform: translateY(-8px);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+
+          .card-image img {
+            transform: scale(1.05);
+          }
+        }
+      }
+    }
+
+    .card-image {
+      margin: calc($spacing-unit * 2);
+      margin-bottom: 0;
+      border-radius: 8px;
+    }
+  }
+
+  // Common styles
+  .card {
+    border-radius: 12px;
+    overflow: hidden;
+    text-decoration: none;
+    transition: all 0.3s ease;
   }
 
   .card-image {
@@ -123,66 +373,33 @@
 
   .card-info {
     padding: calc($spacing-unit * 3);
-    background-color: rgb(18, 18, 18);
     display: flex;
+    flex-wrap: wrap;
   }
 
   .card-title {
-    color: $white;
-    font-family: $font-family-syncopate;
     font-size: calc($font-size-base * 1.5);
     margin-bottom: $spacing-unit;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    width: 80%;
-  }
-
-  .card-arrow {
-    width: 20%;
-    position: absolute;
-    bottom: calc($spacing-unit * 3);
-    right: calc($spacing-unit * 3);
-
-
-    img {
-      transition: all 0.3s ease;
-      width: 40px;
-      height: 40px;
-    }
-
-    .arrow-disabled {
-      opacity: 1;
-    }
-
-    .arrow-active {
-      opacity: 0;
-      transform: translateX(-5px);
-    }
   }
 
   .card-description {
-    color: $text-light-gray;
-    font-family: $font-family-base;
     font-size: $font-size-base;
     line-height: $line-height-base;
     margin-bottom: calc($spacing-unit * 2);
-    padding-right: calc($spacing-unit * 4);
+    width: 100%;
   }
 
-  // Mobile styles
   @include mobile {
-    padding: calc($spacing-unit * 4) 0;
-
-    .section-header {
-      margin-bottom: calc($spacing-unit * 4);
-    }
+    padding: calc($spacing-unit * 4) $container-padding;
 
     .card-title {
       font-size: calc($font-size-base * 1.25);
     }
 
-    .card-description {
-      padding-right: 0;
+    .project-links {
+      flex-direction: column;
     }
   }
 }
