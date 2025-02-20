@@ -1,0 +1,88 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.contact {
+    background-color: $primary-color;
+    padding: calc($spacing-unit * 16) $container-padding;
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+
+    .container {
+        max-width: $desktop;
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    .contact-content {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: calc($spacing-unit * 4);
+    }
+
+    .subtitle {
+        color: $white;
+        font-family: $font-family-syncopate;
+        font-size: calc($font-size-base * 1.15);
+        font-weight: 400;
+        letter-spacing: 0.1em;
+    }
+
+    .title {
+        color: $white;
+        font-family: $font-family-syncopate;
+        font-size: calc($font-size-h1 * 2.5);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .email {
+        color: $white;
+        font-family: $font-family-syncopate;
+        font-size: calc($font-size-h1 * 1.4);
+        text-decoration: none;
+        position: relative;
+        padding-bottom: $spacing-unit;
+
+        &::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: $white;
+        }
+
+        &:hover {
+            color: $color-beige;
+
+            &::after {
+                background-color: $color-beige;
+            }
+        }
+    }
+
+    @include mobile {
+        padding: calc($spacing-unit * 8) $container-padding;
+
+        .contact-content {
+            gap: calc($spacing-unit * 2);
+        }
+
+        .subtitle {
+            font-size: $font-size-base;
+        }
+
+        .title {
+            font-size: calc($font-size-h1 * 1.5);
+        }
+
+        .email {
+            font-size: $font-size-h1;
+        }
+    }
+}

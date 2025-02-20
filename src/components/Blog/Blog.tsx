@@ -29,7 +29,7 @@ const Blog = () => {
       columns={3}
       cards={blogPosts.map(post => ({
         ...post,
-        variant: 'light' // Using dark theme like projects
+        variant: 'light' 
       }))}
     />
   );

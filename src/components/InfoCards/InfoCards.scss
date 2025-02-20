@@ -41,14 +41,13 @@
       background-color: $primary-color;
 
       .card {
-        background-color: $white;
 
         .card-info {
-          background-color: $white;
+          background-color: #0d0d0d;
         }
 
         .card-title {
-          color: $primary-color;
+          color: $white;
           width: 80%;
         }
 
@@ -62,7 +61,6 @@
       background-color: $white;
 
       .card {
-        background-color: $primary-color;
 
         .card-info {
           background-color: $primary-color;
@@ -103,8 +101,6 @@
     }
 
     .card:hover {
-      transform: translateY(-8px);
-
       .arrow-disabled {
         opacity: 0;
       }
@@ -313,11 +309,10 @@
     &.blog-light {
       background-color: $white;
       border-radius: 16px;
-      margin: 0 16px;
+      margin: 16px;
 
       .card {
-        border: 1px solid rgba(0, 0, 0, 0.1);
-        background-color: $white;
+        border: 2px solid $light-black;
 
         .card-info {
           background-color: $white;
@@ -332,7 +327,6 @@
         }
 
         &:hover {
-          transform: translateY(-8px);
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 
           .card-image img {
@@ -343,7 +337,6 @@
     }
 
     .card-image {
-      margin: calc($spacing-unit * 2);
       margin-bottom: 0;
       border-radius: 8px;
     }

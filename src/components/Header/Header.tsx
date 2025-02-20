@@ -9,7 +9,7 @@ const Header: FC = () => {
       <div className="container">
         <Link href="/" className="logo">
           <Image
-            src="/logo.png"
+            src="/edrishusein-logo.svg"
             alt="Edris Husein Logo"
             width={80}
             height={40}
