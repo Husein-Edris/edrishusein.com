@@ -15,8 +15,6 @@ import Footer from '@/src/components/Footer/Footer';
 // 4. Add the tech stack page#
 // 5. Add the bookshelf page
 // 6. Fix Mobile issues
-// 7. Add Kotakt Section
-// 8. Add the contact page
 // 9. Add the privacy policy page
 // 9. Add the Imprint page
 // 10. Add the about page
