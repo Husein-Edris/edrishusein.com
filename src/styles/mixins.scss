@@ -56,10 +56,6 @@
   }
 
   &.dark {
-    .section-number {
-      color: $color-beige;
-    }
-
     .section-title {
       color: #fff;
 
@@ -70,10 +66,6 @@
   }
 
   &.light {
-    .section-number {
-      color: $text-light-gray;
-    }
-
     .section-title {
       color: $primary-color;
 

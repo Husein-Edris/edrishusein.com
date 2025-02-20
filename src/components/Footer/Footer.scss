@@ -1,0 +1,81 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.footer {
+    background-color: $primary-color;
+    padding: calc($spacing-unit * 4) $container-padding;
+    display: flex;
+    justify-content: center;
+
+    .container {
+        max-width: $desktop;
+        width: 100%;
+    }
+
+    .footer-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+
+        @include mobile {
+            flex-direction: column;
+            gap: calc($spacing-unit * 4);
+        }
+    }
+
+    .footer-left {
+        display: flex;
+        flex-direction: column;
+        gap: calc($spacing-unit * 2);
+
+        .logo {
+            display: block;
+
+            &:hover {
+                opacity: 0.8;
+                transition: opacity 0.3s ease;
+            }
+        }
+
+        .copyright {
+            color: $text-light-gray;
+            font-family: $font-family-base;
+            font-size: calc($font-size-base * 0.875);
+        }
+    }
+
+    .footer-nav {
+        display: flex;
+        gap: calc($spacing-unit * 8);
+
+        @include mobile {
+            flex-direction: column;
+            gap: calc($spacing-unit * 4);
+        }
+
+        .nav-list {
+            display: flex;
+            flex-direction: column;
+            gap: calc($spacing-unit * 2);
+            list-style: none;
+            margin: 0;
+            padding: 0;
+
+            a {
+                color: $white;
+                text-decoration: none;
+                font-family: $font-family-base;
+                font-size: $font-size-base;
+                transition: color 0.3s ease;
+
+                &:hover {
+                    color: $text-light-gray;
+                }
+            }
+        }
+
+        .main-links {
+            margin-right: calc($spacing-unit * 4);
+        }
+    }
+}
