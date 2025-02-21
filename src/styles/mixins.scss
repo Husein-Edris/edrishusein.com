@@ -44,6 +44,10 @@
     position: relative;
     display: inline-block;
 
+    @include mobile {
+      font-size: calc($font-size-h1 / 1.5);
+    }
+
     &::after {
       content: '';
       position: absolute;

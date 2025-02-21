@@ -4,12 +4,15 @@
 .header {
   background-color: $primary-color;
   padding: calc($spacing-unit * 2) $container-padding;
-  // position: fixed;
-  // top: 0;
-  // left: 0;
-  // right: 0;
-  // z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
 
+  @include mobile {
+    padding: calc($spacing-unit * 2);
+  }
 
   .container {
     max-width: $desktop;
@@ -17,15 +20,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-
-    @include mobile {
-      flex-direction: column;
-      gap: $spacing-unit;
-    }
   }
 
   .logo {
     display: block;
+    z-index: 1001;
 
     img {
       height: 90px;
@@ -37,14 +36,138 @@
     }
   }
 
-  nav {
-    flex: 1;
-    margin: 0 calc($spacing-unit * 2);
+  .menu-toggle {
+    --bar-width: 30px;
+    --bar-height: 2px;
+    --bar-gap: 8px;
+    --animation-timing: 200ms ease-in-out;
+    --menu-height: calc(var(--bar-height) * 3 + var(--bar-gap) * 2);
+    --x-width: calc(var(--menu-height) * 1.41421356237);
+
+    display: none;
+    z-index: 1001;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    width: var(--bar-width);
+    height: var(--menu-height);
+    position: relative;
 
     @include mobile {
-      width: 100%;
-      margin: $spacing-unit 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--bar-gap);
     }
+
+    &::before,
+    &::after,
+    .menu-icon {
+      content: "";
+      width: var(--bar-width);
+      height: var(--bar-height);
+      background-color: $white;
+      border-radius: 9999px;
+      transform-origin: left center;
+      transition: opacity var(--animation-timing), 
+                width var(--animation-timing),
+                rotate var(--animation-timing), 
+                translate var(--animation-timing),
+                background-color var(--animation-timing);
+    }
+
+    .menu-icon {
+      opacity: 1;
+    }
+  }
+
+  // Mobile menu styles
+  @include mobile {
+
+    .main-nav {
+      display: none;
+    }
+
+    .mobile-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background-color: $primary-color;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+
+      &.active {
+        opacity: 1;
+        visibility: visible;
+
+        & + .menu-toggle {
+          &::before {
+            rotate: 45deg;
+            width: var(--x-width);
+            translate: 0 calc(var(--bar-height) / -2);
+            background-color: $white;
+          }
+
+          &::after {
+            rotate: -45deg;
+            width: var(--x-width);
+            translate: 0 calc(var(--bar-height) / 2);
+            background-color: $white;
+          }
+
+          .menu-icon {
+            opacity: 0;
+            width: 0;
+          }
+        }
+
+        .navList {
+          transform: translateY(0);
+        }
+      }
+
+      .main-nav {
+        display: block;
+        height: 100%;
+      }
+
+      .navList {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: calc($spacing-unit * 3);
+        transform: translateY(20px);
+        transition: transform 0.3s ease;
+      }
+
+      .navLink {
+        font-family: $font-family-syncopate;
+        font-size: 24px;
+        color: $white !important;
+        text-decoration: none;
+        transition: color 0.3s ease;
+
+        &:hover {
+          color: $text-light-gray !important;
+        }
+
+        &::after {
+          display: none;
+        }
+      }
+    }
+  }
+
+  // Desktop nav styles
+  .main-nav {
+    flex: 1;
+    margin: 0 calc($spacing-unit * 2);
 
     .navList {
       display: flex;
@@ -53,12 +176,6 @@
       list-style: none;
       margin: 0;
       padding: 0;
-
-      @include mobile {
-        flex-direction: column;
-        align-items: center;
-        gap: $spacing-unit;
-      }
 
       .navItem {
         position: relative;
@@ -72,13 +189,13 @@
         .navLink {
           font-family: $font-family-syncopate;
           text-decoration: none;
-          color: white;
-          font-family: $font-family-syncopate;
+          color: $white;
           font-weight: bold;
           font-size: 16px;
           display: flex;
-          flex-direction: column;
+          flex-direction: row;
           align-items: flex-start;
+          gap: 5px;
 
           &::after {
             content: "";
@@ -88,14 +205,10 @@
             left: 0;
             right: 0;
             height: 2px;
-            background-color: white;
+            background-color: $white;
             opacity: 0.3;
             transform-origin: center;
             transition: all 0.3s ease;
-          }
-
-          &:active {
-            color: $secondary-color;
           }
 
           .navNumber {
@@ -107,7 +220,6 @@
           .navText {
             position: relative;
           }
-
         }
       }
     }
@@ -117,9 +229,10 @@
     display: flex;
     gap: $spacing-unit;
     align-items: center;
+    z-index: 1001;
 
     @include mobile {
-      margin-top: $spacing-unit;
+      display: none;
     }
   }
 
