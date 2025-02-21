@@ -1,9 +1,18 @@
-import { FC } from 'react';
+'use client';
+
+import { FC, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import './Header.scss';
 
 const Header: FC = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+    document.body.style.overflow = !isMenuOpen ? 'hidden' : 'auto';
+  };
+
   return (
     <header className="header">
       <div className="container">
@@ -17,36 +26,46 @@ const Header: FC = () => {
           />
         </Link>
 
-        <nav className="main-nav">
-          <ul className="navList">
-            <li className="navItem">
-              <Link href="/projects" className="navLink">
-                <span className="navNumber">01</span>
-                <span className="navText">PROJECTS</span>
+        <div className={`mobile-menu ${isMenuOpen ? 'active' : ''}`}>
+          <nav className="main-nav">
+            <ul className="navList">
+              <li className="navItem">
+                <Link href="/" className="navLink" onClick={toggleMenu}>
+                  <span className="navNumber">01</span>
+                  <span className="navText">HOME</span>
+                </Link>
+              </li>
+              <li className="navItem">
+                <Link href="/projects" className="navLink" onClick={toggleMenu}>
+                  <span className="navNumber">02</span>
+                  <span className="navText">PORTFOLIO</span>
+                </Link>
+              </li>
+              <li className="navItem">
+                <Link href="/about" className="navLink" onClick={toggleMenu}>
+                  <span className="navNumber">03</span>
+                  <span className="navText">ABOUT</span>
+                </Link>
+              </li>
+              <li className="navItem">
+                <Link href="/blog" className="navLink" onClick={toggleMenu}>
+                  <span className="navNumber">04</span>
+                  <span className="navText">BLOG</span>
+                </Link>
+              </li>
+              <li className="navItem">
+                <Link href="/contact" className="navLink" onClick={toggleMenu}>
+                  <span className="navNumber">05</span>
+                  <span className="navText">CONTACT</span>
+                </Link>
+              </li>
+            </ul>
+          </nav>
+        </div>
 
-              </Link>
-            </li>
-            <li className="navItem">
-              <Link href="/contact" className="navLink">
-                <span className="navNumber">02</span>
-                <span className="navText">ABOUT</span>
-              </Link>
-            </li>
-            <li className="navItem">
-              <Link href="/contact" className="navLink">
-                <span className="navNumber">03</span>
-                <span className="navText">BLOG</span>
-
-              </Link>
-            </li>
-            <li className="navItem">
-              <Link href="/contact" className="navLink">
-                <span className="navNumber">04</span>
-                <span className="navText">CONTACT</span>
-              </Link>
-            </li>
-          </ul>
-        </nav>
+        <button className="menu-toggle" onClick={toggleMenu} aria-label="Toggle menu">
+          <span className="menu-icon"></span>
+        </button>
 
         <div className="socialLinks">
           <a

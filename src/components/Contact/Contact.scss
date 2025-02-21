@@ -8,6 +8,10 @@
     display: flex;
     align-items: center;
 
+    @include mobile {
+        padding: calc($spacing-unit * 8) calc($spacing-unit * 2);
+    }
+
     .container {
         max-width: $desktop;
         width: 100%;
@@ -67,8 +71,6 @@
     }
 
     @include mobile {
-        padding: calc($spacing-unit * 8) $container-padding;
-
         .contact-content {
             gap: calc($spacing-unit * 2);
         }
@@ -78,11 +80,11 @@
         }
 
         .title {
-            font-size: calc($font-size-h1 * 1.5);
+            font-size: calc($font-size-h1 * 2);
         }
 
         .email {
-            font-size: $font-size-h1;
+            font-size: 20px;
         }
     }
 }

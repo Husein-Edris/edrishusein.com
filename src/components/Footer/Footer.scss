@@ -7,6 +7,10 @@
     display: flex;
     justify-content: center;
 
+    @include mobile {
+        padding: calc($spacing-unit * 8) calc($spacing-unit * 2);
+    }
+
     .container {
         max-width: $desktop;
         width: 100%;
@@ -18,7 +22,7 @@
         align-items: flex-start;
 
         @include mobile {
-            flex-direction: column;
+            flex-direction: row;
             gap: calc($spacing-unit * 4);
         }
     }
@@ -34,6 +38,11 @@
             &:hover {
                 opacity: 0.8;
                 transition: opacity 0.3s ease;
+            }
+            img {
+                @include tablet {
+                    height: 120px !important;
+                }
             }
         }
 

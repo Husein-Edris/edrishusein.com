@@ -2,16 +2,20 @@
 @use '../../styles/mixins' as *;
 
 .info-cards {
-  padding: $container-padding;
+  padding: calc($spacing-unit * 8) $container-padding;
   display: flex;
   justify-content: center;
+
+  @include mobile {
+    padding: calc($spacing-unit * 4) calc($spacing-unit * 2);
+  }
 
   .container {
     max-width: $desktop;
     width: 100%;
   }
 
-  // Grid styles
+  // Grid styles with tablet support
   .cards-grid {
     display: grid;
     gap: calc($spacing-unit * 3);
@@ -23,15 +27,26 @@
 
     &.columns-2 {
       grid-template-columns: repeat(2, 1fr);
+
+      @include tablet {
+        grid-template-columns: repeat(2, 1fr);
+        gap: calc($spacing-unit * 2);
+      }
     }
 
     &.columns-3 {
       grid-template-columns: repeat(3, 1fr);
+
+      @include tablet {
+        grid-template-columns: repeat(2, 1fr);
+        gap: calc($spacing-unit * 2);
+      }
     }
 
     @include mobile {
       grid-template-columns: 1fr !important;
       gap: calc($spacing-unit * 4);
+      margin-bottom: calc($spacing-unit * 4);
     }
   }
 
@@ -41,7 +56,6 @@
       background-color: $primary-color;
 
       .card {
-
         .card-info {
           background-color: #0d0d0d;
         }
@@ -61,7 +75,6 @@
       background-color: $white;
 
       .card {
-
         .card-info {
           background-color: $primary-color;
         }
@@ -83,10 +96,28 @@
       justify-content: flex-end;
       align-items: flex-start;
 
+      @include tablet {
+        width: 15%;
+      }
+
+      @include mobile {
+        width: 20%;
+      }
+
       img {
         width: 40px;
         height: 40px;
         transition: all 0.3s ease;
+
+        @include tablet {
+          width: 32px;
+          height: 32px;
+        }
+
+        @include mobile {
+          width: 24px;
+          height: 24px;
+        }
       }
 
       .arrow-disabled {
@@ -101,6 +132,8 @@
     }
 
     .card:hover {
+      transform: translateY(-8px);
+
       .arrow-disabled {
         opacity: 0;
       }
@@ -122,16 +155,6 @@
     overflow-x: hidden;
 
     .cards-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: calc($spacing-unit * 3);
-      margin-bottom: calc($spacing-unit * 8);
-
-      @include mobile {
-        grid-template-columns: 1fr;
-        gap: calc($spacing-unit * 4);
-      }
-
       @media (min-width: $mobile) {
         &:hover .card:not(:hover) {
           transform: scale(0.9);
@@ -151,6 +174,10 @@
       cursor: pointer;
       filter: grayscale(100%);
       transition: all 0.3s ease;
+      @include mobile {
+        filter: grayscale(0%);
+
+      }
 
       @media (min-width: $mobile) {
         &:hover {
@@ -175,10 +202,6 @@
           .project-links {
             opacity: 1;
             transform: translateY(0);
-          }
-
-          .card-image img {
-            transform: scale(1.05);
           }
         }
       }
@@ -213,37 +236,30 @@
     .card-image {
       width: 100%;
       height: 250px;
-      position: relative;
-      overflow: hidden;
 
-      img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.3s ease;
+      @include tablet {
+        height: 220px;
+      }
+
+      @include mobile {
+        height: 250px;
       }
     }
 
     .card-info {
-      padding: calc($spacing-unit * 3);
+      padding: calc($spacing-unit * 3) !important;
+
       background-color: rgba($text-light-gray, 0.1);
       transition: all 0.3s ease;
     }
 
     .card-title {
-      font-size: calc($font-size-base * 1.5);
-      margin-bottom: $spacing-unit;
       color: rgba($white, 0.7);
-      transition: all 0.3s ease;
     }
 
     .card-description {
-      font-size: $font-size-base;
-      line-height: $line-height-base;
-      margin-bottom: calc($spacing-unit * 2);
       color: $white;
       opacity: 0.6;
-      transition: all 0.3s ease;
     }
 
     .project-links {
@@ -252,9 +268,16 @@
       opacity: 0.6;
       transform: translateY(10px);
       transition: all 0.3s ease;
+
+      @include mobile {
+        flex-direction: column;
+        gap: calc($spacing-unit);
+        width: 100%;
+      }
     }
 
     .project-link {
+      font-family: $font-family-syncopate;
       font-size: calc($font-size-base * 0.875);
       color: $white;
       text-decoration: none;
@@ -262,6 +285,11 @@
       border: 1px solid $white;
       border-radius: 4px;
       transition: all 0.3s ease;
+      text-align: center;
+
+      @include mobile {
+        width: 100%;
+      }
 
       &:hover {
         background-color: $white;
@@ -272,9 +300,14 @@
     .view-more {
       text-align: center;
       margin-top: calc($spacing-unit * 6);
+
+      @include mobile {
+        margin-top: calc($spacing-unit * 4);
+      }
     }
 
     .view-more-link {
+      font-family: $font-family-syncopate;
       color: $white;
       text-decoration: none;
       font-size: calc($font-size-base * 1.25);
@@ -309,10 +342,18 @@
     &.blog-light {
       background-color: $white;
       border-radius: 16px;
-      margin: 16px;
+      margin: calc($spacing-unit * 2);
+
+      @include mobile {
+        margin: $spacing-unit;
+      }
 
       .card {
         border: 2px solid $light-black;
+
+        @include mobile {
+          border-width: 1px;
+        }
 
         .card-info {
           background-color: $white;
@@ -327,6 +368,7 @@
         }
 
         &:hover {
+          transform: translateY(-8px);
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 
           .card-image img {
@@ -342,57 +384,82 @@
     }
   }
 
-  // Common styles
+  // Common card styles
   .card {
     border-radius: 12px;
     overflow: hidden;
     text-decoration: none;
     transition: all 0.3s ease;
-  }
+    height: 100%;
 
-  .card-image {
-    position: relative;
-    width: 100%;
-    height: 300px;
-    overflow: hidden;
-
-    img {
-      width: 100%;
+    .card-content {
       height: 100%;
-      object-fit: cover;
-      transition: transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
     }
-  }
 
-  .card-info {
-    padding: calc($spacing-unit * 3);
-    display: flex;
-    flex-wrap: wrap;
-  }
+    .card-image {
+      position: relative;
+      width: 100%;
+      height: 300px;
+      overflow: hidden;
 
-  .card-title {
-    font-size: calc($font-size-base * 1.5);
-    margin-bottom: $spacing-unit;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
+      @include tablet {
+        padding: calc($spacing-unit * 2);
+        height: 250px;
+      }
 
-  .card-description {
-    font-size: $font-size-base;
-    line-height: $line-height-base;
-    margin-bottom: calc($spacing-unit * 2);
-    width: 100%;
-  }
+      @include mobile {
+        padding: calc($spacing-unit * 2);
+        height: 250px;
+      }
 
-  @include mobile {
-    padding: calc($spacing-unit * 4) $container-padding;
+      img {
+        border-radius: 4px;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+      }
+    }
+
+    .card-info {
+      padding: calc($spacing-unit * 3);
+      display: flex;
+      flex-wrap: wrap;
+      flex: 1;
+
+      @include mobile {
+        padding: calc($spacing-unit * 2);
+      }
+    }
 
     .card-title {
-      font-size: calc($font-size-base * 1.25);
+      font-family: $font-family-syncopate;
+      font-size: calc($font-size-base * 1.5);
+      margin-bottom: $spacing-unit;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+
+      @include tablet {
+        font-size: calc($font-size-base * 1.25);
+      }
+
+      @include mobile {
+        font-size: calc($font-size-base * 1.1);
+      }
     }
 
-    .project-links {
-      flex-direction: column;
+    .card-description {
+      font-family: $font-family-base;
+      font-size: $font-size-base;
+      line-height: $line-height-base;
+      margin-bottom: calc($spacing-unit * 2);
+      width: 100%;
+
+      @include mobile {
+        font-size: calc($font-size-base * 0.9);
+      }
     }
   }
 }
