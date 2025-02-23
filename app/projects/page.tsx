@@ -1,4 +1,3 @@
-// app/projects/page.tsx
 import { GraphQLClient } from 'graphql-request';
 import Image from 'next/image';
 import Link from 'next/link';
