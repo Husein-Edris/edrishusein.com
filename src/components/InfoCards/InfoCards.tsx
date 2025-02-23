@@ -240,9 +240,12 @@ async function InfoCards({
           ))}
         </div>
 
-        {skin === 'projects' && (
+        {(skin === 'projects' || skin === 'blog') && (
           <div className="view-more">
-            <Link href="/projects" className="view-more-link">
+            <Link
+              href={skin === 'projects' ? '/projects' : '/notebook'}
+              className="view-more-link"
+            >
               VIEW MORE
             </Link>
           </div>

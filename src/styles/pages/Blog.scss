@@ -1,0 +1,164 @@
+// src/styles/pages/Blog.scss
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.blog-archive {
+  background-color: $primary-color;
+  min-height: 100vh;
+  padding: calc($spacing-unit * 8) 0;
+
+  @include mobile {
+    padding: calc($spacing-unit * 4) 0;
+  }
+
+  .hero-section {
+    text-align: center;
+    margin-bottom: calc($spacing-unit * 6);
+
+    @include mobile {
+      margin-bottom: calc($spacing-unit * 4);
+    }
+
+    .title {
+      font-family: $font-family-syncopate;
+      font-size: calc($font-size-base * 3);
+      color: $white;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: $spacing-unit;
+
+      @include mobile {
+        font-size: calc($font-size-base * 2);
+      }
+    }
+
+    .description {
+      font-family: $font-family-base;
+      font-size: calc($font-size-base * 1.2);
+      color: $text-light-gray;
+      max-width: 600px;
+      margin: 0 auto;
+
+      @include mobile {
+        font-size: $font-size-base;
+      }
+    }
+  }
+
+  .container {
+    max-width: $desktop;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 $container-padding;
+
+    @include mobile {
+      padding: 0 calc($spacing-unit * 2);
+    }
+  }
+
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: calc($spacing-unit * 3);
+    margin-bottom: calc($spacing-unit * 8);
+
+    @include tablet {
+      grid-template-columns: repeat(2, 1fr);
+      gap: calc($spacing-unit * 2);
+    }
+
+    @include mobile {
+      grid-template-columns: 1fr;
+      gap: calc($spacing-unit * 4);
+      margin-bottom: calc($spacing-unit * 4);
+    }
+
+    .blog-card {
+      border-radius: 12px;
+      overflow: hidden;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      height: 100%;
+      background-color: rgba($text-light-gray, 0.1);
+
+      &:hover {
+        transform: translateY(-8px);
+
+        .card-image img {
+          transform: scale(1.05);
+        }
+      }
+
+      .card-content {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .card-image {
+        position: relative;
+        width: 100%;
+        height: 300px;
+        overflow: hidden;
+
+        @include tablet {
+          height: 250px;
+        }
+
+        @include mobile {
+          height: 250px;
+        }
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.3s ease;
+        }
+      }
+
+      .card-info {
+        padding: calc($spacing-unit * 3);
+        display: flex;
+        flex-wrap: wrap;
+        flex: 1;
+        background-color: rgba($text-light-gray, 0.1);
+
+        @include mobile {
+          padding: calc($spacing-unit * 2);
+        }
+      }
+
+      .card-title {
+        font-family: $font-family-syncopate;
+        font-size: calc($font-size-base * 1.5);
+        margin-bottom: $spacing-unit;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: $white;
+        width: 100%;
+
+        @include tablet {
+          font-size: calc($font-size-base * 1.25);
+        }
+
+        @include mobile {
+          font-size: calc($font-size-base * 1.1);
+        }
+      }
+
+      .card-description {
+        font-family: $font-family-base;
+        font-size: $font-size-base;
+        line-height: $line-height-base;
+        color: $text-light-gray;
+        margin-bottom: calc($spacing-unit * 2);
+        width: 100%;
+
+        @include mobile {
+          font-size: calc($font-size-base * 0.9);
+        }
+      }
+    }
+  }
+}
