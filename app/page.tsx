@@ -1,39 +1,83 @@
+// app/page.tsx
+import { GraphQLClient } from 'graphql-request';
 import Hero from '@/src/components/Hero/Hero';
-import Header from '../src/components/Header/Header';
+import Header from '@/src/components/Header/Header';
 import About from '@/src/components/about/about';
 import InfoCards from '@/src/components/InfoCards/InfoCards';
-import { blogPosts } from '@/src/data/blogPosts';
-import { projectsData } from '@/src/data/projectsData';
 import Contact from '@/src/components/Contact/Contact';
 import Footer from '@/src/components/Footer/Footer';
 
+// GraphQL client setup
+const client = new GraphQLClient(process.env.NEXT_PUBLIC_WORDPRESS_API_URL || '', {
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
-// Todos
-// 1. Fetch the projects data form Wordpress
-// 2. Fetch the blog posts data form Wordpress
-// 3. Fetch the tech stack data form Wordpress
-// 4. Add the tech stack page#
-// 5. Add the bookshelf page
-// 6. Fix Mobile issues
-// 9. Add the privacy policy page
-// 9. Add the Imprint page
-// 10. Add the about page
-// 11. Run Build
+// Query for hero and homepage sections
+const GET_HOMEPAGE_DATA = `
+  query GetHomepage {
+    page(id: "home", idType: URI) {
+      homepageSections {
+        heroSection {
+          title
+          heroCopy
+          heroImage {
+            node {
+              sourceUrl
+              altText
+              mediaDetails {
+                height
+                width
+              }
+            }
+          }
+        }
+        aboutSection {
+          title
+          aboutMeText
+        }
+        contactSection {
+          subTitle
+          title
+          email
+        }
+      }
+    }
+  }
+`;
 
-export default function Home() {
+async function getHomepageData() {
+  try {
+    const data = await client.request(GET_HOMEPAGE_DATA);
+    return data.page.homepageSections;
+  } catch (error) {
+    console.error('Error fetching homepage data:', error);
+    return null;
+  }
+}
+
+export const dynamic = 'force-dynamic';
+
+export default async function HomePage() {
+  const homepageData = await getHomepageData();
+
   return (
     <main>
       <Header />
-      <Hero />
+      <Hero data={homepageData?.heroSection} />
+      
+      {/* Projects section - fetches its own data */}
       <InfoCards
         skin="projects"
         variant="dark"
-        sectionNumber="01 "
-        sectionTitle="Projects"
+        sectionNumber="01"
         columns={3}
-        cards={projectsData}
       />
-      <About />
+
+      <About data={homepageData?.aboutSection} />
+      
+      {/* Bookshelf and Tech Stack */}
       <InfoCards
         skin="default"
         variant="dark"
@@ -51,18 +95,19 @@ export default function Home() {
             image: "/images/tech-bg.png",
             link: "/tech-stack"
           }
-        ]} />
+        ]}
+      />
+      
+      {/* Blog/Notebook section - fetches its own data */}
       <InfoCards
         skin="blog"
         variant="light"
         sectionNumber="03"
-        sectionTitle="NOTEBOOK"
         columns={3}
-        cards={blogPosts}
       />
-      <Contact />
+
+      <Contact data={homepageData?.contactSection} />
       <Footer />
     </main>
-
   );
 }
