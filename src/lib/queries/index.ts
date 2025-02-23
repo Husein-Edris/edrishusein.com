@@ -1,4 +1,36 @@
-// src/lib/queries/projects.ts
+// src/lib/queries/index.ts
+export const GET_HOMEPAGE_DATA = `
+  query GetHomepage {
+    page(id: "home", idType: URI) {
+      homepageSections {
+        heroSection {
+          title
+          heroCopy
+          heroImage {
+            node {
+              sourceUrl
+              altText
+              mediaDetails {
+                height
+                width
+              }
+            }
+          }
+        }
+        aboutSection {
+          title
+          aboutMeText
+        }
+        contactSection {
+          subTitle
+          title
+          email
+        }
+      }
+    }
+  }
+`;
+
 export const GET_PROJECTS_FOR_GRID = `
   query GetProjects {
     projects(first: 3) {

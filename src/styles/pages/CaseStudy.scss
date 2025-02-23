@@ -1,0 +1,206 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.case-study {
+  background-color: $primary-color;
+  color: $white;
+  min-height: 100vh;
+  padding: calc($spacing-unit * 8) 0;
+
+  @include mobile {
+    padding: calc($spacing-unit * 4) 0;
+  }
+
+  .container {
+    max-width: $desktop;
+    margin: 0 auto;
+    padding: 0 $container-padding;
+
+    @include mobile {
+      padding: 0 calc($spacing-unit * 2);
+    }
+  }
+
+  .title {
+    font-family: $font-family-syncopate;
+    font-size: calc($font-size-base * 3);
+    margin-bottom: calc($spacing-unit * 4);
+    text-align: center;
+
+    @include mobile {
+      font-size: calc($font-size-base * 2);
+      margin-bottom: calc($spacing-unit * 3);
+    }
+  }
+
+  section {
+    margin-bottom: calc($spacing-unit * 8);
+
+    @include mobile {
+      margin-bottom: calc($spacing-unit * 6);
+    }
+
+    h2 {
+      font-family: $font-family-syncopate;
+      font-size: calc($font-size-base * 2);
+      margin-bottom: calc($spacing-unit * 3);
+      color: $white;
+
+      @include mobile {
+        font-size: calc($font-size-base * 1.5);
+        margin-bottom: calc($spacing-unit * 2);
+      }
+    }
+  }
+
+  .tech-stack {
+    .tech-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: calc($spacing-unit * 2);
+      
+      .tech-item {
+        display: flex;
+        align-items: center;
+        gap: $spacing-unit;
+        padding: calc($spacing-unit * 1.5);
+        background: rgba($text-light-gray, 0.1);
+        border-radius: 8px;
+        transition: transform 0.3s ease;
+
+        &:hover {
+          transform: translateY(-4px);
+        }
+
+        img {
+          width: 40px;
+          height: 40px;
+          object-fit: contain;
+        }
+
+        span {
+          font-family: $font-family-base;
+          color: $white;
+        }
+      }
+    }
+  }
+
+  .content {
+    .challenge, .solution {
+      background: rgba($text-light-gray, 0.1);
+      padding: calc($spacing-unit * 4);
+      border-radius: 12px;
+      margin-bottom: calc($spacing-unit * 4);
+
+      @include mobile {
+        padding: calc($spacing-unit * 2);
+      }
+
+      h2 {
+        margin-bottom: calc($spacing-unit * 2);
+      }
+
+      p {
+        color: $text-light-gray;
+        line-height: 1.8;
+        margin-bottom: $spacing-unit;
+      }
+    }
+  }
+
+  .features {
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: calc($spacing-unit * 3);
+
+      .feature-card {
+        background: rgba($text-light-gray, 0.1);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+
+        &:hover {
+          transform: translateY(-8px);
+
+          img {
+            transform: scale(1.05);
+          }
+        }
+
+        img {
+          width: 100%;
+          height: 200px;
+          object-fit: cover;
+          transition: transform 0.3s ease;
+        }
+
+        h3 {
+          font-family: $font-family-syncopate;
+          font-size: calc($font-size-base * 1.2);
+          padding: calc($spacing-unit * 2);
+          color: $white;
+        }
+
+        p {
+          padding: 0 calc($spacing-unit * 2) calc($spacing-unit * 2);
+          color: $text-light-gray;
+          line-height: 1.6;
+        }
+      }
+    }
+  }
+
+  .gallery {
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: calc($spacing-unit * 2);
+
+      @include mobile {
+        grid-template-columns: 1fr;
+      }
+
+      img {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        border-radius: 8px;
+        transition: transform 0.3s ease;
+
+        &:hover {
+          transform: scale(1.02);
+        }
+      }
+    }
+  }
+
+  .links {
+    display: flex;
+    justify-content: center;
+    gap: calc($spacing-unit * 2);
+    margin-top: calc($spacing-unit * 8);
+
+    @include mobile {
+      flex-direction: column;
+      gap: $spacing-unit;
+    }
+
+    .link-button {
+      font-family: $font-family-syncopate;
+      font-size: calc($font-size-base * 1.1);
+      color: $white;
+      text-decoration: none;
+      padding: calc($spacing-unit * 1.5) calc($spacing-unit * 3);
+      border: 2px solid $white;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: $white;
+        color: $primary-color;
+      }
+    }
+  }
+}
