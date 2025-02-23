@@ -1,4 +1,3 @@
-// app/page.tsx
 import { GraphQLClient } from 'graphql-request';
 import Hero from '@/src/components/Hero/Hero';
 import Header from '@/src/components/Header/Header';
