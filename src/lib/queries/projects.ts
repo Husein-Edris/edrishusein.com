@@ -1,19 +1,12 @@
-export const GET_PROJECTS_DATA = `
-  query GetProjectsData {
-    # Get section title from homepage
-    page(id: "home", idType: URI) {
-      homepageSections {
-        projectsSection {
-          title
-        }
-      }
-    }
-    # Get projects using native WordPress fields
-    projects(first: 3) {
+// src/lib/queries/projects.ts
+export const GET_PROJECTS_FOR_GRID = `
+  query GetProjects {
+    projects(first: 3, where: { orderby: { field: DATE, order: DESC } }) {
       nodes {
         id
         title
         excerpt
+        uri
         featuredImage {
           node {
             sourceUrl
@@ -24,7 +17,29 @@ export const GET_PROJECTS_DATA = `
             }
           }
         }
+      }
+    }
+  }
+`;
+
+export const GET_ALL_PROJECTS = `
+  query GetAllProjects {
+    projects(first: 100, where: { orderby: { field: DATE, order: DESC } }) {
+      nodes {
+        id
+        title
+        excerpt
         uri
+        featuredImage {
+          node {
+            sourceUrl
+            altText
+            mediaDetails {
+              height
+              width
+            }
+          }
+        }
       }
     }
   }

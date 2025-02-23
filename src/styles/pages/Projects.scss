@@ -1,0 +1,181 @@
+// src/styles/pages/Projects.scss
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.projects-archive {
+    background-color: $primary-color;
+    min-height: 100vh;
+    padding: calc($spacing-unit * 8) 0;
+
+    @include mobile {
+        padding: calc($spacing-unit * 4) 0;
+    }
+
+    .hero-section {
+        text-align: center;
+        margin-bottom: calc($spacing-unit * 8);
+        padding: 0 $container-padding;
+
+        @include mobile {
+            margin-bottom: calc($spacing-unit * 4);
+        }
+
+        .title {
+            font-family: $font-family-syncopate;
+            font-size: calc($font-size-base * 3);
+            color: $white;
+            margin-bottom: $spacing-unit;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+
+            @include mobile {
+                font-size: calc($font-size-base * 2);
+            }
+        }
+
+        .description {
+            font-size: calc($font-size-base * 1.2);
+            color: $text-light-gray;
+            max-width: 600px;
+            margin: 0 auto;
+
+            @include mobile {
+                font-size: $font-size-base;
+            }
+        }
+    }
+
+    .container {
+        max-width: $desktop;
+        margin: 0 auto;
+        padding: 0 $container-padding;
+
+        @include mobile {
+            padding: 0 calc($spacing-unit * 2);
+        }
+    }
+
+    .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: calc($spacing-unit * 4);
+
+        @include tablet {
+            grid-template-columns: repeat(2, 1fr);
+            gap: calc($spacing-unit * 3);
+        }
+
+        @include mobile {
+            grid-template-columns: 1fr;
+            gap: calc($spacing-unit * 4);
+        }
+    }
+
+    .project-card {
+        background-color: rgba($text-light-gray, 0.1);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        filter: grayscale(100%);
+
+        &:hover {
+            transform: translateY(-8px);
+            filter: grayscale(0%);
+
+            .card-image img {
+                transform: scale(1.05);
+            }
+        }
+
+        &.light {
+            background-color: $white;
+
+            .card-content {
+                .card-title {
+                    color: $primary-color;
+                }
+
+                .card-description {
+                    color: $text-light-gray;
+                }
+
+                .project-link {
+                    color: $primary-color;
+                    border-color: $primary-color;
+
+                    &:hover {
+                        background-color: $primary-color;
+                        color: $white;
+                    }
+                }
+            }
+        }
+
+        .card-image {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            overflow: hidden;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.3s ease;
+            }
+        }
+
+        .card-content {
+            padding: calc($spacing-unit * 3);
+
+            @include mobile {
+                padding: calc($spacing-unit * 2);
+            }
+
+            .card-title {
+                font-family: $font-family-syncopate;
+                font-size: calc($font-size-base * 1.5);
+                color: $white;
+                margin-bottom: $spacing-unit;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+
+                @include mobile {
+                    font-size: calc($font-size-base * 1.25);
+                }
+            }
+
+            .card-description {
+                color: $text-light-gray;
+                margin-bottom: calc($spacing-unit * 2);
+                line-height: 1.5;
+            }
+
+            .project-links {
+                display: flex;
+                gap: $spacing-unit;
+
+                @include mobile {
+                    flex-direction: column;
+                }
+
+                .project-link {
+                    font-family: $font-family-syncopate;
+                    color: $white;
+                    text-decoration: none;
+                    padding: calc($spacing-unit * 0.75) calc($spacing-unit * 1.5);
+                    border: 1px solid $white;
+                    border-radius: 4px;
+                    transition: all 0.3s ease;
+                    text-align: center;
+                    font-size: calc($font-size-base * 0.875);
+
+                    &:hover {
+                        background-color: $white;
+                        color: $primary-color;
+                    }
+                }
+            }
+        }
+    }
+}
