@@ -1,4 +1,3 @@
-// src/components/InfoCards/InfoCards.tsx
 import { GraphQLClient } from 'graphql-request';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -94,7 +93,7 @@ interface InfoCardsProps {
 async function getProjectsData() {
   try {
     const data = await client.request(GET_PROJECTS_DATA);
-    
+
     const projectCards: InfoCardProps[] = data.projects.nodes.map((project: any) => ({
       title: project.title,
       description: project.excerpt,
@@ -118,7 +117,7 @@ async function getProjectsData() {
 async function getPostsData() {
   try {
     const data = await client.request(GET_POSTS_DATA);
-    
+
     const postCards: InfoCardProps[] = data.posts.nodes.map((post: any) => ({
       title: post.title,
       description: post.excerpt,
@@ -153,7 +152,7 @@ async function InfoCards({
 
   if (!cards) {
     let data = null;
-    
+
     switch (skin) {
       case 'projects':
         data = await getProjectsData();
@@ -176,9 +175,9 @@ async function InfoCards({
     <section className={sectionClass}>
       <div className="container">
         {(sectionNumber || displayTitle) && (
-          <SectionHeader 
-            number={sectionNumber} 
-            title={displayTitle} 
+          <SectionHeader
+            number={sectionNumber}
+            title={displayTitle}
             variant={variant}
           />
         )}
@@ -221,7 +220,7 @@ async function InfoCards({
                       />
                     </div>
                   )}
-                  <div 
+                  <div
                     className="card-description"
                     dangerouslySetInnerHTML={{ __html: card.description }}
                   />
