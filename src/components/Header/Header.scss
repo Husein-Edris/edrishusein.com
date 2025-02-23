@@ -69,11 +69,11 @@
       background-color: $white;
       border-radius: 9999px;
       transform-origin: left center;
-      transition: opacity var(--animation-timing), 
-                width var(--animation-timing),
-                rotate var(--animation-timing), 
-                translate var(--animation-timing),
-                background-color var(--animation-timing);
+      transition: opacity var(--animation-timing),
+        width var(--animation-timing),
+        rotate var(--animation-timing),
+        translate var(--animation-timing),
+        background-color var(--animation-timing);
     }
 
     .menu-icon {
@@ -104,7 +104,7 @@
         opacity: 1;
         visibility: visible;
 
-        & + .menu-toggle {
+        &+.menu-toggle {
           &::before {
             rotate: 45deg;
             width: var(--x-width);
@@ -193,9 +193,13 @@
           font-weight: bold;
           font-size: 16px;
           display: flex;
-          flex-direction: row;
+          flex-direction: column;
           align-items: flex-start;
           gap: 5px;
+
+          @include mobile {
+            flex-direction: row;
+          }
 
           &::after {
             content: "";

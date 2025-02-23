@@ -1,4 +1,3 @@
-import SectionHeader from '../SectionHeader/SectionHeader';
 import './Contact.scss';
 
 const Contact = () => {

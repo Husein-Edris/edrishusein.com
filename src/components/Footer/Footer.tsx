@@ -24,8 +24,8 @@ const Footer = () => {
                             <Image
                                 src="/edrishusein-logo.svg"
                                 alt="Edris Husein Logo"
-                                width={80}
-                                height={40}
+                                width={60}
+                                height={60}
                                 priority
                             />
                         </Link>
