@@ -1,4 +1,3 @@
-// src/lib/queries/projects.ts
 export const GET_PROJECTS_FOR_GRID = `
   query GetProjects {
     projects(first: 3, where: { orderby: { field: DATE, order: DESC } }) {

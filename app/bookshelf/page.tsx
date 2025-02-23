@@ -1,4 +1,3 @@
-// app/bookshelf/page.tsx
 import { GraphQLClient } from 'graphql-request';
 import Image from 'next/image';
 import Header from '@/src/components/Header/Header';
