@@ -35,7 +35,7 @@ export default async function ProjectsPage() {
         <div className="container">
           <div className="projects-grid">
             {projects.map((project: any, index: number) => (
-              <div key={project.id} className={`project-card ${index % 2 === 0 ? 'dark' : 'light'}`}>
+              <div key={project.id} className="project-card dark">
                 {project.featuredImage?.node && (
                   <div className="card-image">
                     <Image

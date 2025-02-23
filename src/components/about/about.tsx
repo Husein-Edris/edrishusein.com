@@ -1,7 +1,6 @@
 import './about.scss';
 import SectionHeader from '../SectionHeader/SectionHeader';
 
-
 const About = () => {
   return (
     <section className="about">

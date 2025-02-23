@@ -97,7 +97,7 @@ export default async function HomePage() {
         ]}
       />
       
-      {/* Blog/Notebook section - fetches its own data */}
+      {/* Blog/Notebook section */}
       <InfoCards
         skin="blog"
         variant="light"

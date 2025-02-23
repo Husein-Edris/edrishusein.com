@@ -4,7 +4,7 @@
 .blog-archive {
   background-color: $primary-color;
   min-height: 100vh;
-  padding: calc($spacing-unit * 8) 0;
+  padding: calc($container-padding * 2.5) $container-padding;
 
   @include mobile {
     padding: calc($spacing-unit * 4) 0;
@@ -48,7 +48,6 @@
     max-width: $desktop;
     width: 100%;
     margin: 0 auto;
-    padding: 0 $container-padding;
 
     @include mobile {
       padding: 0 calc($spacing-unit * 2);
