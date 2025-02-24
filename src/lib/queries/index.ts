@@ -21,6 +21,40 @@ export const GET_HOMEPAGE_DATA = `
           title
           aboutMeText
         }
+        bookshelfSection {
+          title
+          description
+          featuredImage {
+            sourceUrl
+            altText
+          }
+          button {
+            url
+            title
+            target
+          }
+        }
+        techstackSection {
+          title
+          description
+          featuredImage {
+            sourceUrl
+            altText
+          }
+          button {
+            url
+            title
+            target
+          }
+        }
+        notebookSection {
+          title
+          button {
+            url
+            title
+            target
+          }
+        }
         contactSection {
           subTitle
           title

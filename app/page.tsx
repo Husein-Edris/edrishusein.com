@@ -49,7 +49,7 @@ export default async function HomePage() {
     <main>
       <Header />
       <Hero data={homepageData?.heroSection} />
-      
+
       <InfoCards
         skin="projects"
         variant="dark"
@@ -60,7 +60,7 @@ export default async function HomePage() {
       />
 
       <About data={homepageData?.aboutSection} />
-      
+
       <InfoCards
         skin="default"
         variant="dark"
@@ -80,7 +80,7 @@ export default async function HomePage() {
           }
         ]}
       />
-      
+
       <InfoCards
         skin="blog"
         variant="light"

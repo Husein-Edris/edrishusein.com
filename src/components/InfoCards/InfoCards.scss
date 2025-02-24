@@ -61,6 +61,9 @@
         }
 
         .card-title {
+          word-wrap: break-word;
+          hyphens: auto;
+          overflow-wrap: break-word;
           color: $white;
           width: 80%;
         }
@@ -174,6 +177,13 @@
       cursor: pointer;
       filter: grayscale(100%);
       transition: all 0.3s ease;
+
+      .card-title {
+        word-wrap: break-word;
+        hyphens: auto;
+        overflow-wrap: anywhere;
+      }
+
       @include mobile {
         filter: grayscale(0%);
 
@@ -264,8 +274,10 @@
 
     .project-links {
       display: flex;
+      flex-direction: column;
       gap: $spacing-unit;
       opacity: 0.6;
+      width: 100%;
       transform: translateY(10px);
       transition: all 0.3s ease;
 
