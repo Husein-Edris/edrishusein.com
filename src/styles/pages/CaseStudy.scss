@@ -1,3 +1,4 @@
+// Enhanced src/styles/pages/CaseStudy.scss
 @use '../../styles/variables' as *;
 @use '../../styles/mixins' as *;
 
@@ -5,54 +6,83 @@
   background-color: $primary-color;
   color: $white;
   min-height: 100vh;
-  padding: calc($spacing-unit * 8) 0;
 
-  @include mobile {
-    padding: calc($spacing-unit * 4) 0;
+  .hero-section {
+    background-color: rgba($text-light-gray, 0.1);
+    padding: calc($spacing-unit * 12) 0 calc($spacing-unit * 8);
+    text-align: center;
+    
+    @include mobile {
+      padding: calc($spacing-unit * 8) 0 calc($spacing-unit * 6);
+    }
+    
+    .title {
+      font-family: $font-family-syncopate;
+      font-size: calc($font-size-h1 * 1.25);
+      margin-bottom: calc($spacing-unit * 3);
+      
+      @include mobile {
+        font-size: $font-size-h1;
+        margin-bottom: calc($spacing-unit * 2);
+      }
+    }
+    
+    .overview {
+      max-width: 800px;
+      margin: 0 auto;
+      color: $text-light-gray;
+      font-size: calc($font-size-base * 1.2);
+      line-height: 1.6;
+      
+      @include mobile {
+        font-size: $font-size-base;
+        padding: 0 calc($spacing-unit * 2);
+      }
+    }
   }
 
   .container {
     max-width: $desktop;
     margin: 0 auto;
-    padding: 0 $container-padding;
-
+    padding: calc($container-padding * 2) ;
+    
     @include mobile {
-      padding: 0 calc($spacing-unit * 2);
-    }
-  }
-
-  .title {
-    font-family: $font-family-syncopate;
-    font-size: calc($font-size-base * 3);
-    margin-bottom: calc($spacing-unit * 4);
-    text-align: center;
-
-    @include mobile {
-      font-size: calc($font-size-base * 2);
-      margin-bottom: calc($spacing-unit * 3);
+      padding: calc($spacing-unit * 4) calc($spacing-unit * 2);
     }
   }
 
   section {
     margin-bottom: calc($spacing-unit * 8);
-
+    
     @include mobile {
       margin-bottom: calc($spacing-unit * 6);
     }
-
+    
     h2 {
       font-family: $font-family-syncopate;
       font-size: calc($font-size-base * 2);
-      margin-bottom: calc($spacing-unit * 3);
-      color: $white;
-
+      margin-bottom: calc($spacing-unit * 4);
+      position: relative;
+      display: inline-block;
+      
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 80px;
+        height: 4px;
+        background-color: $color-beige;
+      }
+      
       @include mobile {
         font-size: calc($font-size-base * 1.5);
-        margin-bottom: calc($spacing-unit * 2);
+        margin-bottom: calc($spacing-unit * 3);
       }
     }
   }
 
+  // Enhanced Tech Stack section
   .tech-stack {
     .tech-grid {
       display: flex;
@@ -66,83 +96,102 @@
         padding: calc($spacing-unit * 1.5);
         background: rgba($text-light-gray, 0.1);
         border-radius: 8px;
-        transition: transform 0.3s ease;
-
+        transition: transform 0.3s ease, background-color 0.3s ease;
+        
         &:hover {
           transform: translateY(-4px);
+          background-color: rgba($text-light-gray, 0.2);
         }
-
+        
         img {
           width: 40px;
           height: 40px;
           object-fit: contain;
         }
-
+        
         span {
           font-family: $font-family-base;
           color: $white;
+          font-weight: 500;
         }
       }
     }
   }
 
+  // Enhanced Content section
   .content {
     .challenge, .solution {
       background: rgba($text-light-gray, 0.1);
       padding: calc($spacing-unit * 4);
       border-radius: 12px;
       margin-bottom: calc($spacing-unit * 4);
-
+      
       @include mobile {
         padding: calc($spacing-unit * 2);
       }
-
+      
       h2 {
         margin-bottom: calc($spacing-unit * 2);
+        
+        &::after {
+          width: 60px;
+          bottom: -8px;
+        }
       }
-
+      
       p {
         color: $text-light-gray;
         line-height: 1.8;
         margin-bottom: $spacing-unit;
       }
+      
+      ul, ol {
+        color: $text-light-gray;
+        margin-left: calc($spacing-unit * 3);
+        margin-bottom: calc($spacing-unit * 2);
+        
+        li {
+          margin-bottom: calc($spacing-unit);
+        }
+      }
     }
   }
 
+  // Enhanced Features section
   .features {
     .features-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: calc($spacing-unit * 3);
-
+      
       .feature-card {
         background: rgba($text-light-gray, 0.1);
         border-radius: 12px;
         overflow: hidden;
         transition: transform 0.3s ease;
-
+        
         &:hover {
           transform: translateY(-8px);
-
+          
           img {
             transform: scale(1.05);
           }
         }
-
+        
         img {
           width: 100%;
           height: 200px;
           object-fit: cover;
           transition: transform 0.3s ease;
         }
-
+        
         h3 {
           font-family: $font-family-syncopate;
           font-size: calc($font-size-base * 1.2);
           padding: calc($spacing-unit * 2);
           color: $white;
         }
-
+        
         p {
           padding: 0 calc($spacing-unit * 2) calc($spacing-unit * 2);
           color: $text-light-gray;
@@ -152,23 +201,24 @@
     }
   }
 
+  // Enhanced Gallery section
   .gallery {
     .gallery-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
       gap: calc($spacing-unit * 2);
-
+      
       @include mobile {
         grid-template-columns: 1fr;
       }
-
+      
       img {
         width: 100%;
         height: 300px;
         object-fit: cover;
         border-radius: 8px;
         transition: transform 0.3s ease;
-
+        
         &:hover {
           transform: scale(1.02);
         }
@@ -176,17 +226,18 @@
     }
   }
 
+  // Enhanced Links section
   .links {
     display: flex;
     justify-content: center;
     gap: calc($spacing-unit * 2);
     margin-top: calc($spacing-unit * 8);
-
+    
     @include mobile {
       flex-direction: column;
       gap: $spacing-unit;
     }
-
+    
     .link-button {
       font-family: $font-family-syncopate;
       font-size: calc($font-size-base * 1.1);
@@ -196,10 +247,15 @@
       border: 2px solid $white;
       border-radius: 4px;
       transition: all 0.3s ease;
-
+      
       &:hover {
         background: $white;
         color: $primary-color;
+      }
+      
+      @include mobile {
+        width: 100%;
+        text-align: center;
       }
     }
   }
