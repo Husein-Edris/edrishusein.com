@@ -36,13 +36,14 @@ export default async function HomePage() {
     getProjectsData()
   ]);
 
-  const transformedProjects = projectsData?.projects.nodes.map(project => ({
+  // Transform projects data, with safe null checks
+  const transformedProjects = projectsData?.projects?.nodes?.map(project => ({
     title: project.title,
     description: project.excerpt,
     image: project.featuredImage?.node?.sourceUrl,
     variant: 'dark',
     visitLink: project.caseStudy?.projectLinks?.liveSite || '#',
-    caseStudyLink: `/projects/${project.slug}`
+    caseStudyLink: project.slug ? `/projects/${project.slug}` : '#'
   })) || [];
 
   return (

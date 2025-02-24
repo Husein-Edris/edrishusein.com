@@ -33,8 +33,8 @@ export const GET_ALL_PROJECTS = `
       nodes {
         id
         title
-        excerpt
         slug
+        excerpt
         featuredImage {
           node {
             sourceUrl
@@ -48,6 +48,7 @@ export const GET_ALL_PROJECTS = `
         caseStudy {
           projectLinks {
             liveSite
+            github
           }
         }
       }
@@ -58,12 +59,14 @@ export const GET_ALL_PROJECTS = `
 export const GET_CASE_STUDY = `
   query GetCaseStudy($slug: ID!) {
     project(id: $slug, idType: SLUG) {
+      id
       title
-      seo {
-        title
-        metaDesc
-        opengraphImage {
+      content
+      excerpt
+      featuredImage {
+        node {
           sourceUrl
+          altText
         }
       }
       caseStudy {
