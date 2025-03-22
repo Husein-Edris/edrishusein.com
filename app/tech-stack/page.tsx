@@ -69,7 +69,7 @@ export default async function TechStackPage() {
                 <div className="content">
                   <h3 className="tech-title">{tech.title}</h3>
                   {tech.excerpt && (
-                    <div 
+                    <div
                       className="tech-description"
                       dangerouslySetInnerHTML={{ __html: tech.excerpt }}
                     />

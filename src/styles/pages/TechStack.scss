@@ -2,81 +2,140 @@
 @use '../../styles/mixins' as *;
 
 .tech-stack-page {
-    background-color: #000;
-    color: #fff;
-    min-height: 100vh;
-    padding: calc($container-padding * 2.5) $container-padding;
+  background-color: #000;
+  color: #fff;
+  min-height: 100vh;
+  padding: 100px 0;
   
-    .container {
-      max-width: 1200px;
-    }
-  
-    .hero-section {
-      text-align: center;
-      margin-bottom: 60px;
-  
-      .title {
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .hero-section {
+    text-align: center;
+    margin-bottom: 100px;
+
+    .title {
+      font-size: 64px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      font-family: $font-family-syncopate;
+      
+      @include mobile {
         font-size: 48px;
-        font-weight: bold;
-        margin-bottom: 20px;
-      }
-  
-      .description {
-        color: #888;
-        font-size: 18px;
-        max-width: 600px;
-        margin: 0 auto;
       }
     }
-  
-    .tech-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 30px;
-  
-      .tech-card {
-        background: #111;
-        border-radius: 12px;
-        overflow: hidden;
-        transition: transform 0.3s ease;
-  
-        &:hover {
-          transform: translateY(-5px);
+
+    .description {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 18px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+  }
+
+  .category-heading {
+    font-size: 36px;
+    font-weight: 600;
+    margin-bottom: 40px;
+    margin-top: 80px;
+
+    &:first-of-type {
+      margin-top: 0;
+    }
+  }
+
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    
+    @include tablet {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    @include mobile {
+      grid-template-columns: 1fr;
+    }
+
+    .tech-card {
+      background: #111;
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      }
+
+      .image-wrapper {
+        height: 180px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 30px;
+        background: #1a1a1a;
+        position: relative;
+        
+        .tech-image {
+          width: auto;
+          height: 100%;
+          object-fit: contain;
+        }
+
+        .placeholder-image {
+          width: 80px;
+          height: 80px;
+          background: linear-gradient(135deg, #2563eb, #4f46e5);
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 32px;
+          font-weight: bold;
+          color: white;
+        }
+      }
+
+      .content {
+        padding: 24px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+
+        .tech-title {
+          font-size: 20px;
+          font-weight: 600;
+          margin-bottom: 8px;
+          color: #fff;
+        }
+
+        .tech-tag {
+          font-size: 14px;
+          color: rgba(255, 255, 255, 0.5);
+          margin-bottom: 16px;
+        }
+
+        .tech-description {
+          color: rgba(255, 255, 255, 0.7);
+          font-size: 15px;
+          line-height: 1.5;
+          flex-grow: 1;
           
-          .image-wrapper img {
-            transform: scale(1.05);
-          }
-        }
-  
-        .image-wrapper {
-          position: relative;
-          width: 100%;
-          height: 200px;
-          overflow: hidden;
-  
-          img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s ease;
-          }
-        }
-  
-        .content {
-          padding: 20px;
-  
-          .tech-title {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 10px;
-          }
-  
-          .tech-description {
-            color: #888;
-            font-size: 16px;
-            line-height: 1.5;
+          p {
+            margin: 0;
           }
         }
       }
     }
   }
+}
