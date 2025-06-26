@@ -30,7 +30,7 @@ const GET_BOOKS = `
 
 async function getBooksData() {
   try {
-    const data = await client.request(GET_BOOKS);
+    const data = await client.request(GET_BOOKS) as any;
     return data.books.nodes;
   } catch (error) {
     console.error('Error fetching books:', error);

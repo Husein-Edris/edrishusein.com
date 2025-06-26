@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       { 
         error: 'Failed to fetch project data',
-        message: error.message,
+        message: error instanceof Error ? error.message : 'Unknown error',
         slug: slug
       }, 
       { status: 500 }

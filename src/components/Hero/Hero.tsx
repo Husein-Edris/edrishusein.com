@@ -3,28 +3,8 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
+import { HeroSection } from '@/src/types/wordpress';
 import './Hero.scss';
-
-interface MediaDetails {
-  height: number;
-  width: number;
-}
-
-interface HeroImageNode {
-  sourceUrl: string;
-  altText: string;
-  mediaDetails: MediaDetails;
-}
-
-interface HeroImage {
-  node: HeroImageNode;
-}
-
-interface HeroSection {
-  title: string;
-  heroCopy: string;
-  heroImage: HeroImage;
-}
 
 interface HeroProps {
   data?: HeroSection;
@@ -34,12 +14,12 @@ const Hero = ({ data }: HeroProps) => {
   const [imageError, setImageError] = useState(false);
 
   // Fallback data
-  const fallbackData = {
+  const fallbackData: HeroSection = {
     title: "<span class=\"subTitle\">I'm</span>EDRIS<span class=\"wave\">👋🏻</span>",
     heroCopy: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
     heroImage: {
       node: {
-        sourceUrl: "/images/default-profile.jpg",
+        sourceUrl: "/images/Edris-Husein-Hero.png",
         altText: "Profile Image",
         mediaDetails: {
           width: 450,
@@ -57,9 +37,9 @@ const Hero = ({ data }: HeroProps) => {
   // Process title HTML
   const processedTitle = content.title?.replace(/className=/g, 'class=');
 
-  // Image properties
+  // Image properties - updated for ACF GraphQL structure
   const imageProps = {
-    src: content.heroImage?.node?.sourceUrl || '/images/default-profile.jpg',
+    src: content.heroImage?.node?.sourceUrl || '/images/Edris-Husein-Hero.png',
     alt: content.heroImage?.node?.altText || 'Profile Image',
     width: content.heroImage?.node?.mediaDetails?.width || 450,
     height: content.heroImage?.node?.mediaDetails?.height || 450,
