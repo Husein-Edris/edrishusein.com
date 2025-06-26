@@ -1,5 +1,9 @@
 @use './variables' as *;
 
+// ============================================================================
+// RESPONSIVE MIXINS
+// ============================================================================
+
 @mixin mobile {
   @media (max-width: $mobile) {
     @content;
@@ -18,10 +22,198 @@
   }
 }
 
+@mixin wide {
+  @media (min-width: $wide) {
+    @content;
+  }
+}
+
+// ============================================================================
+// UTILITY MIXINS
+// ============================================================================
+
 @mixin flex-center {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin container {
+  max-width: $desktop;
+  margin: 0 auto;
+  padding-left: $container-padding;
+  padding-right: $container-padding;
+  
+  @include mobile {
+    padding-left: $container-padding-mobile;
+    padding-right: $container-padding-mobile;
+  }
+}
+
+@mixin section-spacing {
+  padding: $section-padding-y $container-padding;
+  
+  @include mobile {
+    padding: $section-padding-y-mobile $container-padding-mobile;
+  }
+}
+
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// ============================================================================
+// BUTTON SYSTEM
+// ============================================================================
+
+@mixin button-base {
+  font-family: $font-family-syncopate;
+  font-weight: $font-weight-normal;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: none;
+  cursor: pointer;
+  transition: all $transition-base;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+@mixin button-size($size: 'md') {
+  @if $size == 'sm' {
+    font-size: $font-size-sm;
+    padding: $spacing-sm $spacing-md;
+    border-radius: $border-radius-sm;
+    min-height: 36px;
+  } @else if $size == 'md' {
+    font-size: $font-size-base;
+    padding: $spacing-md $spacing-lg;
+    border-radius: $border-radius-md;
+    min-height: 44px;
+  } @else if $size == 'lg' {
+    font-size: $font-size-lg;
+    padding: $spacing-lg $spacing-xl;
+    border-radius: $border-radius-lg;
+    min-height: 52px;
+  }
+}
+
+@mixin button-primary {
+  @include button-base;
+  background-color: $color-beige;
+  color: $primary-dark;
+  border: 2px solid $color-beige;
+  
+  &:hover:not(:disabled) {
+    background-color: transparent;
+    color: $color-beige;
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+@mixin button-secondary {
+  @include button-base;
+  background-color: transparent;
+  color: $white;
+  border: 2px solid $white;
+  
+  &:hover:not(:disabled) {
+    background-color: $white;
+    color: $primary-dark;
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+@mixin button-outline {
+  @include button-base;
+  background-color: transparent;
+  color: $primary-dark;
+  border: 2px solid $primary-dark;
+  
+  &:hover:not(:disabled) {
+    background-color: $primary-dark;
+    color: $white;
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+@mixin button-ghost {
+  @include button-base;
+  background-color: transparent;
+  color: inherit;
+  border: 2px solid transparent;
+  
+  &:hover:not(:disabled) {
+    background-color: $bg-gray-light;
+    transform: translateY(-1px);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// ============================================================================
+// CARD MIXINS
+// ============================================================================
+
+@mixin card-base {
+  background: $white;
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+  transition: all $transition-base;
+  box-shadow: $shadow-sm;
+  
+  &:hover {
+    box-shadow: $shadow-lg;
+    transform: translateY(-4px);
+  }
+}
+
+@mixin card-dark {
+  background: $bg-gray-dark;
+  color: $white;
+  
+  &:hover {
+    background: rgba($white, 0.1);
+  }
 }
 
 @mixin section-header {

@@ -2,18 +2,18 @@
 @use '../../styles/mixins' as *;
 
 .about {
-  background-color: white;
+  background-color: $bg-light;
   padding: $container-padding;
   overflow-x: hidden;
   display: flex;
   justify-content: center;
 
   @include mobile {
-    padding: calc($spacing-unit * 8) calc($spacing-unit * 2);
+    padding: $spacing-3xl $container-padding-mobile;
   }
 
   .section-title {
-    color: #151515;
+    color: $primary-dark;
   }
 
   .container {
@@ -21,21 +21,21 @@
 
     .description {
       color: $secondary-color;
-      font-weight: 500;
-      font-size: 33px;
+      font-weight: $font-weight-medium;
+      font-size: $font-size-3xl;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: $spacing-sm;
       line-height: 1.4;
 
       @include mobile {
-        font-size: calc($font-size-base * 1.25);
+        font-size: $font-size-lg;
       }
 
       h3 {
-        font-size: 30px;
+        font-size: $font-size-2xl;
         color: $primary-color;
-        margin-top: calc($spacing-unit * 6);
+        margin-top: $spacing-2xl;
       }
 
       a {
@@ -48,13 +48,13 @@
       }
 
       ul {
-        margin-top: calc($spacing-unit * 2);
+        margin-top: $spacing-md;
         padding: 0;
-        margin: 0 0 40px 0;
+        margin: 0 0 $spacing-xl 0;
 
         li {
           margin-left: 5%;
-          margin-bottom: calc($spacing-unit * 1);
+          margin-bottom: $spacing-sm;
 
           &::marker {
             color: $primary-color;
@@ -67,7 +67,7 @@
       }
 
       p {
-        margin-bottom: calc($spacing-unit * 2);
+        margin-bottom: $spacing-md;
       }
     }
   }

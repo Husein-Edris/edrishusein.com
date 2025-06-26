@@ -13,7 +13,7 @@
   }
 
   .projects-header {
-    margin-bottom: calc($spacing-unit * 8);
+    margin-bottom: $spacing-3xl;
     position: relative;
 
     &::after {
@@ -31,7 +31,7 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: calc($spacing-unit * 3);
-    margin-bottom: calc($spacing-unit * 8);
+    margin-bottom: $spacing-3xl;
 
     @include mobile {
       grid-template-columns: 1fr;
@@ -50,7 +50,7 @@
   }
 
   .project-card {
-    border-radius: 12px;
+    border-radius: $border-radius-lg;
     overflow: hidden;
     background-color: rgba($text-light-gray, 0.1);
     position: relative;
@@ -66,11 +66,11 @@
         filter: grayscale(0%);
         transform: scale(1.1);
         z-index: 2;
-        background-color: #1a1a1a;
+        background-color: $bg-dark;
         width: 115%;
 
         .project-content {
-          background-color: #1a1a1a;
+          background-color: $bg-dark;
         }
 
         .project-title {

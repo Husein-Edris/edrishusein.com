@@ -3,12 +3,12 @@
 
 .footer {
     background-color: $primary-color;
-    padding: calc($spacing-unit * 4) $container-padding;
+    padding: $spacing-xl $container-padding;
     display: flex;
     justify-content: center;
 
     @include mobile {
-        padding: calc($spacing-unit * 8) calc($spacing-unit * 2);
+        padding: $spacing-3xl $container-padding-mobile;
     }
 
     .container {
@@ -23,21 +23,21 @@
 
         @include mobile {
             flex-direction: row;
-            gap: calc($spacing-unit * 4);
+            gap: $spacing-xl;
         }
     }
 
     .footer-left {
         display: flex;
         flex-direction: column;
-        gap: calc($spacing-unit * 2);
+        gap: $spacing-md;
 
         .logo {
             display: block;
 
             &:hover {
                 opacity: 0.8;
-                transition: opacity 0.3s ease;
+                transition: opacity $transition-base;
             }
             img {
                 @include tablet {
@@ -49,23 +49,23 @@
         .copyright {
             color: $text-light-gray;
             font-family: $font-family-base;
-            font-size: calc($font-size-base * 0.875);
+            font-size: $font-size-sm;
         }
     }
 
     .footer-nav {
         display: flex;
-        gap: calc($spacing-unit * 8);
+        gap: $spacing-3xl;
 
         @include mobile {
             flex-direction: column;
-            gap: calc($spacing-unit * 4);
+            gap: $spacing-xl;
         }
 
         .nav-list {
             display: flex;
             flex-direction: column;
-            gap: calc($spacing-unit * 2);
+            gap: $spacing-md;
             list-style: none;
             margin: 0;
             padding: 0;
@@ -75,7 +75,7 @@
                 text-decoration: none;
                 font-family: $font-family-base;
                 font-size: $font-size-base;
-                transition: color 0.3s ease;
+                transition: color $transition-base;
 
                 &:hover {
                     color: $text-light-gray;
@@ -84,7 +84,7 @@
         }
 
         .main-links {
-            margin-right: calc($spacing-unit * 4);
+            margin-right: $spacing-xl;
         }
     }
 }
