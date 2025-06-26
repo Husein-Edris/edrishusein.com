@@ -170,19 +170,6 @@ export default function ProjectPage() {
             </div>
           )}
 
-          {/* Debug: Show all available data */}
-          {process.env.NODE_ENV === 'development' && (
-            <section className="debug-info" style={{ background: '#f0f0f0', padding: '20px', margin: '20px 0', borderRadius: '8px' }}>
-              <h3>Debug: Available Data</h3>
-              <pre style={{ fontSize: '12px', overflow: 'auto' }}>
-                {JSON.stringify({
-                  caseStudy: project.caseStudy,
-                  content: project.content,
-                  excerpt: project.excerpt
-                }, null, 2)}
-              </pre>
-            </section>
-          )}
 
           {/* Technologies */}
           <section className="tech-stack">
@@ -210,8 +197,10 @@ export default function ProjectPage() {
                 </div>
               ))}
             </div>
-            {project.caseStudy?.projectOverview?.technologies?.length === 0 && (
-              <p className="tech-note">Default technologies shown for demonstration. Configure in WordPress admin.</p>
+            {(!project.caseStudy?.projectOverview?.technologies || project.caseStudy.projectOverview.technologies.length === 0) && (
+              <p className="tech-note" style={{ fontSize: '14px', opacity: 0.7, marginTop: '16px' }}>
+                Sample technologies shown. Configure in WordPress admin to customize.
+              </p>
             )}
           </section>
 
