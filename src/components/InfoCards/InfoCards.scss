@@ -382,6 +382,26 @@
       margin-bottom: 0;
       border-radius: 8px;
     }
+
+    // View more button styling for light blog section
+    .view-more-link {
+      @include button-outline;
+      @include button-size('md');
+      display: inline-flex;
+      align-items: center;
+      gap: $spacing-sm;
+      font-size: $font-size-base;
+      
+      &::after {
+        content: '→';
+        font-size: $font-size-lg;
+        transition: transform $transition-base;
+      }
+      
+      &:hover::after {
+        transform: translateX(4px);
+      }
+    }
   }
 
   // Common card styles
