@@ -39,6 +39,18 @@ export class SectionTransformers {
     }));
   }
 
+  static transformPosts(posts: unknown[]): InfoCardData[] {
+    if (!Array.isArray(posts)) return [];
+    
+    return posts.map((post: any) => ({
+      title: post.title || 'Untitled Post',
+      description: post.excerpt || 'No description available',
+      image: post.featuredImage?.node?.sourceUrl || '/images/Blog-sample-img.png',
+      link: post.slug ? `/notebook/${post.slug}` : '#',
+      variant: 'light' as const
+    }));
+  }
+
   static createStaticInfoCards(): InfoCardData[] {
     return [
       {
@@ -90,10 +102,14 @@ export class SectionTransformers {
 export class SectionFactory {
   static createHomepageSections(
     homepageData: HomepageSections | null,
-    projectsData: unknown
+    projectsData: unknown,
+    postsData: unknown
   ): SectionConfig[] {
     const projectNodes = (projectsData as any)?.projects?.nodes || [];
     const transformedProjects = SectionTransformers.transformProjects(projectNodes);
+    
+    const postNodes = (postsData as any)?.posts?.nodes || [];
+    const transformedPosts = SectionTransformers.transformPosts(postNodes);
 
     return [
       createSectionConfig('hero', 'hero', {
@@ -125,7 +141,8 @@ export class SectionFactory {
         variant: 'light',
         sectionNumber: '03',
         sectionTitle: homepageData?.notebookSection?.title || 'NOTEBOOK',
-        columns: 3
+        columns: 3,
+        cards: transformedPosts
       }, 5),
 
       createSectionConfig('contact', 'contact', {

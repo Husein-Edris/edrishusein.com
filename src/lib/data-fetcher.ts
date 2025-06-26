@@ -1,6 +1,6 @@
 // Enhanced data fetching with error handling and fallbacks
 import { client } from './client';
-import { GET_HOMEPAGE_DATA, GET_PROJECTS_FOR_GRID } from './queries';
+import { GET_HOMEPAGE_DATA, GET_PROJECTS_FOR_GRID, GET_POSTS_FOR_NOTEBOOK } from './queries';
 import { discoverWordPressSchema, WORKING_QUERIES } from './schema-discovery';
 import { HomepageResponse, ProjectsResponse, HomepageSections } from '@/src/types/wordpress';
 
@@ -81,6 +81,55 @@ const FALLBACK_PROJECTS_DATA = {
   }
 };
 
+const FALLBACK_POSTS_DATA = {
+  posts: {
+    nodes: [
+      {
+        id: "1",
+        title: "Getting Started with Next.js",
+        excerpt: "A comprehensive guide to building modern web applications with Next.js and React.",
+        slug: "getting-started-nextjs",
+        date: "2024-01-15",
+        featuredImage: {
+          node: {
+            sourceUrl: "/images/Blog-sample-img.png",
+            altText: "Next.js Blog Post",
+            mediaDetails: { height: 400, width: 600 }
+          }
+        }
+      },
+      {
+        id: "2",
+        title: "WordPress Headless CMS",
+        excerpt: "Building scalable applications with WordPress as a headless content management system.",
+        slug: "wordpress-headless-cms",
+        date: "2024-01-10",
+        featuredImage: {
+          node: {
+            sourceUrl: "/images/Blog-sample-img.png",
+            altText: "WordPress CMS Blog Post",
+            mediaDetails: { height: 400, width: 600 }
+          }
+        }
+      },
+      {
+        id: "3",
+        title: "Design Systems in Practice",
+        excerpt: "How to implement and maintain consistent design systems across large applications.",
+        slug: "design-systems-practice",
+        date: "2024-01-05",
+        featuredImage: {
+          node: {
+            sourceUrl: "/images/Blog-sample-img.png",
+            altText: "Design Systems Blog Post",
+            mediaDetails: { height: 400, width: 600 }
+          }
+        }
+      }
+    ]
+  }
+};
+
 export interface FetchResult<T> {
   data: T | null;
   error: string | null;
@@ -150,14 +199,30 @@ export class DataFetcher {
     );
   }
 
+  static async getPostsData(): Promise<FetchResult<any>> {
+    return this.fetchWithFallback(
+      async () => {
+        console.log('🔍 Attempting to fetch posts data from:', process.env.NEXT_PUBLIC_WORDPRESS_API_URL);
+        // Try the posts query for notebook section
+        const response = await client.request(GET_POSTS_FOR_NOTEBOOK);
+        console.log('✅ WordPress posts data loaded successfully:', response);
+        return response;
+      },
+      FALLBACK_POSTS_DATA,
+      'Error fetching posts data'
+    );
+  }
+
   // Batch fetch for homepage
   static async getHomepageBundle(): Promise<{
     homepage: FetchResult<HomepageSections>;
     projects: FetchResult<ProjectsResponse>;
+    posts: FetchResult<any>;
   }> {
-    const [homepage, projects] = await Promise.allSettled([
+    const [homepage, projects, posts] = await Promise.allSettled([
       this.getHomepageData(),
-      this.getProjectsData()
+      this.getProjectsData(),
+      this.getPostsData()
     ]);
 
     return {
@@ -166,7 +231,10 @@ export class DataFetcher {
         : { data: FALLBACK_HOMEPAGE_DATA, error: 'Failed to fetch', source: 'fallback' },
       projects: projects.status === 'fulfilled' 
         ? projects.value 
-        : { data: FALLBACK_PROJECTS_DATA, error: 'Failed to fetch', source: 'fallback' }
+        : { data: FALLBACK_PROJECTS_DATA, error: 'Failed to fetch', source: 'fallback' },
+      posts: posts.status === 'fulfilled' 
+        ? posts.value 
+        : { data: FALLBACK_POSTS_DATA, error: 'Failed to fetch', source: 'fallback' }
     };
   }
 }

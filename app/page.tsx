@@ -9,15 +9,16 @@ export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
   // Fetch all data with enhanced error handling
-  const { homepage, projects } = await DataFetcher.getHomepageBundle();
+  const { homepage, projects, posts } = await DataFetcher.getHomepageBundle();
 
   // Log data sources in development
-  logDataSources({ homepage, projects });
+  logDataSources({ homepage, projects, posts });
 
   // Create dynamic sections configuration
   const sections = SectionFactory.createHomepageSections(
     homepage.data,
-    projects.data
+    projects.data,
+    posts.data
   );
 
   return (
