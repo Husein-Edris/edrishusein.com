@@ -2,6 +2,8 @@
 export const GET_HOMEPAGE_DATA = `
   query GetHomepage {
     page(id: "home", idType: URI) {
+      id
+      title
       homepageSections {
         heroSection {
           title
@@ -17,6 +19,9 @@ export const GET_HOMEPAGE_DATA = `
             }
           }
         }
+        projectsSection {
+          title
+        }
         aboutSection {
           title
           aboutMeText
@@ -25,35 +30,32 @@ export const GET_HOMEPAGE_DATA = `
           title
           description
           featuredImage {
-            sourceUrl
-            altText
-          }
-          button {
-            url
-            title
-            target
+            node {
+              sourceUrl
+              altText
+              mediaDetails {
+                height
+                width
+              }
+            }
           }
         }
         techstackSection {
           title
           description
           featuredImage {
-            sourceUrl
-            altText
-          }
-          button {
-            url
-            title
-            target
+            node {
+              sourceUrl
+              altText
+              mediaDetails {
+                height
+                width
+              }
+            }
           }
         }
         notebookSection {
           title
-          button {
-            url
-            title
-            target
-          }
         }
         contactSection {
           subTitle
