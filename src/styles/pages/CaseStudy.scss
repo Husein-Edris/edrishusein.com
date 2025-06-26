@@ -9,31 +9,31 @@
 
   .hero-section {
     background-color: rgba($text-light-gray, 0.1);
-    padding: $spacing-3xl 0 $spacing-2xl;
+    padding: $spacing-xl;
     text-align: center;
-    
+
     @include mobile {
-      padding: $spacing-2xl 0 $spacing-xl;
+      padding: $spacing-lg;
     }
-    
+
     .title {
       font-family: $font-family-syncopate;
       font-size: $font-size-4xl;
       margin-bottom: $spacing-md;
-      
+
       @include mobile {
         font-size: $font-size-3xl;
         margin-bottom: $spacing-sm;
       }
     }
-    
+
     .overview {
       max-width: 700px;
       margin: 0 auto $spacing-lg;
       color: $text-light-gray;
       font-size: $font-size-lg;
       line-height: 1.5;
-      
+
       @include mobile {
         font-size: $font-size-base;
         padding: 0 $spacing-md;
@@ -46,13 +46,13 @@
       justify-content: center;
       gap: $spacing-md;
       margin-top: $spacing-md;
-      
+
       @include mobile {
         flex-direction: column;
         gap: $spacing-sm;
         padding: 0 $spacing-md;
       }
-      
+
       .link-button {
         font-family: $font-family-syncopate;
         font-size: calc($font-size-base * 0.9);
@@ -62,29 +62,29 @@
         transition: all 0.3s ease;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        
+
         &.primary {
           background-color: $color-beige;
           color: $primary-color;
           border: 2px solid $color-beige;
-          
+
           &:hover {
             background-color: transparent;
             color: $color-beige;
           }
         }
-        
+
         &.secondary {
           background-color: transparent;
           color: $white;
           border: 2px solid $white;
-          
+
           &:hover {
             background-color: $white;
             color: $primary-color;
           }
         }
-        
+
         @include mobile {
           width: 100%;
           text-align: center;
@@ -96,8 +96,8 @@
   .container {
     max-width: $desktop;
     margin: 0 auto;
-    padding: calc($container-padding * 2) ;
-    
+    padding: $spacing-xl;
+
     @include mobile {
       padding: calc($spacing-unit * 4) calc($spacing-unit * 2);
     }
@@ -105,18 +105,18 @@
 
   section {
     margin-bottom: calc($spacing-unit * 8);
-    
+
     @include mobile {
       margin-bottom: calc($spacing-unit * 6);
     }
-    
+
     h2 {
       font-family: $font-family-syncopate;
       font-size: calc($font-size-base * 2);
       margin-bottom: calc($spacing-unit * 4);
       position: relative;
       display: inline-block;
-      
+
       &::after {
         content: '';
         position: absolute;
@@ -126,7 +126,7 @@
         height: 4px;
         background-color: $color-beige;
       }
-      
+
       @include mobile {
         font-size: calc($font-size-base * 1.5);
         margin-bottom: calc($spacing-unit * 3);
@@ -140,7 +140,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: calc($spacing-unit * 2);
-      
+
       .tech-item {
         display: flex;
         align-items: center;
@@ -149,18 +149,18 @@
         background: rgba($text-light-gray, 0.1);
         border-radius: 8px;
         transition: transform 0.3s ease, background-color 0.3s ease;
-        
+
         &:hover {
           transform: translateY(-4px);
           background-color: rgba($text-light-gray, 0.2);
         }
-        
+
         img {
           width: 40px;
           height: 40px;
           object-fit: contain;
         }
-        
+
         span {
           font-family: $font-family-base;
           color: $white;
@@ -174,7 +174,7 @@
   .featured-image {
     margin-bottom: calc($spacing-unit * 8);
     text-align: center;
-    
+
     .project-featured-image {
       width: 100%;
       height: auto;
@@ -184,26 +184,27 @@
   }
 
   // Challenge and Solution sections
-  .challenge, .solution {
+  .challenge,
+  .solution {
     background: rgba($text-light-gray, 0.1);
     padding: calc($spacing-unit * 4);
     border-radius: 12px;
     margin-bottom: calc($spacing-unit * 6);
-    
+
     @include mobile {
       padding: calc($spacing-unit * 3);
       margin-bottom: calc($spacing-unit * 4);
     }
-    
+
     h2 {
       margin-bottom: calc($spacing-unit * 3);
-      
+
       &::after {
         width: 60px;
         bottom: -8px;
       }
     }
-    
+
     .content {
       p {
         color: $text-light-gray;
@@ -211,18 +212,19 @@
         margin-bottom: calc($spacing-unit * 1.5);
         font-size: calc($font-size-base * 1.1);
       }
-      
-      ul, ol {
+
+      ul,
+      ol {
         color: $text-light-gray;
         margin-left: calc($spacing-unit * 3);
         margin-bottom: calc($spacing-unit * 2);
-        
+
         li {
           margin-bottom: calc($spacing-unit);
           line-height: 1.6;
         }
       }
-      
+
       strong {
         color: $white;
       }
@@ -235,29 +237,29 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
       gap: calc($spacing-unit * 4);
-      
+
       @include mobile {
         grid-template-columns: 1fr;
         gap: calc($spacing-unit * 3);
       }
-      
+
       .feature-item {
         background: rgba($text-light-gray, 0.1);
         border-radius: 12px;
         overflow: hidden;
         transition: transform 0.3s ease;
-        
+
         &:hover {
           transform: translateY(-8px);
-          
+
           .feature-img {
             transform: scale(1.05);
           }
         }
-        
+
         .feature-image {
           overflow: hidden;
-          
+
           .feature-img {
             width: 100%;
             height: 200px;
@@ -265,17 +267,17 @@
             transition: transform 0.3s ease;
           }
         }
-        
+
         .feature-content {
           padding: calc($spacing-unit * 3);
-          
+
           h3 {
             font-family: $font-family-syncopate;
             font-size: calc($font-size-base * 1.2);
             color: $white;
             margin-bottom: calc($spacing-unit * 1.5);
           }
-          
+
           p {
             color: $text-light-gray;
             line-height: 1.6;
@@ -292,26 +294,26 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
       gap: calc($spacing-unit * 3);
-      
+
       @include mobile {
         grid-template-columns: 1fr;
         gap: calc($spacing-unit * 2);
       }
-      
+
       .gallery-item {
         overflow: hidden;
         border-radius: 12px;
         background: rgba($text-light-gray, 0.1);
         transition: transform 0.3s ease;
-        
+
         &:hover {
           transform: translateY(-4px);
-          
+
           .gallery-image {
             transform: scale(1.02);
           }
         }
-        
+
         .gallery-image {
           width: 100%;
           height: 300px;
@@ -329,27 +331,27 @@
     border-radius: 12px;
     margin-bottom: calc($spacing-unit * 6);
     text-align: center;
-    
+
     @include mobile {
       padding: calc($spacing-unit * 3);
       margin-bottom: calc($spacing-unit * 4);
     }
-    
+
     h2 {
       margin-bottom: calc($spacing-unit * 3);
       color: $white;
     }
-    
+
     .action-links {
       display: flex;
       justify-content: center;
       gap: calc($spacing-unit * 2);
-      
+
       @include mobile {
         flex-direction: column;
         gap: $spacing-unit;
       }
-      
+
       .action-link {
         font-family: $font-family-syncopate;
         font-size: calc($font-size-base * 1.1);
@@ -360,31 +362,31 @@
         text-transform: uppercase;
         letter-spacing: 0.5px;
         min-width: 180px;
-        
+
         &.primary {
           background-color: $color-beige;
           color: $primary-color;
           border: 2px solid $color-beige;
-          
+
           &:hover {
             background-color: transparent;
             color: $color-beige;
             transform: translateY(-2px);
           }
         }
-        
+
         &.secondary {
           background-color: transparent;
           color: $white;
           border: 2px solid $white;
-          
+
           &:hover {
             background-color: $white;
             color: $primary-color;
             transform: translateY(-2px);
           }
         }
-        
+
         @include mobile {
           width: 100%;
           text-align: center;
@@ -398,21 +400,21 @@
     background: rgba($text-light-gray, 0.05);
     padding: calc($spacing-unit * 8) 0;
     margin-top: calc($spacing-unit * 8);
-    
+
     @include mobile {
       padding: calc($spacing-unit * 6) 0;
       margin-top: calc($spacing-unit * 6);
     }
-    
+
     h2 {
       text-align: center;
       margin-bottom: calc($spacing-unit * 6);
-      
+
       @include mobile {
         margin-bottom: calc($spacing-unit * 4);
       }
     }
-    
+
     .more-projects-loading,
     .more-projects-error {
       text-align: center;
@@ -427,12 +429,12 @@
     justify-content: center;
     gap: calc($spacing-unit * 2);
     margin-top: calc($spacing-unit * 8);
-    
+
     @include mobile {
       flex-direction: column;
       gap: $spacing-unit;
     }
-    
+
     .link-button {
       font-family: $font-family-syncopate;
       font-size: calc($font-size-base * 1.1);
@@ -442,12 +444,12 @@
       border: 2px solid $white;
       border-radius: 4px;
       transition: all 0.3s ease;
-      
+
       &:hover {
         background: $white;
         color: $primary-color;
       }
-      
+
       @include mobile {
         width: 100%;
         text-align: center;

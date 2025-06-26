@@ -121,28 +121,15 @@ function InfoCards({
                       className="card-description"
                       dangerouslySetInnerHTML={{ __html: card.description }}
                     />
-                    {skin === 'projects' && (
+                    {skin === 'projects' && card.caseStudyLink && (
                       <div className="project-links" onClick={(e) => e.stopPropagation()}>
-                        {card.visitLink && card.visitLink !== '#' && (
-                          <a 
-                            href={card.visitLink} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="project-link visit-link"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            VISIT SITE
-                          </a>
-                        )}
-                        {card.caseStudyLink && (
-                          <Link 
-                            href={card.caseStudyLink} 
-                            className="project-link case-study-link"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            CASE STUDY
-                          </Link>
-                        )}
+                        <Link 
+                          href={card.caseStudyLink} 
+                          className="project-link case-study-link"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          CASE STUDY
+                        </Link>
                       </div>
                     )}
                   </div>

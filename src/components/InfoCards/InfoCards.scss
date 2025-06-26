@@ -284,8 +284,7 @@
 
     .project-links {
       display: flex;
-      flex-direction: row;
-      gap: calc($spacing-unit * 0.5);
+      justify-content: center;
       opacity: 0.7;
       width: 100%;
       transform: translateY(10px);
@@ -293,37 +292,19 @@
       margin-top: calc($spacing-unit * 1.25);
       position: relative;
       z-index: 10;
-
-      @include mobile {
-        flex-direction: row;
-        gap: calc($spacing-unit * 0.4);
-        width: 100%;
-      }
-
-      // When only one button is present
-      &:has(.project-link:only-child) {
-        justify-content: flex-start;
-        
-        .project-link {
-          flex: 0 0 auto;
-          min-width: 100px;
-          max-width: 140px;
-        }
-      }
     }
 
     .project-link {
       @include button-secondary;
       @include button-size('sm');
-      flex: 1;
-      max-width: 120px;
       font-size: $font-size-xs;
       letter-spacing: 0.03em;
+      min-width: 100px;
 
       @include mobile {
         font-size: $font-size-xs;
         padding: $spacing-xs $spacing-sm;
-        max-width: 110px;
+        min-width: 90px;
       }
     }
 
