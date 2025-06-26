@@ -29,7 +29,7 @@
     
     .overview {
       max-width: 800px;
-      margin: 0 auto;
+      margin: 0 auto calc($spacing-unit * 4);
       color: $text-light-gray;
       font-size: calc($font-size-base * 1.2);
       line-height: 1.6;
@@ -37,6 +37,58 @@
       @include mobile {
         font-size: $font-size-base;
         padding: 0 calc($spacing-unit * 2);
+        margin-bottom: calc($spacing-unit * 3);
+      }
+    }
+
+    .project-links {
+      display: flex;
+      justify-content: center;
+      gap: calc($spacing-unit * 2);
+      margin-top: calc($spacing-unit * 2);
+      
+      @include mobile {
+        flex-direction: column;
+        gap: $spacing-unit;
+        padding: 0 calc($spacing-unit * 2);
+      }
+      
+      .link-button {
+        font-family: $font-family-syncopate;
+        font-size: calc($font-size-base * 0.9);
+        text-decoration: none;
+        padding: calc($spacing-unit * 1.25) calc($spacing-unit * 2.5);
+        border-radius: 4px;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        
+        &.primary {
+          background-color: $color-beige;
+          color: $primary-color;
+          border: 2px solid $color-beige;
+          
+          &:hover {
+            background-color: transparent;
+            color: $color-beige;
+          }
+        }
+        
+        &.secondary {
+          background-color: transparent;
+          color: $white;
+          border: 2px solid $white;
+          
+          &:hover {
+            background-color: $white;
+            color: $primary-color;
+          }
+        }
+        
+        @include mobile {
+          width: 100%;
+          text-align: center;
+        }
       }
     }
   }
@@ -118,31 +170,46 @@
     }
   }
 
-  // Enhanced Content section
-  .content {
-    .challenge, .solution {
-      background: rgba($text-light-gray, 0.1);
-      padding: calc($spacing-unit * 4);
+  // Featured Image section
+  .featured-image {
+    margin-bottom: calc($spacing-unit * 8);
+    text-align: center;
+    
+    .project-featured-image {
+      width: 100%;
+      height: auto;
       border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  // Challenge and Solution sections
+  .challenge, .solution {
+    background: rgba($text-light-gray, 0.1);
+    padding: calc($spacing-unit * 4);
+    border-radius: 12px;
+    margin-bottom: calc($spacing-unit * 6);
+    
+    @include mobile {
+      padding: calc($spacing-unit * 3);
       margin-bottom: calc($spacing-unit * 4);
+    }
+    
+    h2 {
+      margin-bottom: calc($spacing-unit * 3);
       
-      @include mobile {
-        padding: calc($spacing-unit * 2);
+      &::after {
+        width: 60px;
+        bottom: -8px;
       }
-      
-      h2 {
-        margin-bottom: calc($spacing-unit * 2);
-        
-        &::after {
-          width: 60px;
-          bottom: -8px;
-        }
-      }
-      
+    }
+    
+    .content {
       p {
         color: $text-light-gray;
         line-height: 1.8;
-        margin-bottom: $spacing-unit;
+        margin-bottom: calc($spacing-unit * 1.5);
+        font-size: calc($font-size-base * 1.1);
       }
       
       ul, ol {
@@ -152,19 +219,29 @@
         
         li {
           margin-bottom: calc($spacing-unit);
+          line-height: 1.6;
         }
+      }
+      
+      strong {
+        color: $white;
       }
     }
   }
 
-  // Enhanced Features section
-  .features {
+  // Key Features section
+  .key-features {
     .features-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: calc($spacing-unit * 3);
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: calc($spacing-unit * 4);
       
-      .feature-card {
+      @include mobile {
+        grid-template-columns: 1fr;
+        gap: calc($spacing-unit * 3);
+      }
+      
+      .feature-item {
         background: rgba($text-light-gray, 0.1);
         border-radius: 12px;
         overflow: hidden;
@@ -173,56 +250,174 @@
         &:hover {
           transform: translateY(-8px);
           
-          img {
+          .feature-img {
             transform: scale(1.05);
           }
         }
         
-        img {
-          width: 100%;
-          height: 200px;
-          object-fit: cover;
-          transition: transform 0.3s ease;
+        .feature-image {
+          overflow: hidden;
+          
+          .feature-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+          }
         }
         
-        h3 {
-          font-family: $font-family-syncopate;
-          font-size: calc($font-size-base * 1.2);
-          padding: calc($spacing-unit * 2);
-          color: $white;
-        }
-        
-        p {
-          padding: 0 calc($spacing-unit * 2) calc($spacing-unit * 2);
-          color: $text-light-gray;
-          line-height: 1.6;
+        .feature-content {
+          padding: calc($spacing-unit * 3);
+          
+          h3 {
+            font-family: $font-family-syncopate;
+            font-size: calc($font-size-base * 1.2);
+            color: $white;
+            margin-bottom: calc($spacing-unit * 1.5);
+          }
+          
+          p {
+            color: $text-light-gray;
+            line-height: 1.6;
+            margin: 0;
+          }
         }
       }
     }
   }
 
-  // Enhanced Gallery section
-  .gallery {
+  // Project Gallery section
+  .project-gallery {
     .gallery-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-      gap: calc($spacing-unit * 2);
+      gap: calc($spacing-unit * 3);
       
       @include mobile {
         grid-template-columns: 1fr;
+        gap: calc($spacing-unit * 2);
       }
       
-      img {
-        width: 100%;
-        height: 300px;
-        object-fit: cover;
-        border-radius: 8px;
+      .gallery-item {
+        overflow: hidden;
+        border-radius: 12px;
+        background: rgba($text-light-gray, 0.1);
         transition: transform 0.3s ease;
         
         &:hover {
-          transform: scale(1.02);
+          transform: translateY(-4px);
+          
+          .gallery-image {
+            transform: scale(1.02);
+          }
+        }
+        
+        .gallery-image {
+          width: 100%;
+          height: 300px;
+          object-fit: cover;
+          transition: transform 0.3s ease;
         }
       }
+    }
+  }
+
+  // Project Action Links section
+  .project-action-links {
+    background: rgba($text-light-gray, 0.1);
+    padding: calc($spacing-unit * 4);
+    border-radius: 12px;
+    margin-bottom: calc($spacing-unit * 6);
+    text-align: center;
+    
+    @include mobile {
+      padding: calc($spacing-unit * 3);
+      margin-bottom: calc($spacing-unit * 4);
+    }
+    
+    h2 {
+      margin-bottom: calc($spacing-unit * 3);
+      color: $white;
+    }
+    
+    .action-links {
+      display: flex;
+      justify-content: center;
+      gap: calc($spacing-unit * 2);
+      
+      @include mobile {
+        flex-direction: column;
+        gap: $spacing-unit;
+      }
+      
+      .action-link {
+        font-family: $font-family-syncopate;
+        font-size: calc($font-size-base * 1.1);
+        text-decoration: none;
+        padding: calc($spacing-unit * 1.5) calc($spacing-unit * 3);
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        min-width: 180px;
+        
+        &.primary {
+          background-color: $color-beige;
+          color: $primary-color;
+          border: 2px solid $color-beige;
+          
+          &:hover {
+            background-color: transparent;
+            color: $color-beige;
+            transform: translateY(-2px);
+          }
+        }
+        
+        &.secondary {
+          background-color: transparent;
+          color: $white;
+          border: 2px solid $white;
+          
+          &:hover {
+            background-color: $white;
+            color: $primary-color;
+            transform: translateY(-2px);
+          }
+        }
+        
+        @include mobile {
+          width: 100%;
+          text-align: center;
+        }
+      }
+    }
+  }
+
+  // More Projects section 
+  .more-projects {
+    background: rgba($text-light-gray, 0.05);
+    padding: calc($spacing-unit * 8) 0;
+    margin-top: calc($spacing-unit * 8);
+    
+    @include mobile {
+      padding: calc($spacing-unit * 6) 0;
+      margin-top: calc($spacing-unit * 6);
+    }
+    
+    h2 {
+      text-align: center;
+      margin-bottom: calc($spacing-unit * 6);
+      
+      @include mobile {
+        margin-bottom: calc($spacing-unit * 4);
+      }
+    }
+    
+    .more-projects-loading,
+    .more-projects-error {
+      text-align: center;
+      color: $text-light-gray;
+      padding: calc($spacing-unit * 4);
     }
   }
 
