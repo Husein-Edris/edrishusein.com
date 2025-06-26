@@ -10,6 +10,16 @@ import Footer from '@/src/components/Footer/Footer';
 import MoreProjects from '@/src/components/MoreProjects/MoreProjects';
 import '@/src/styles/pages/CaseStudy.scss';
 
+// Default technologies for fallback
+const DEFAULT_TECHNOLOGIES = [
+  { id: '1', title: 'JavaScript', featuredImage: { node: { sourceUrl: '/icons/javascript.svg', altText: 'JavaScript' } } },
+  { id: '2', title: 'React', featuredImage: { node: { sourceUrl: '/icons/react.svg', altText: 'React' } } },
+  { id: '3', title: 'Next.js', featuredImage: { node: { sourceUrl: '/icons/nextjs.svg', altText: 'Next.js' } } },
+  { id: '4', title: 'WordPress', featuredImage: { node: { sourceUrl: '/icons/wordpress.svg', altText: 'WordPress' } } },
+  { id: '5', title: 'GraphQL', featuredImage: { node: { sourceUrl: '/icons/graphql.svg', altText: 'GraphQL' } } },
+  { id: '6', title: 'SCSS', featuredImage: { node: { sourceUrl: '/icons/sass.svg', altText: 'SCSS' } } }
+];
+
 export default function ProjectPage() {
   const params = useParams();
   const [project, setProject] = useState(null);
@@ -175,27 +185,35 @@ export default function ProjectPage() {
           )}
 
           {/* Technologies */}
-          {project.caseStudy?.projectOverview?.technologies && project.caseStudy.projectOverview.technologies.length > 0 && (
-            <section className="tech-stack">
-              <h2>Technologies Used</h2>
-              <div className="tech-grid">
-                {project.caseStudy.projectOverview.technologies.map((tech) => (
-                  <div key={tech.id} className="tech-item">
-                    {tech.featuredImage?.node && (
-                      <Image
-                        src={tech.featuredImage.node.sourceUrl}
-                        alt={tech.featuredImage.node.altText || tech.title}
-                        width={40}
-                        height={40}
-                        className="tech-icon"
-                      />
-                    )}
-                    <span>{tech.title}</span>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
+          <section className="tech-stack">
+            <h2>Technologies Used</h2>
+            <div className="tech-grid">
+              {(project.caseStudy?.projectOverview?.technologies?.length > 0 
+                ? project.caseStudy.projectOverview.technologies 
+                : DEFAULT_TECHNOLOGIES.slice(0, 4) // Show first 4 default technologies
+              ).map((tech) => (
+                <div key={tech.id} className="tech-item">
+                  {tech.featuredImage?.node && (
+                    <Image
+                      src={tech.featuredImage.node.sourceUrl}
+                      alt={tech.featuredImage.node.altText || tech.title}
+                      width={40}
+                      height={40}
+                      className="tech-icon"
+                      onError={(e) => {
+                        // Fallback to a default icon if the image fails to load
+                        e.currentTarget.src = '/icons/code.svg';
+                      }}
+                    />
+                  )}
+                  <span>{tech.title}</span>
+                </div>
+              ))}
+            </div>
+            {project.caseStudy?.projectOverview?.technologies?.length === 0 && (
+              <p className="tech-note">Default technologies shown for demonstration. Configure in WordPress admin.</p>
+            )}
+          </section>
 
           {/* Main Content (if available) */}
           {project.content && (

@@ -123,10 +123,46 @@ export const GET_ALL_PROJECTS = `
   }
 `;
 
+export const GET_POSTS_FOR_NOTEBOOK = `
+  query GetPostsForNotebook {
+    posts(first: 3, where: { orderby: { field: DATE, order: DESC } }) {
+      nodes {
+        id
+        title
+        excerpt
+        slug
+        date
+        featuredImage {
+          node {
+            sourceUrl
+            altText
+            mediaDetails {
+              height
+              width
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const GET_CASE_STUDY = `
   query GetCaseStudy($slug: ID!) {
     project(id: $slug, idType: SLUG) {
       title
+      excerpt
+      content
+      featuredImage {
+        node {
+          sourceUrl
+          altText
+          mediaDetails {
+            width
+            height
+          }
+        }
+      }
       seo {
         title
         metaDesc
@@ -168,6 +204,23 @@ export const GET_CASE_STUDY = `
         projectLinks {
           liveSite
           github
+        }
+      }
+    }
+  }
+`;
+
+export const GET_ALL_TECH = `
+  query GetAllTech {
+    techs(first: 50) {
+      nodes {
+        id
+        title
+        featuredImage {
+          node {
+            sourceUrl
+            altText
+          }
         }
       }
     }

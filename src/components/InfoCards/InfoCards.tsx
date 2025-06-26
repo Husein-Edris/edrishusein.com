@@ -77,9 +77,10 @@ function InfoCards({
         )}
         <div className={`cards-grid columns-${columns}`}>
           {displayCards?.map((card, index) => {
-            const CardWrapper = skin === 'projects' ? 'div' : Link;
+            // For project cards, make the entire card clickable to the case study page
+            const CardWrapper = skin === 'projects' ? Link : Link;
             const cardProps = skin === 'projects' 
-              ? { className: `card ${card.variant || variant}` }
+              ? { href: card.caseStudyLink || '#', className: `card ${card.variant || variant}` }
               : { href: card.link || '#', className: `card ${card.variant || variant}` };
 
             return (
@@ -121,13 +122,14 @@ function InfoCards({
                       dangerouslySetInnerHTML={{ __html: card.description }}
                     />
                     {skin === 'projects' && (
-                      <div className="project-links">
+                      <div className="project-links" onClick={(e) => e.stopPropagation()}>
                         {card.visitLink && card.visitLink !== '#' && (
                           <a 
                             href={card.visitLink} 
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="project-link visit-link"
+                            onClick={(e) => e.stopPropagation()}
                           >
                             VISIT SITE
                           </a>
@@ -136,6 +138,7 @@ function InfoCards({
                           <Link 
                             href={card.caseStudyLink} 
                             className="project-link case-study-link"
+                            onClick={(e) => e.stopPropagation()}
                           >
                             CASE STUDY
                           </Link>
