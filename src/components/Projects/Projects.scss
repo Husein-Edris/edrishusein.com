@@ -154,7 +154,7 @@
   }
 
   .view-more-link {
-    @include button-outline;
+    @include button-secondary;
     @include button-size('md');
     display: inline-flex;
     align-items: center;
