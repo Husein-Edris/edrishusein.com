@@ -50,6 +50,10 @@ export interface WordPressProject {
     projectGallery?: Array<{
       sourceUrl: string;
       altText: string;
+      mediaDetails: {
+        width: number;
+        height: number;
+      };
     }>;
   };
 }
