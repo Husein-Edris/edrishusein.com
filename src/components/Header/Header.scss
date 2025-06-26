@@ -3,10 +3,10 @@
 
 .header {
   background-color: $primary-color;
-  padding: calc($spacing-unit * 2) $container-padding;
+  padding: $spacing-md $container-padding;
 
   @include mobile {
-    padding: calc($spacing-unit * 2);
+    padding: $spacing-md;
   }
 
   .container {
@@ -34,8 +34,8 @@
   .menu-toggle {
     --bar-width: 30px;
     --bar-height: 2px;
-    --bar-gap: 8px;
-    --animation-timing: 200ms ease-in-out;
+    --bar-gap: #{$spacing-sm};
+    --animation-timing: #{$transition-fast};
     --menu-height: calc(var(--bar-height) * 3 + var(--bar-gap) * 2);
     --x-width: calc(var(--menu-height) * 1.41421356237);
 
@@ -143,7 +143,7 @@
 
       .navLink {
         font-family: $font-family-syncopate;
-        font-size: 24px;
+        font-size: $font-size-2xl;
         color: $white !important;
         text-decoration: none;
         transition: color 0.3s ease;
@@ -185,12 +185,12 @@
           font-family: $font-family-syncopate;
           text-decoration: none;
           color: $white;
-          font-weight: bold;
-          font-size: 16px;
+          font-weight: $font-weight-bold;
+          font-size: $font-size-base;
           display: flex;
           flex-direction: column;
           align-items: flex-start;
-          gap: 5px;
+          gap: $spacing-xs;
 
           @include mobile {
             flex-direction: row;
@@ -211,9 +211,9 @@
           }
 
           .navNumber {
-            font-size: 14px;
-            color: #b3b3b3;
-            margin-bottom: 5px;
+            font-size: $font-size-sm;
+            color: $text-light-gray;
+            margin-bottom: $spacing-xs;
           }
 
           .navText {

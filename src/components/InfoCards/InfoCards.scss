@@ -57,7 +57,7 @@
 
       .card {
         .card-info {
-          background-color: #0d0d0d;
+          background-color: $bg-dark;
         }
 
         .card-title {
@@ -195,10 +195,10 @@
           transform: scale(1.1);
           z-index: 2;
           width: 115%;
-          background-color: #1a1a1a;
+          background-color: $bg-dark;
 
           .card-info {
-            background-color: #1a1a1a;
+            background-color: $bg-dark;
           }
 
           .card-title {
@@ -311,34 +311,17 @@
     }
 
     .project-link {
-      font-family: $font-family-syncopate;
-      font-size: calc($font-size-base * 0.65);
-      color: $white;
-      text-decoration: none;
-      padding: calc($spacing-unit * 0.4) calc($spacing-unit * 0.8);
-      border: 1px solid rgba($white, 0.5);
-      border-radius: 3px;
-      transition: all 0.3s ease;
-      text-align: center;
+      @include button-secondary;
+      @include button-size('sm');
       flex: 1;
-      background-color: transparent;
-      letter-spacing: 0.3px;
-      text-transform: uppercase;
-      font-weight: 400;
-      white-space: nowrap;
       max-width: 120px;
+      font-size: $font-size-xs;
+      letter-spacing: 0.03em;
 
       @include mobile {
-        font-size: calc($font-size-base * 0.6);
-        padding: calc($spacing-unit * 0.35) calc($spacing-unit * 0.7);
+        font-size: $font-size-xs;
+        padding: $spacing-xs $spacing-sm;
         max-width: 110px;
-      }
-
-      &:hover {
-        background-color: rgba($white, 0.9);
-        color: $primary-color;
-        border-color: rgba($white, 0.9);
-        transform: translateY(-1px);
       }
     }
 

@@ -1,25 +1,131 @@
 
+// ============================================================================
+// DESIGN SYSTEM VARIABLES
+// ============================================================================
+
 // Colors
+// ----------------------------------------------------------------------------
+// Primary Colors
 $primary-color: var(--background);
-$secondary-color: #666;
+$primary-dark: #0a0a0a;
+$primary-light: #ffffff;
+
+// Secondary Colors
+$secondary-color: #666666;
 $text-light-gray: #808080;
+$text-dark-gray: #404040;
 $color-beige: #B2A59B;
-$white: #fff;
+
+// Neutral Colors
+$white: #ffffff;
 $light-black: #404040;
+$black: #000000;
+
+// Semantic Colors
+$success-color: #22c55e;
+$error-color: #ef4444;
+$warning-color: #f59e0b;
+$info-color: #3b82f6;
+
+// Background Colors
+$bg-light: #ffffff;
+$bg-dark: #0a0a0a;
+$bg-gray-light: rgba(128, 128, 128, 0.1);
+$bg-gray-dark: rgba(255, 255, 255, 0.1);
 
 // Breakpoints
+// ----------------------------------------------------------------------------
 $mobile: 768px;
 $tablet: 1024px;
 $desktop: 1200px;
+$wide: 1400px;
 
 // Typography
+// ----------------------------------------------------------------------------
+// Font Families
 $font-family-syncopate: 'Syncopate', sans-serif;
 $font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
   Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-$font-size-h1: 50px;
-$font-size-base: 16px;
-$line-height-base: 1.5;
 
-// Spacing
+// Font Sizes
+$font-size-xs: 12px;
+$font-size-sm: 14px;
+$font-size-base: 16px;
+$font-size-lg: 18px;
+$font-size-xl: 20px;
+$font-size-2xl: 24px;
+$font-size-3xl: 30px;
+$font-size-4xl: 36px;
+$font-size-5xl: 48px;
+$font-size-h1: 50px;
+$font-size-h2: 40px;
+$font-size-h3: 32px;
+$font-size-h4: 24px;
+$font-size-h5: 20px;
+$font-size-h6: 18px;
+
+// Line Heights
+$line-height-tight: 1.25;
+$line-height-base: 1.5;
+$line-height-relaxed: 1.75;
+
+// Font Weights
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+// Spacing System
+// ----------------------------------------------------------------------------
 $spacing-unit: 8px;
+
+// Spacing Scale (based on 8px grid)
+$spacing-xs: calc($spacing-unit * 0.5);    // 4px
+$spacing-sm: $spacing-unit;                // 8px
+$spacing-md: calc($spacing-unit * 2);      // 16px
+$spacing-lg: calc($spacing-unit * 3);      // 24px
+$spacing-xl: calc($spacing-unit * 4);      // 32px
+$spacing-2xl: calc($spacing-unit * 6);     // 48px
+$spacing-3xl: calc($spacing-unit * 8);     // 64px
+$spacing-4xl: calc($spacing-unit * 12);    // 96px
+$spacing-5xl: calc($spacing-unit * 16);    // 128px
+
+// Container & Layout
 $container-padding: 6rem;
+$container-padding-mobile: calc($spacing-unit * 2);
+$section-padding-y: $spacing-3xl;
+$section-padding-y-mobile: $spacing-2xl;
+
+// Border Radius
+// ----------------------------------------------------------------------------
+$border-radius-sm: 4px;
+$border-radius-md: 8px;
+$border-radius-lg: 12px;
+$border-radius-xl: 16px;
+$border-radius-2xl: 24px;
+$border-radius-full: 9999px;
+
+// Shadows
+// ----------------------------------------------------------------------------
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+$shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+// Transitions
+// ----------------------------------------------------------------------------
+$transition-fast: 150ms ease-in-out;
+$transition-base: 300ms ease-in-out;
+$transition-slow: 500ms ease-in-out;
+
+// Z-Index Scale
+// ----------------------------------------------------------------------------
+$z-dropdown: 1000;
+$z-sticky: 1020;
+$z-fixed: 1030;
+$z-modal-backdrop: 1040;
+$z-modal: 1050;
+$z-popover: 1060;
+$z-tooltip: 1070;
