@@ -1,6 +1,7 @@
 // app/api/project/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { GraphQLClient } from 'graphql-request';
+import { GET_CASE_STUDY } from '@/src/lib/queries';
 
 const client = new GraphQLClient(process.env.NEXT_PUBLIC_WORDPRESS_API_URL || '');
 
@@ -49,10 +50,17 @@ const GET_PROJECT_WITH_CASE_STUDY_V1 = `
       caseStudy {
         projectOverview {
           techStack {
-            ... on Tech {
-              id
-              title
-              slug
+            nodes {
+              ... on Tech {
+                id
+                title
+                featuredImage {
+                  node {
+                    sourceUrl
+                    altText
+                  }
+                }
+              }
             }
           }
         }
@@ -95,10 +103,17 @@ const GET_PROJECT_WITH_CASE_STUDY_V2 = `
       caseStudy {
         projectOverview {
           technologies {
-            ... on Tech {
-              id
-              title
-              slug
+            nodes {
+              ... on Tech {
+                id
+                title
+                featuredImage {
+                  node {
+                    sourceUrl
+                    altText
+                  }
+                }
+              }
             }
           }
         }
@@ -164,10 +179,11 @@ export async function GET(request: NextRequest) {
     console.log('Fetching project data for slug:', slug);
     
     // Try different query variations to find working ACF structure
-    let data: { project: any };
+    let data: { project: unknown };
     let queryUsed = 'unknown';
     
     const queries = [
+      { name: 'Main Query (from queries/index)', query: GET_CASE_STUDY },
       { name: 'Enhanced V2 (technologies)', query: GET_PROJECT_WITH_CASE_STUDY_V2 },
       { name: 'Enhanced V1 (techStack)', query: GET_PROJECT_WITH_CASE_STUDY_V1 },
       { name: 'Basic ACF (projectLinks)', query: GET_PROJECT_WITH_CASE_STUDY },
