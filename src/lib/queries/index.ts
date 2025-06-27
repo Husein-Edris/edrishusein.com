@@ -173,13 +173,15 @@ export const GET_CASE_STUDY = `
       caseStudy {
         projectOverview {
           technologies {
-            ... on Tech {
-              id
-              title
-              featuredImage {
-                node {
-                  sourceUrl
-                  altText
+            nodes {
+              ... on Tech {
+                id
+                title
+                featuredImage {
+                  node {
+                    sourceUrl
+                    altText
+                  }
                 }
               }
             }
@@ -204,6 +206,70 @@ export const GET_CASE_STUDY = `
         projectLinks {
           liveSite
           github
+        }
+      }
+    }
+  }
+`;
+
+export const GET_POST_BY_SLUG = `
+  query GetPostBySlug($slug: ID!) {
+    post(id: $slug, idType: SLUG) {
+      title
+      content
+      excerpt
+      date
+      slug
+      featuredImage {
+        node {
+          sourceUrl
+          altText
+          mediaDetails {
+            width
+            height
+          }
+        }
+      }
+      author {
+        node {
+          name
+          avatar {
+            url
+          }
+          description
+        }
+      }
+      categories {
+        nodes {
+          name
+          slug
+        }
+      }
+      tags {
+        nodes {
+          name
+          slug
+        }
+      }
+      blogPostFields {
+        readingTime
+        conclusionSection {
+          conclusionTitle
+          conclusionPoints {
+            pointText
+          }
+        }
+        customTags {
+          tagName
+          tagColor
+        }
+        authorBioOverride
+      }
+      seo {
+        title
+        metaDesc
+        opengraphImage {
+          sourceUrl
         }
       }
     }

@@ -74,16 +74,16 @@ export async function GET(request: NextRequest) {
   try {
     console.log('🔍 Fetching other projects, excluding:', excludeSlug);
     
-    let data: { projects: { nodes: any[] } };
+    let data: { projects: { nodes: unknown[] } };
     
     try {
       // Try the filtered query first
-      data = await client.request(GET_OTHER_PROJECTS, { excludeSlug }) as { projects: { nodes: any[] } };
+      data = await client.request(GET_OTHER_PROJECTS, { excludeSlug }) as { projects: { nodes: unknown[] } };
       console.log('✅ Filtered query successful');
     } catch (filterError) {
       console.warn('⚠️ Filtered query failed, falling back to get all projects:', filterError);
       // Fall back to getting all projects and filtering client-side
-      data = await client.request(GET_ALL_PROJECTS) as { projects: { nodes: any[] } };
+      data = await client.request(GET_ALL_PROJECTS) as { projects: { nodes: unknown[] } };
       // Filter out the current project
       data.projects.nodes = data.projects.nodes.filter(project => project.slug !== excludeSlug);
       console.log('✅ Fallback query successful');
