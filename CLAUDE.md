@@ -25,6 +25,14 @@ This is a Next.js 15 personal portfolio website for Edris Husein using the App R
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
 
+## Git Commit Guidelines
+
+When making commits, use standard commit messages without AI tool attribution. Do not include:
+- "🤖 Generated with [Claude Code]" 
+- "Co-Authored-By: Claude <noreply@anthropic.com>"
+
+Keep commit messages clean and focused on the actual changes made.
+
 ## Architecture & Data Flow
 
 ### Content Management Strategy

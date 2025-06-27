@@ -185,12 +185,41 @@ export class DataFetcher {
     );
   }
 
-  static async getProjectsData(): Promise<FetchResult<ProjectsResponse>> {
+  static async getProjectsData(limit: number = 6): Promise<FetchResult<ProjectsResponse>> {
     return this.fetchWithFallback(
       async () => {
         console.log('🔍 Attempting to fetch projects data from:', process.env.NEXT_PUBLIC_WORDPRESS_API_URL);
-        // Try the regular projects query
-        const response = await client.request(GET_PROJECTS_FOR_GRID);
+        
+        // Use optimized query with pagination
+        const OPTIMIZED_PROJECTS_QUERY = `
+          query GetProjects($limit: Int!) {
+            projects(first: $limit, where: { orderby: { field: DATE, order: DESC } }) {
+              nodes {
+                id
+                title
+                excerpt
+                slug
+                featuredImage {
+                  node {
+                    sourceUrl
+                    altText
+                    mediaDetails {
+                      height
+                      width
+                    }
+                  }
+                }
+                caseStudy {
+                  projectLinks {
+                    liveSite
+                  }
+                }
+              }
+            }
+          }
+        `;
+        
+        const response = await client.request(OPTIMIZED_PROJECTS_QUERY, { limit });
         console.log('✅ WordPress projects data loaded successfully:', response);
         return response;
       },
@@ -199,12 +228,37 @@ export class DataFetcher {
     );
   }
 
-  static async getPostsData(): Promise<FetchResult<any>> {
+  static async getPostsData(limit: number = 6): Promise<FetchResult<any>> {
     return this.fetchWithFallback(
       async () => {
         console.log('🔍 Attempting to fetch posts data from:', process.env.NEXT_PUBLIC_WORDPRESS_API_URL);
-        // Try the posts query for notebook section
-        const response = await client.request(GET_POSTS_FOR_NOTEBOOK);
+        
+        // Use optimized query with pagination
+        const OPTIMIZED_POSTS_QUERY = `
+          query GetPosts($limit: Int!) {
+            posts(first: $limit, where: { orderby: { field: DATE, order: DESC } }) {
+              nodes {
+                id
+                title
+                excerpt
+                slug
+                date
+                featuredImage {
+                  node {
+                    sourceUrl
+                    altText
+                    mediaDetails {
+                      height
+                      width
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `;
+        
+        const response = await client.request(OPTIMIZED_POSTS_QUERY, { limit });
         console.log('✅ WordPress posts data loaded successfully:', response);
         return response;
       },

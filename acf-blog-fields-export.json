@@ -1,0 +1,260 @@
+[
+    {
+        "key": "group_blog_post_fields",
+        "title": "Blog Post Content",
+        "fields": [
+            {
+                "key": "field_blog_reading_time",
+                "label": "Reading Time",
+                "name": "reading_time",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "Estimated reading time (e.g., '5 min read'). Leave empty for auto-calculation.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "50",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "placeholder": "5 min read",
+                "prepend": "",
+                "append": "",
+                "show_in_graphql": 1,
+                "graphql_description": "",
+                "graphql_field_name": "readingTime",
+                "graphql_non_null": 0
+            },
+            {
+                "key": "field_blog_conclusion",
+                "label": "Conclusion Section",
+                "name": "conclusion_section",
+                "aria-label": "",
+                "type": "group",
+                "instructions": "Optional conclusion section to highlight key takeaways",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "layout": "block",
+                "show_in_graphql": 1,
+                "graphql_description": "",
+                "graphql_field_name": "conclusionSection",
+                "graphql_non_null": 0,
+                "sub_fields": [
+                    {
+                        "key": "field_conclusion_title",
+                        "label": "Conclusion Title",
+                        "name": "conclusion_title",
+                        "aria-label": "",
+                        "type": "text",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "Key Takeaways",
+                        "maxlength": "",
+                        "placeholder": "Key Takeaways",
+                        "prepend": "",
+                        "append": "",
+                        "show_in_graphql": 1,
+                        "graphql_description": "",
+                        "graphql_field_name": "conclusionTitle",
+                        "graphql_non_null": 0
+                    },
+                    {
+                        "key": "field_conclusion_points",
+                        "label": "Key Points",
+                        "name": "conclusion_points",
+                        "aria-label": "",
+                        "type": "repeater",
+                        "instructions": "Add key takeaways or conclusion points",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "collapsed": "",
+                        "min": 0,
+                        "max": 5,
+                        "layout": "table",
+                        "button_label": "Add Key Point",
+                        "show_in_graphql": 1,
+                        "graphql_description": "",
+                        "graphql_field_name": "conclusionPoints",
+                        "graphql_non_null": 0,
+                        "rows_per_page": 20,
+                        "sub_fields": [
+                            {
+                                "key": "field_conclusion_point_text",
+                                "label": "Point",
+                                "name": "point_text",
+                                "aria-label": "",
+                                "type": "textarea",
+                                "instructions": "",
+                                "required": 1,
+                                "conditional_logic": 0,
+                                "wrapper": {
+                                    "width": "",
+                                    "class": "",
+                                    "id": ""
+                                },
+                                "default_value": "",
+                                "maxlength": "",
+                                "rows": 3,
+                                "placeholder": "Enter a key takeaway or important point",
+                                "new_lines": "",
+                                "show_in_graphql": 1,
+                                "graphql_description": "",
+                                "graphql_field_name": "pointText",
+                                "graphql_non_null": 0
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "key": "field_blog_tags_custom",
+                "label": "Custom Tags",
+                "name": "custom_tags",
+                "aria-label": "",
+                "type": "repeater",
+                "instructions": "Add custom tags for this post (in addition to WordPress tags)",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "collapsed": "",
+                "min": 0,
+                "max": 10,
+                "layout": "table",
+                "button_label": "Add Tag",
+                "show_in_graphql": 1,
+                "graphql_description": "",
+                "graphql_field_name": "customTags",
+                "graphql_non_null": 0,
+                "rows_per_page": 20,
+                "sub_fields": [
+                    {
+                        "key": "field_custom_tag_name",
+                        "label": "Tag Name",
+                        "name": "tag_name",
+                        "aria-label": "",
+                        "type": "text",
+                        "instructions": "",
+                        "required": 1,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "70",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "maxlength": "",
+                        "placeholder": "React",
+                        "prepend": "",
+                        "append": "",
+                        "show_in_graphql": 1,
+                        "graphql_description": "",
+                        "graphql_field_name": "tagName",
+                        "graphql_non_null": 0
+                    },
+                    {
+                        "key": "field_custom_tag_color",
+                        "label": "Tag Color",
+                        "name": "tag_color",
+                        "aria-label": "",
+                        "type": "select",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "30",
+                            "class": "",
+                            "id": ""
+                        },
+                        "choices": {
+                            "blue": "Blue",
+                            "green": "Green",
+                            "purple": "Purple",
+                            "orange": "Orange",
+                            "red": "Red",
+                            "gray": "Gray"
+                        },
+                        "default_value": "blue",
+                        "allow_null": 0,
+                        "multiple": 0,
+                        "ui": 1,
+                        "ajax": 0,
+                        "return_format": "value",
+                        "placeholder": "",
+                        "show_in_graphql": 1,
+                        "graphql_description": "",
+                        "graphql_field_name": "tagColor",
+                        "graphql_non_null": 0
+                    }
+                ]
+            },
+            {
+                "key": "field_blog_author_bio",
+                "label": "Author Bio Override",
+                "name": "author_bio_override",
+                "aria-label": "",
+                "type": "textarea",
+                "instructions": "Optional custom author bio for this post (overrides default user bio)",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "rows": 3,
+                "placeholder": "Custom author bio for this specific post...",
+                "new_lines": "",
+                "show_in_graphql": 1,
+                "graphql_description": "",
+                "graphql_field_name": "authorBioOverride",
+                "graphql_non_null": 0
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "post"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": "",
+        "show_in_rest": 1,
+        "show_in_graphql": 1,
+        "graphql_field_name": "blogPostFields",
+        "map_graphql_types_from_location_rules": 0,
+        "graphql_types": ""
+    }
+]
