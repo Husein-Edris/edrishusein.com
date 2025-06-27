@@ -1,0 +1,490 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.about-page {
+  background-color: $primary-color;
+  color: $white;
+  min-height: 100vh;
+
+  .container {
+    @include container;
+  }
+
+  // Hero Section
+  .about-hero {
+    padding: calc($spacing-unit * 12) 0 calc($spacing-unit * 8) 0;
+    
+    @include mobile {
+      padding: calc($spacing-unit * 8) 0 calc($spacing-unit * 6) 0;
+    }
+
+    .hero-content {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: calc($spacing-unit * 8);
+      align-items: center;
+
+      @include tablet {
+        grid-template-columns: 1fr;
+        gap: calc($spacing-unit * 6);
+        text-align: center;
+      }
+
+      @include mobile {
+        gap: calc($spacing-unit * 4);
+      }
+    }
+
+    .hero-text {
+      .hero-title {
+        font-family: $font-family-syncopate;
+        font-size: calc($font-size-h1 * 1.2);
+        font-weight: $font-weight-normal;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: calc($spacing-unit * 3);
+        line-height: 1.1;
+        color: $white;
+
+        @include tablet {
+          font-size: $font-size-h1;
+        }
+
+        @include mobile {
+          font-size: calc($font-size-h1 * 0.8);
+          margin-bottom: calc($spacing-unit * 2);
+        }
+      }
+
+      .hero-subtitle {
+        font-family: $font-family-base;
+        font-size: calc($font-size-lg * 1.1);
+        line-height: $line-height-relaxed;
+        color: $text-light-gray;
+        margin: 0;
+
+        @include mobile {
+          font-size: $font-size-base;
+        }
+      }
+    }
+
+    .hero-image {
+      justify-self: end;
+
+      @include tablet {
+        justify-self: center;
+      }
+
+      .profile-image {
+        border-radius: 50%;
+        width: 100%;
+        height: auto;
+        max-width: 400px;
+        
+        @include tablet {
+          max-width: 300px;
+        }
+
+        @include mobile {
+          max-width: 250px;
+        }
+      }
+    }
+  }
+
+  // Content Section
+  .about-content {
+    padding: calc($spacing-unit * 8) 0;
+    border-top: 1px solid rgba($white, 0.1);
+
+    @include mobile {
+      padding: calc($spacing-unit * 6) 0;
+    }
+
+    .content-wrapper {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .about-text {
+      font-family: $font-family-base;
+      font-size: $font-size-lg;
+      line-height: $line-height-relaxed;
+      color: $text-light-gray;
+
+      @include mobile {
+        font-size: $font-size-base;
+      }
+
+      p {
+        margin-bottom: calc($spacing-unit * 2);
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+
+      h2, h3 {
+        color: $white;
+        font-family: $font-family-syncopate;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin: calc($spacing-unit * 4) 0 calc($spacing-unit * 2) 0;
+
+        &:first-child {
+          margin-top: 0;
+        }
+      }
+
+      h2 {
+        font-size: $font-size-h2;
+
+        @include mobile {
+          font-size: calc($font-size-h2 * 0.9);
+        }
+      }
+
+      h3 {
+        font-size: $font-size-h3;
+
+        @include mobile {
+          font-size: calc($font-size-h3 * 0.9);
+        }
+      }
+    }
+  }
+
+  // Experience Section
+  .about-experience {
+    padding: calc($spacing-unit * 8) 0;
+    border-top: 1px solid rgba($white, 0.1);
+
+    @include mobile {
+      padding: calc($spacing-unit * 6) 0;
+    }
+
+    .section-title {
+      font-family: $font-family-syncopate;
+      font-size: $font-size-h2;
+      font-weight: $font-weight-normal;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: calc($spacing-unit * 6);
+      color: $white;
+      text-align: center;
+
+      @include mobile {
+        font-size: calc($font-size-h2 * 0.9);
+        margin-bottom: calc($spacing-unit * 4);
+      }
+    }
+
+    .experience-list {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .experience-item {
+      background: rgba($white, 0.05);
+      border-radius: 12px;
+      padding: calc($spacing-unit * 4);
+      margin-bottom: calc($spacing-unit * 4);
+      border: 1px solid rgba($white, 0.1);
+
+      @include mobile {
+        padding: calc($spacing-unit * 3);
+        margin-bottom: calc($spacing-unit * 3);
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .experience-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: calc($spacing-unit * 1);
+        gap: calc($spacing-unit * 2);
+
+        @include mobile {
+          flex-direction: column;
+          gap: calc($spacing-unit * 0.5);
+        }
+
+        .position {
+          font-family: $font-family-syncopate;
+          font-size: $font-size-h3;
+          font-weight: $font-weight-normal;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          color: $white;
+          margin: 0;
+
+          @include mobile {
+            font-size: calc($font-size-h3 * 0.9);
+          }
+        }
+
+        .duration {
+          font-family: $font-family-base;
+          font-size: $font-size-sm;
+          color: $color-beige;
+          font-weight: $font-weight-medium;
+          white-space: nowrap;
+
+          @include mobile {
+            font-size: $font-size-xs;
+          }
+        }
+      }
+
+      .company {
+        font-family: $font-family-base;
+        font-size: $font-size-lg;
+        font-weight: $font-weight-medium;
+        color: $color-beige;
+        margin: 0 0 calc($spacing-unit * 2) 0;
+
+        @include mobile {
+          font-size: $font-size-base;
+        }
+      }
+
+      .description {
+        font-family: $font-family-base;
+        font-size: $font-size-base;
+        line-height: $line-height-relaxed;
+        color: $text-light-gray;
+        margin: 0 0 calc($spacing-unit * 2) 0;
+
+        @include mobile {
+          font-size: calc($font-size-base * 0.9);
+        }
+      }
+
+      .technologies {
+        display: flex;
+        flex-wrap: wrap;
+        gap: calc($spacing-unit * 0.5);
+        align-items: center;
+
+        @include mobile {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: calc($spacing-unit * 0.25);
+        }
+
+        .tech-label {
+          font-family: $font-family-base;
+          font-size: $font-size-sm;
+          font-weight: $font-weight-medium;
+          color: $white;
+
+          @include mobile {
+            font-size: $font-size-xs;
+          }
+        }
+
+        .tech-list {
+          font-family: $font-family-base;
+          font-size: $font-size-sm;
+          color: $color-beige;
+
+          @include mobile {
+            font-size: $font-size-xs;
+          }
+        }
+      }
+    }
+  }
+
+  // Skills Section
+  .about-skills {
+    padding: calc($spacing-unit * 8) 0;
+    border-top: 1px solid rgba($white, 0.1);
+
+    @include mobile {
+      padding: calc($spacing-unit * 6) 0;
+    }
+
+    .section-title {
+      font-family: $font-family-syncopate;
+      font-size: $font-size-h2;
+      font-weight: $font-weight-normal;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: calc($spacing-unit * 6);
+      color: $white;
+      text-align: center;
+
+      @include mobile {
+        font-size: calc($font-size-h2 * 0.9);
+        margin-bottom: calc($spacing-unit * 4);
+      }
+    }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: calc($spacing-unit * 4);
+
+      @include mobile {
+        grid-template-columns: 1fr;
+        gap: calc($spacing-unit * 3);
+      }
+    }
+
+    .skill-category {
+      background: rgba($white, 0.05);
+      border-radius: 12px;
+      padding: calc($spacing-unit * 4);
+      border: 1px solid rgba($white, 0.1);
+
+      @include mobile {
+        padding: calc($spacing-unit * 3);
+      }
+
+      .category-title {
+        font-family: $font-family-syncopate;
+        font-size: $font-size-h4;
+        font-weight: $font-weight-normal;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: $color-beige;
+        margin: 0 0 calc($spacing-unit * 3) 0;
+
+        @include mobile {
+          font-size: calc($font-size-h4 * 0.9);
+          margin-bottom: calc($spacing-unit * 2);
+        }
+      }
+
+      .skills-list {
+        display: flex;
+        flex-direction: column;
+        gap: calc($spacing-unit * 2);
+
+        @include mobile {
+          gap: calc($spacing-unit * 1.5);
+        }
+      }
+
+      .skill-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: calc($spacing-unit * 1) 0;
+        border-bottom: 1px solid rgba($white, 0.1);
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .skill-name {
+          font-family: $font-family-base;
+          font-size: $font-size-base;
+          color: $white;
+
+          @include mobile {
+            font-size: calc($font-size-base * 0.9);
+          }
+        }
+
+        .skill-level {
+          font-family: $font-family-base;
+          font-size: $font-size-sm;
+          color: $text-light-gray;
+          font-style: italic;
+
+          @include mobile {
+            font-size: $font-size-xs;
+          }
+        }
+      }
+    }
+  }
+
+  // Personal Section
+  .about-personal {
+    padding: calc($spacing-unit * 8) 0;
+    border-top: 1px solid rgba($white, 0.1);
+
+    @include mobile {
+      padding: calc($spacing-unit * 6) 0;
+    }
+
+    .personal-content {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: calc($spacing-unit * 6);
+      align-items: center;
+
+      @include tablet {
+        grid-template-columns: 1fr;
+        gap: calc($spacing-unit * 4);
+        text-align: center;
+      }
+    }
+
+    .personal-text {
+      .section-title {
+        font-family: $font-family-syncopate;
+        font-size: $font-size-h2;
+        font-weight: $font-weight-normal;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: calc($spacing-unit * 3);
+        color: $white;
+
+        @include tablet {
+          text-align: center;
+        }
+
+        @include mobile {
+          font-size: calc($font-size-h2 * 0.9);
+          margin-bottom: calc($spacing-unit * 2);
+        }
+      }
+
+      .personal-description {
+        font-family: $font-family-base;
+        font-size: $font-size-lg;
+        line-height: $line-height-relaxed;
+        color: $text-light-gray;
+
+        @include mobile {
+          font-size: $font-size-base;
+        }
+
+        p {
+          margin-bottom: calc($spacing-unit * 2);
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+
+    .personal-image {
+      justify-self: end;
+
+      @include tablet {
+        justify-self: center;
+      }
+
+      .image {
+        border-radius: 12px;
+        width: 100%;
+        height: auto;
+        max-width: 300px;
+
+        @include mobile {
+          max-width: 250px;
+        }
+      }
+    }
+  }
+}

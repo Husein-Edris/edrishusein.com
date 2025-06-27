@@ -292,3 +292,78 @@ export const GET_ALL_TECH = `
     }
   }
 `;
+
+export const GET_ABOUT_PAGE = `
+  query GetAboutPage {
+    page(id: "about", idType: URI) {
+      id
+      title
+      content
+      featuredImage {
+        node {
+          sourceUrl
+          altText
+          mediaDetails {
+            width
+            height
+          }
+        }
+      }
+      aboutPageFields {
+        aboutHeroTitle
+        aboutHeroSubtitle
+        aboutHeroImage {
+          node {
+            sourceUrl
+            altText
+            mediaDetails {
+              width
+              height
+            }
+          }
+        }
+        experienceSection {
+          sectionTitle
+          experienceItems {
+            companyName
+            position
+            duration
+            description
+            technologies
+          }
+        }
+        skillsSection {
+          sectionTitle
+          skillCategories {
+            categoryName
+            skills {
+              skillName
+              proficiencyLevel
+            }
+          }
+        }
+        personalSection {
+          sectionTitle
+          personalContent
+          personalImage {
+            node {
+              sourceUrl
+              altText
+              mediaDetails {
+                width
+                height
+              }
+            }
+          }
+        }
+      }
+      seo {
+        title
+        metaDesc
+        opengraphImage {
+          sourceUrl
+        }
+      }
+    }
+  }
+`;
