@@ -94,6 +94,8 @@ function InfoCards({
                         width={400}
                         height={300}
                         priority={index === 0}
+                        loading={index === 0 ? "eager" : "lazy"}
+                        quality={85}
                       />
                     </div>
                   )}
@@ -102,18 +104,11 @@ function InfoCards({
                     {skin === 'default' && (
                       <div className="card-arrow">
                         <Image
-                          src="/icons/arrow-disabled.svg"
-                          alt="Arrow"
-                          width={40}
-                          height={40}
-                          className="arrow-disabled"
-                        />
-                        <Image
                           src="/icons/arrow-active.svg"
                           alt="Arrow"
                           width={40}
                           height={40}
-                          className="arrow-active"
+                          className="arrow-simple"
                         />
                       </div>
                     )}
@@ -139,16 +134,6 @@ function InfoCards({
           })}
         </div>
 
-        {(skin === 'projects' || skin === 'blog') && (
-          <div className="view-more">
-            <Link
-              href={skin === 'projects' ? '/projects' : '/notebook'}
-              className="view-more-link"
-            >
-              VIEW MORE
-            </Link>
-          </div>
-        )}
       </div>
     </section>
   );

@@ -94,11 +94,6 @@ const Projects = ({ data }: ProjectsProps) => {
           ))}
         </div>
 
-        <div className="view-more">
-          <Link href="/projects" className="view-more-link">
-            VIEW MORE
-          </Link>
-        </div>
       </div>
     </section>
   );

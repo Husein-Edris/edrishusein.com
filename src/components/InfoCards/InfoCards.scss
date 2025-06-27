@@ -110,7 +110,6 @@
       img {
         width: 40px;
         height: 40px;
-        transition: all 0.3s ease;
 
         @include tablet {
           width: 32px;
@@ -123,32 +122,13 @@
         }
       }
 
-      .arrow-disabled {
+      .arrow-simple {
         opacity: 1;
-      }
-
-      .arrow-active {
-        opacity: 0;
-        transform: translateX(-5px);
-        position: absolute;
       }
     }
 
     .card:hover {
-      transform: translateY(-8px);
-
-      .arrow-disabled {
-        opacity: 0;
-      }
-
-      .arrow-active {
-        opacity: 1;
-        transform: translateX(0);
-      }
-
-      .card-image img {
-        transform: scale(1.05);
-      }
+      // Removed animations for better performance
     }
   }
 
@@ -158,14 +138,7 @@
     overflow-x: hidden;
 
     .cards-grid {
-      @media (min-width: $mobile) {
-        &:hover .card:not(:hover) {
-          transform: scale(0.9);
-          opacity: 0.5;
-          filter: grayscale(100%);
-          transition: all 0.3s ease;
-        }
-      }
+      // Removed hover effects for better performance
     }
 
     .card {
