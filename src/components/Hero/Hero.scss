@@ -3,11 +3,11 @@
 
 .hero {
   background-color: $primary-color;
-  min-height: 100vh;
+  // min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: $spacing-3xl $container-padding;
+  padding: $container-padding;
 
   @include mobile {
     padding: $spacing-xl $container-padding-mobile;
