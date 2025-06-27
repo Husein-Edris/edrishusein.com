@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
+import InfoCards from '@/src/components/InfoCards/InfoCards';
 import '@/src/styles/pages/BlogPost.scss';
 
 export default function BlogPostPageSimple() {
@@ -186,44 +187,20 @@ export default function BlogPostPageSimple() {
 
         {/* More Articles Section */}
         {moreArticles.length > 0 && (
-          <section className="more-articles">
-            <div className="container">
-              <h2>More Articles</h2>
-              <div className="articles-grid">
-                {moreArticles.map((article, index) => (
-                  <Link href={`/notebook/${article.slug}`} key={index} className="article-card">
-                    <div className="article-image">
-                      <Image
-                        src={article.featuredImage?.node?.sourceUrl || "/images/Blog-sample-img.png"}
-                        alt={article.title}
-                        width={400}
-                        height={250}
-                        className="card-image"
-                      />
-                    </div>
-                    <div className="article-content">
-                      <h3 className="article-title">{article.title}</h3>
-                      <p className="article-excerpt">
-                        {article.excerpt ? article.excerpt.replace(/<[^>]*>/g, '').substring(0, 120) + '...' : ''}
-                      </p>
-                      <div className="article-meta">
-                        <time className="article-date">
-                          {new Date(article.date).toLocaleDateString('en-US', { 
-                            year: 'numeric', 
-                            month: 'short', 
-                            day: 'numeric' 
-                          })}
-                        </time>
-                        {article.readingTime && (
-                          <span className="article-reading-time">{article.readingTime}</span>
-                        )}
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </section>
+          <InfoCards
+            skin="blog"
+            variant="light"
+            sectionNumber="03"
+            sectionTitle="More Articles"
+            columns={3}
+            cards={moreArticles.map((article) => ({
+              title: article.title,
+              description: article.excerpt?.replace(/<[^>]*>/g, '').substring(0, 120) + '...' || '',
+              image: article.featuredImage?.node?.sourceUrl || "/images/Blog-sample-img.png",
+              link: `/notebook/${article.slug}`,
+              variant: 'light' as const
+            }))}
+          />
         )}
       </main>
       <Footer />

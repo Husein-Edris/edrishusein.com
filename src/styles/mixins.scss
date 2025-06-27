@@ -216,6 +216,27 @@
   }
 }
 
+// Global card hover effect for consistent behavior
+@mixin card-hover-effect {
+  &:hover {
+    filter: grayscale(0%);
+
+    .card-title {
+      color: $white;
+    }
+
+    .card-description {
+      color: $white;
+      opacity: 1;
+    }
+
+    .project-links {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
 @mixin section-header {
   margin-bottom: calc($spacing-unit * 8);
   position: relative;
