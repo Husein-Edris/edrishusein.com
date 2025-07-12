@@ -2,20 +2,21 @@
 
 ## 🎯 Current Status (as of 2025-07-12)
 
-### ⚡ Recent Issue Fixed
-**RESOLVED**: Projects from WordPress CMS not showing on frontend
-- **Problem**: GraphQL queries were looking for custom post type `projects` but WordPress was using standard `posts`
-- **Solution**: Updated all GraphQL queries in `src/lib/queries/index.ts` to use `posts` instead of `projects`
-- **Files Modified**: 
-  - `src/lib/queries/index.ts` (lines 72, 100, 152) ✅
-  - Updated: `GET_PROJECTS_FOR_GRID`, `GET_ALL_PROJECTS`, `GET_CASE_STUDY`
+### 🎯 **Current Focus: Fix Projects Not Showing**
+**ISSUE**: Projects from production WordPress (`cms.edrishusein.com`) not displaying on frontend
+- **User Confirmation**: Work with production data from `cms.edrishusein.com`
+- **Goal**: Display existing projects that are saved in production WordPress
+- **WordPress Admin**: Shows custom post types (Projects, Skills, Hobbies, etc.) are available
 
-### 🔄 Pending Changes
-- Modified files need to be committed:
-  - `app/about/page.tsx` 
-  - `src/lib/queries/index.ts` (GraphQL post type fixes)
-  - `src/styles/pages/About.scss`
-- Untracked files: `WORDPRESS_SETUP.md`, `headless-wp-theme.zip`, `wordpress-exports/`
+### 🔄 **User Decisions Made:**
+1. ✅ **Use Production Data**: Work with `cms.edrishusein.com` (not local)
+2. ✅ **Focus on Projects**: Fix project display issue first priority
+3. 📋 **Later Tasks**: Create real portfolio content, set up About page functionality
+
+### 🚨 **Active Investigation:**
+- Need to test if `projects` post type exists in production GraphQL
+- Verify project data structure and availability
+- Fix any GraphQL query mismatches
 
 ## 🏗️ Project Architecture
 
@@ -218,30 +219,29 @@ GET_ALL_TECH           // ❓ Unknown - custom post type status unclear
 
 ## 🛠️ Immediate Action Items
 
-### High Priority
-1. **Clarify WordPress Environment**
-   - Should `.env.local` point to local or production WordPress?
-   - Update endpoint accordingly
+### 🚨 Current Priority (Confirmed by User)
+1. **Fix Project Display Issue**
+   - ✅ Confirmed: Use production WordPress (`cms.edrishusein.com`)
+   - Test if `projects` post type exists in production GraphQL
+   - Verify existing project data can be queried
+   - Fix GraphQL queries if needed to match production structure
 
-2. **Content Verification**
-   - Check if project content exists in production WordPress
-   - Import/create missing project posts if needed
+2. **Production Data Verification**
+   - Test connection to production GraphQL endpoint
+   - Verify projects saved in WordPress admin are accessible via GraphQL
+   - Ensure frontend can display production project data
 
-3. **ACF Field Import**
-   - Verify all ACF field groups are properly configured
-   - Import from `wordpress-exports/` if needed
+### 📋 Later Tasks (User Confirmed)
+1. **Content Creation**
+   - Create actual project posts with real portfolio content
+   - ✅ User has some projects in production already
 
-### Medium Priority  
-1. **Custom Post Types Decision**
-   - Decide whether to use standard posts vs. custom post types
-   - Update GraphQL queries accordingly if needed
-
-2. **Test Complete Data Flow**
-   - Verify all pages load with proper content
-   - Test fallback systems
+2. **About Page Setup**
+   - Set up Skills/Hobbies custom post types
+   - Import ACF field groups for About page functionality
 
 3. **Environment Consistency**
-   - Ensure local and production setups match
+   - Ensure development workflow with production data
    - Document setup process
 
 ## 📈 Performance Status
@@ -277,11 +277,17 @@ GET_ALL_TECH           // ❓ Unknown - custom post type status unclear
 
 ## 📝 Next Steps
 
-1. **Answer configuration questions** (environment, content, post types)
-2. **Test with correct WordPress data** 
-3. **Verify ACF field configurations**
-4. **Complete content setup**
-5. **Prepare for production deployment**
+### ✅ **Confirmed Decisions (User Input)**
+1. **Environment**: Use production WordPress (`cms.edrishusein.com`)
+2. **Priority**: Fix projects not showing on frontend first
+3. **Content**: Work with existing projects in production, add more later
+4. **About Page**: Set up Skills/Hobbies functionality later
+
+### 🔄 **Immediate Actions**
+1. **Test production GraphQL endpoint** for projects data
+2. **Verify project post type** exists and is accessible
+3. **Fix GraphQL queries** if needed to match production structure
+4. **Test frontend display** with production data
 
 **Last Updated**: 2025-07-12  
-**Status**: Development - Projects display issue resolved, environment configuration needs clarification
+**Status**: Active Investigation - Fixing projects display issue with production data
