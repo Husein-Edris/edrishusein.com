@@ -65,18 +65,42 @@ export async function GET(request: NextRequest) {
       throw new Error(`Project with slug "${slug}" not found via REST API`);
     }
 
-    // Try to get ACF fields
+    // Try to get ACF fields - try multiple methods
     let acfData = null;
     try {
-      const acfEndpoint = `${WORDPRESS_REST_URL}/wp-json/wp/v2/${projectData.type || 'posts'}/${projectData.id}?acf_format=standard&_fields=acf`;
-      console.log(`🎯 Fetching ACF data from: ${acfEndpoint}`);
+      // Method 1: Direct project endpoint with ACF
+      const projectWithACF = `${WORDPRESS_REST_URL}/wp-json/wp/v2/project/${projectData.id}?acf_format=standard`;
+      console.log(`🎯 Fetching full project with ACF from: ${projectWithACF}`);
       
-      const acfResponse = await fetch(acfEndpoint);
-      if (acfResponse.ok) {
-        const acfResult = await acfResponse.json();
-        acfData = acfResult.acf;
-        console.log('✅ ACF data retrieved:', Object.keys(acfData || {}));
+      const fullProjectResponse = await fetch(projectWithACF);
+      if (fullProjectResponse.ok) {
+        const fullProject = await fullProjectResponse.json();
+        // Check both acf and acf_fields (WordPress sometimes uses acf_fields)
+        acfData = fullProject.acf_fields || fullProject.acf || null;
+        console.log('✅ Full project ACF data:', acfData ? Object.keys(acfData) : 'empty');
+        console.log('📄 Full ACF object:', JSON.stringify(acfData, null, 2));
       }
+      
+      // Method 2: If no ACF data, try alternative endpoint
+      if (!acfData || Object.keys(acfData || {}).length === 0) {
+        const altEndpoint = `${WORDPRESS_REST_URL}/wp-json/wp/v2/project/${projectData.id}?_fields=acf,meta`;
+        console.log(`🔄 Trying alternative ACF endpoint: ${altEndpoint}`);
+        
+        const altResponse = await fetch(altEndpoint);
+        if (altResponse.ok) {
+          const altResult = await altResponse.json();
+          acfData = altResult.acf_fields || altResult.acf || altResult.meta || null;
+          console.log('✅ Alternative ACF data:', acfData ? Object.keys(acfData) : 'empty');
+        }
+      }
+      
+      // Method 3: If still no ACF, check the original project data
+      if (!acfData || Object.keys(acfData || {}).length === 0) {
+        console.log('🔍 Checking original project data for ACF fields');
+        acfData = projectData.acf_fields || projectData.acf || null;
+        console.log('✅ Project data ACF:', acfData ? Object.keys(acfData) : 'not found in original data');
+      }
+      
     } catch (acfError) {
       console.warn('⚠️ ACF data fetch failed:', acfError.message);
     }
@@ -102,6 +126,10 @@ export async function GET(request: NextRequest) {
     };
 
     console.log('✅ Project transformed successfully:', transformedProject.title);
+    console.log('📋 Case study data:', transformedProject.caseStudy ? 'Present' : 'Missing');
+    if (transformedProject.caseStudy) {
+      console.log('📊 Case study fields:', Object.keys(transformedProject.caseStudy));
+    }
     
     return NextResponse.json({ 
       project: transformedProject, 
@@ -127,21 +155,51 @@ export async function GET(request: NextRequest) {
 
 // Transform ACF data to match expected case study structure
 function transformACFData(acf: any) {
-  if (!acf) return null;
+  if (!acf) {
+    console.log('⚠️ No ACF data to transform');
+    return null;
+  }
 
-  return {
+  console.log('🔄 Transforming ACF data:', JSON.stringify(acf, null, 2));
+  
+  // Handle the actual WordPress ACF structure from acf_fields
+  const transformed = {
     projectOverview: {
-      technologies: acf.technologies || acf.tech_stack || []
+      // Transform tech_stack array from project_overview section - convert WP tech posts to simple format
+      technologies: (acf.project_overview?.tech_stack || acf.tech_stack || acf.technologies || []).map((tech: any) => {
+        // Handle WordPress tech post objects
+        if (tech && typeof tech === 'object' && tech.post_title) {
+          return {
+            id: tech.ID || tech.id,
+            title: tech.post_title,
+            featuredImage: tech.featured_image ? {
+              node: {
+                sourceUrl: tech.featured_image.source_url || tech.featured_image,
+                altText: tech.post_title
+              }
+            } : null
+          };
+        }
+        // Handle simple objects
+        return tech;
+      })
     },
     projectContent: {
-      challenge: acf.challenge || acf.the_challenge || '',
-      solution: acf.solution || acf.the_solution || '',
-      keyFeatures: acf.key_features || acf.features || []
+      // Get challenge and solution from project_content section
+      challenge: acf.project_content?.challenge || acf.challenge || acf.the_challenge || '',
+      solution: acf.project_content?.solution || acf.solution || acf.the_solution || '',
+      // Key Features (can be null in WordPress)
+      keyFeatures: acf.project_content?.key_features || acf.key_features || acf.features || []
     },
+    // Project Gallery section
     projectGallery: acf.project_gallery || acf.gallery || [],
     projectLinks: {
-      liveSite: acf.live_site || acf.website_url || acf.project_url || '',
-      github: acf.github || acf.github_url || acf.repository || ''
+      // Get links from project_links section
+      liveSite: acf.project_links?.live_site || acf.live_site_url || acf.live_site || acf.website_url || acf.project_url || '',
+      github: acf.project_links?.github || acf.github_repository || acf.github || acf.github_url || acf.repository || ''
     }
   };
+  
+  console.log('✅ ACF data transformed:', JSON.stringify(transformed, null, 2));
+  return transformed;
 }
