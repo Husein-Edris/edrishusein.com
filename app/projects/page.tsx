@@ -1,27 +1,36 @@
 // app/projects/page.tsx
-import { client } from '@/src/lib/client';
-import { GET_ALL_PROJECTS } from '@/src/lib/queries';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
 import InfoCards from '@/src/components/InfoCards/InfoCards';
+import { DataFetcher } from '@/src/lib/data-fetcher';
 
 async function getAllProjects() {
   try {
-    const data = await client.request(GET_ALL_PROJECTS);
-    return data;
+    console.log('🔍 Fetching all projects for projects page');
+    const result = await DataFetcher.getProjectsData(20); // Get more projects for the full list
+    console.log('📊 Projects result:', result);
+    
+    if (result.data) {
+      return result.data;
+    }
+    
+    console.warn('⚠️ No project data available');
+    return null;
   } catch (error) {
-    console.error('Error fetching projects:', error);
+    console.error('❌ Error fetching projects:', error);
     return null;
   }
 }
 
 export default async function ProjectsPage() {
   const projectsData = await getAllProjects();
+  
+  console.log('📋 Projects data for page:', projectsData);
 
-  const transformedProjects = projectsData?.projects.nodes.map(project => ({
+  const transformedProjects = projectsData?.projects?.nodes?.map(project => ({
     title: project.title,
-    description: project.excerpt,
-    image: project.featuredImage?.node?.sourceUrl,
+    description: project.excerpt || '',
+    image: project.featuredImage?.node?.sourceUrl || '/images/Blog-sample-img.png',
     variant: 'dark',
     visitLink: project.caseStudy?.projectLinks?.liveSite || '#',
     caseStudyLink: `/projects/${project.slug}`
