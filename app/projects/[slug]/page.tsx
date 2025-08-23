@@ -40,6 +40,20 @@ export default function ProjectPage() {
         }
 
         console.log('✅ Successfully received project data:', data.project.title);
+        console.log('🔍 Full project object:', data.project);
+        console.log('📋 Case study data:', data.project.caseStudy);
+        if (data.project.caseStudy) {
+          console.log('📊 Case study keys:', Object.keys(data.project.caseStudy));
+          if (data.project.caseStudy.projectOverview) {
+            console.log('🛠️ Project overview:', data.project.caseStudy.projectOverview);
+          }
+          if (data.project.caseStudy.projectContent) {
+            console.log('📝 Project content:', data.project.caseStudy.projectContent);
+          }
+          if (data.project.caseStudy.projectLinks) {
+            console.log('🔗 Project links:', data.project.caseStudy.projectLinks);
+          }
+        }
         setProject(data.project);
       } catch (err) {
         console.error('❌ Error fetching project:', err);
