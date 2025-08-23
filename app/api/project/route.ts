@@ -167,6 +167,9 @@ const GET_PROJECT_WITH_CASE_STUDY = `
   }
 `;
 
+// Import fallback data for when WordPress is unavailable
+import { DataFetcher } from '@/src/lib/data-fetcher';
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const slug = searchParams.get('slug');
@@ -179,7 +182,7 @@ export async function GET(request: NextRequest) {
     console.log('Fetching project data for slug:', slug);
     
     // Try different query variations to find working ACF structure
-    let data: { project: unknown };
+    let data: { project: unknown } | null = null;
     let queryUsed = 'unknown';
     
     const queries = [
@@ -197,18 +200,37 @@ export async function GET(request: NextRequest) {
         queryUsed = name;
         console.log(`✅ ${name} query successful!`);
         break;
-      } catch (queryError) {
+      } catch (queryError: any) {
         console.warn(`⚠️ ${name} query failed:`, queryError.message);
         continue;
       }
     }
     
-    if (!data!) {
-      throw new Error('All query variations failed');
-    }
-    
-    if (!data.project) {
-      throw new Error(`Project with slug "${slug}" not found`);
+    if (!data || !data.project) {
+      console.log('🔄 WordPress GraphQL failed, trying REST API...');
+      
+      // Try WordPress REST API to get real data with ACF fields
+      try {
+        const restResponse = await fetch(`http://localhost:3000/api/project-rest?slug=${slug}`);
+        
+        if (restResponse.ok) {
+          const restData = await restResponse.json();
+          if (restData.project) {
+            console.log(`✅ Found project via REST API: ${restData.project.title}`);
+            return NextResponse.json({
+              project: restData.project,
+              _meta: {
+                queryUsed: 'wordpress-rest-api',
+                source: 'wordpress-rest'
+              }
+            });
+          }
+        }
+      } catch (restError) {
+        console.warn('⚠️ REST API also failed:', restError.message);
+      }
+      
+      throw new Error(`Project with slug "${slug}" not found in WordPress GraphQL or REST API`);
     }
     
     console.log('✅ Project data retrieved:', data.project.title, `(using ${queryUsed} query)`);
@@ -217,7 +239,7 @@ export async function GET(request: NextRequest) {
       console.log('📋 Case study fields:', Object.keys(data.project.caseStudy));
     }
     
-    return NextResponse.json({ ...data, _meta: { queryUsed } });
+    return NextResponse.json({ ...data, _meta: { queryUsed, source: 'wordpress' } });
   } catch (error) {
     console.error('❌ API error:', error);
     return NextResponse.json(

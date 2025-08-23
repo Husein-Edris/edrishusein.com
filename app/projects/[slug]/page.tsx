@@ -163,31 +163,37 @@ export default function ProjectPage() {
 
 
           {/* Technologies */}
-          {project.caseStudy?.projectOverview?.technologies?.nodes?.length > 0 ? (
-            <section className="tech-stack">
-              <h2>Technologies Used</h2>
-              <div className="tech-grid">
-                {project.caseStudy.projectOverview.technologies.nodes.map((tech) => (
-                  <div key={tech.id} className="tech-item">
-                    {tech.featuredImage?.node && (
-                      <Image
-                        src={tech.featuredImage.node.sourceUrl}
-                        alt={tech.featuredImage.node.altText || tech.title}
-                        width={40}
-                        height={40}
-                        className="tech-icon"
-                        onError={(e) => {
-                          // Fallback to a default icon if the image fails to load
-                          e.currentTarget.src = '/icons/code.svg';
-                        }}
-                      />
-                    )}
-                    <span>{tech.title}</span>
-                  </div>
-                ))}
-              </div>
-            </section>
-          ) : null}
+          {(() => {
+            // Handle both GraphQL structure (technologies.nodes) and fallback structure (technologies array)
+            const technologies = project.caseStudy?.projectOverview?.technologies?.nodes || 
+                                project.caseStudy?.projectOverview?.technologies || [];
+            
+            return technologies.length > 0 ? (
+              <section className="tech-stack">
+                <h2>Technologies Used</h2>
+                <div className="tech-grid">
+                  {technologies.map((tech) => (
+                    <div key={tech.id} className="tech-item">
+                      {tech.featuredImage?.node && (
+                        <Image
+                          src={tech.featuredImage.node.sourceUrl}
+                          alt={tech.featuredImage.node.altText || tech.title}
+                          width={40}
+                          height={40}
+                          className="tech-icon"
+                          onError={(e) => {
+                            // Fallback to a default icon if the image fails to load
+                            e.currentTarget.src = '/icons/code.svg';
+                          }}
+                        />
+                      )}
+                      <span>{tech.title}</span>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ) : null;
+          })()}
 
           {/* Main Content (if available) */}
           {project.content && (
