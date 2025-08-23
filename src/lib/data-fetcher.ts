@@ -56,24 +56,30 @@ const FALLBACK_HOMEPAGE_DATA: HomepageSections = {
   }
 };
 
+// Minimal fallback data - WordPress should provide the real content
 const FALLBACK_PROJECTS_DATA = {
   projects: {
     nodes: [
       {
-        id: "1",
-        title: "Sample Project",
-        excerpt: "A showcase project demonstrating modern web development techniques.",
-        slug: "sample-project",
+        id: "fallback-1",
+        title: "WordPress Configuration Required",
+        excerpt: "Projects will appear here once WordPress custom post types and ACF fields are properly configured.",
+        slug: "wordpress-config-required",
+        content: "<p>This is a fallback message. Real project data will come from WordPress once the setup is complete.</p>",
         featuredImage: {
           node: {
             sourceUrl: "/images/Blog-sample-img.png",
-            altText: "Sample Project",
+            altText: "Configuration Required",
             mediaDetails: { height: 600, width: 800 }
           }
         },
         caseStudy: {
+          projectContent: {
+            challenge: "<p>WordPress needs to be configured with proper custom post types and ACF fields.</p>",
+            solution: "<p>Import the ACF configuration and create real project content in WordPress admin.</p>"
+          },
           projectLinks: {
-            liveSite: "https://example.com"
+            liveSite: ""
           }
         }
       }
@@ -190,8 +196,8 @@ export class DataFetcher {
       async () => {
         console.log('🔍 Attempting to fetch projects data from:', process.env.NEXT_PUBLIC_WORDPRESS_API_URL);
         
-        // Use optimized query with pagination
-        const OPTIMIZED_PROJECTS_QUERY = `
+        // First, try the custom post type query
+        const PROJECTS_QUERY = `
           query GetProjects($limit: Int!) {
             projects(first: $limit, where: { orderby: { field: DATE, order: DESC } }) {
               nodes {
@@ -218,10 +224,66 @@ export class DataFetcher {
             }
           }
         `;
-        
-        const response = await client.request(OPTIMIZED_PROJECTS_QUERY, { limit });
-        console.log('✅ WordPress projects data loaded successfully:', response);
-        return response;
+
+        try {
+          const response = await client.request(PROJECTS_QUERY, { limit });
+          console.log('✅ WordPress projects data loaded successfully:', response);
+          return response;
+        } catch (error: any) {
+          console.warn('⚠️ GraphQL projects query failed, trying REST API...');
+          
+          // Try to get projects via WordPress REST API directly
+          try {
+            const restResponse = await fetch(`${process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '')}/wp-json/wp/v2/project?_embed`);
+            
+            if (restResponse.ok) {
+              const restProjects = await restResponse.json();
+              console.log(`✅ Found ${restProjects.length} projects via REST API`);
+              
+              // Transform REST API data to match GraphQL structure
+              const transformedResponse = {
+                projects: {
+                  nodes: restProjects.map((project: any) => ({
+                    id: project.id.toString(),
+                    title: project.title?.rendered || project.title,
+                    excerpt: project.excerpt?.rendered || project.excerpt || '',
+                    slug: project.slug,
+                    featuredImage: project._embedded?.['wp:featuredmedia']?.[0] ? {
+                      node: {
+                        sourceUrl: project._embedded['wp:featuredmedia'][0].source_url,
+                        altText: project._embedded['wp:featuredmedia'][0].alt_text || project.title?.rendered,
+                        mediaDetails: {
+                          height: project._embedded['wp:featuredmedia'][0].media_details?.height || 600,
+                          width: project._embedded['wp:featuredmedia'][0].media_details?.width || 800
+                        }
+                      }
+                    } : {
+                      node: {
+                        sourceUrl: '/images/Blog-sample-img.png',
+                        altText: project.title?.rendered || 'Project Image',
+                        mediaDetails: { height: 600, width: 800 }
+                      }
+                    },
+                    caseStudy: {
+                      projectLinks: {
+                        liveSite: `/projects/${project.slug}`
+                      }
+                    }
+                  }))
+                }
+              };
+              
+              console.log('✅ WordPress REST projects data transformed successfully');
+              return transformedResponse;
+            }
+          } catch (restError) {
+            console.warn('⚠️ REST API also failed:', restError.message);
+          }
+          
+          console.error('❌ Both GraphQL and REST API failed for projects');
+          console.error('   Using minimal fallback data');
+          throw error; // Use fallback data
+        }
       },
       FALLBACK_PROJECTS_DATA,
       'Error fetching projects data'

@@ -2,91 +2,169 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project Overview
-
-This is a Next.js 15 personal portfolio website for Edris Husein using the App Router, TypeScript, and SCSS. The site uses a headless WordPress CMS backend for content management with a hybrid data approach for development/fallback.
-
-### WordPress CMS Backend
-- **Location**: `/Users/edrishusein/Local Sites/cmsedrishuseincom`
-- **Environment**: Local development (blueprint.local)
-- **Stack**: WordPress + MySQL + Nginx + PHP 8.2
-
-### Key WordPress Plugins
-- **WPGraphQL (v2.1.1)**: Core GraphQL API layer
-- **WPGraphQL for ACF (v2.4.1)**: Custom fields integration
-- **FaustWP (v1.8.0)**: Headless WordPress framework optimized for Next.js
-- **Advanced Custom Fields**: Content modeling for portfolio projects
-- **JWT Authentication**: Secure API access
-
 ## Development Commands
 
 - `npm run dev` - Start development server with Turbopack
-- `npm run build` - Build the application for production
+- `npm run build` - Build the application for production  
 - `npm run start` - Start production server
-- `npm run lint` - Run ESLint
+- `npm run lint` - Run ESLint to check code quality
 
-## Git Commit Guidelines
+## Project Architecture
 
-When making commits, use standard commit messages without AI tool attribution. Do not include:
-- "🤖 Generated with [Claude Code]" 
-- "Co-Authored-By: Claude <noreply@anthropic.com>"
+This is a Next.js 15 portfolio website with headless WordPress CMS integration. The architecture follows a hybrid approach with WordPress as primary content source and comprehensive fallback systems.
 
-Keep commit messages clean and focused on the actual changes made.
+### Tech Stack
+- **Frontend**: Next.js 15 (App Router), TypeScript, React 19
+- **Styling**: SCSS with design system (variables + mixins)
+- **CMS**: WordPress headless via WPGraphQL + Advanced Custom Fields
+- **Data Fetching**: GraphQL with Apollo Client and fallback mechanisms
 
-## Architecture & Data Flow
+### WordPress Integration
+- **GraphQL Endpoint**: `NEXT_PUBLIC_WORDPRESS_API_URL` environment variable
+- **Local Backend**: `/Users/edrishusein/Local Sites/cmsedrishuseincom` (Local by Flywheel)
+- **Production Backend**: `cms.edrishusein.com`
+- **Local Environment**: PHP 8.2.23, MySQL 8.0.35, Nginx 1.26.1
 
-### Content Management Strategy
-The site uses a dual-content approach:
-- **Primary**: WordPress headless CMS via GraphQL for dynamic content (hero sections, projects, about)
-- **Fallback**: Static data files in `/src/data/` for development and backup
+#### Core Plugins Stack
+- **WPGraphQL**: Core GraphQL API layer for headless architecture
+- **WPGraphQL for ACF**: Exposes Advanced Custom Fields via GraphQL
+- **FaustWP**: Headless WordPress framework optimized for Next.js
+- **Advanced Custom Fields (ACF)**: Content modeling and custom field management
+- **WP GraphiQL**: GraphQL IDE for query development and testing
+- **WPGraphQL Smart Cache**: Performance optimization for GraphQL queries
+- **WPGraphQL Content Blocks**: Block editor content via GraphQL
 
-### WordPress Backend Setup
-- **GraphQL Endpoint**: Configured in `NEXT_PUBLIC_WORDPRESS_API_URL`
-- **Content Types**: Uses custom ACF fields for portfolio projects and homepage sections
-- **Development Tool**: WP GraphiQL available for query testing
-- **Media**: WordPress media library for project images and assets
+#### Content Architecture
+- **Custom Post Types**: Projects, Books (Bookshelf)
+- **Default Post Types**: Posts (Blog/Notebook), Pages (Homepage sections)
+- **Custom Theme**: `headless-wp-theme` - Security-optimized theme for headless setups
 
-### GraphQL Integration
-- **Client**: `src/lib/client.ts` - GraphQL client configuration
-- **Queries**: `src/lib/queries/index.ts` - All GraphQL queries centralized
-- **Environment**: Requires `NEXT_PUBLIC_WORDPRESS_API_URL` in `.env.local`
+### Data Flow Architecture
+The application implements a sophisticated data fetching strategy via `src/lib/data-fetcher.ts`:
 
-Key queries:
-- `GET_HOMEPAGE_DATA` - Homepage sections and content
-- `GET_PROJECTS_FOR_GRID` - Project listings for homepage
-- `GET_ALL_PROJECTS` - All projects for projects page
-- `GET_CASE_STUDY` - Individual project details
+1. **Primary**: GraphQL queries to WordPress CMS
+2. **Fallback**: Comprehensive static data when WordPress unavailable
+3. **Error Handling**: Graceful degradation with logging
+4. **Development Mode**: Enhanced debugging and fallback warnings
 
-### Page Architecture
-- **Homepage** (`app/page.tsx`): Server-side rendered, fetches both homepage and project data in parallel
-- **Projects** (`app/projects/[slug]/page.tsx`): Client-side rendered dynamic pages using API routes
-- **API Route** (`app/api/project/route.ts`): Simplified GraphQL proxy for project data
+Key data transformation occurs in `src/lib/section-registry.ts`:
+- `SectionFactory.createHomepageSections()` - Converts WordPress data to component configs
+- `SectionTransformers` - Handles data normalization and null-safety
+- Dynamic section ordering and configuration management
 
-### Component Structure
-Components are organized by feature with co-located SCSS files:
-- Layout components: Header, Footer, Hero
-- Content components: InfoCards (configurable card system), About, Contact
-- Each component has its own `.scss` file following BEM methodology
+### Component Architecture
+
+#### InfoCards System (`src/components/InfoCards/`)
+Universal card component with multiple skins:
+- `default` - General purpose cards
+- `projects` - Project showcase with hover effects
+- `blog` - Blog post previews
+- `bookshelf` - Book recommendations
+- `techstack` - Technology showcase
+
+#### Dynamic Homepage Rendering
+- `SectionRenderer` component processes WordPress ACF sections
+- Factory pattern creates section configurations
+- Supports reordering and enabling/disabling sections
+- Fallback to static content when CMS unavailable
+
+#### Case Study Pages (`/projects/[slug]`)
+- Dynamic routing with slug-based URLs
+- Client-side data fetching via API routes
+- MoreProjects component for related content
+- Technology association with fallback stacks
 
 ### Styling System
-- **SCSS Architecture**: Variables (`src/styles/variables.scss`) and mixins (`src/styles/mixins.scss`)
-- **Page Styles**: Organized in `src/styles/pages/` by page type
-- **Font Loading**: Custom fonts (Syncopate, Inter) preloaded in layout
-- **Design Pattern**: Dark/light variants with consistent spacing system
 
-### Data Transformation
-Homepage data flows through transformation layers:
-1. GraphQL response from WordPress
-2. Null-safe transformation for component props
-3. InfoCards component with flexible configuration
+#### SCSS Architecture
+- **Variables** (`src/styles/variables.scss`): Colors, typography, spacing, breakpoints
+- **Mixins** (`src/styles/mixins.scss`): Button system, responsive helpers, layout utilities
+- **Component Styles**: Co-located `.scss` files using BEM methodology
+- **Page Styles**: Organized in `src/styles/pages/` by route
 
-## Key Environment Variables
+#### Design System Features
+- 8px spacing grid system (`$spacing-xs` to `$spacing-5xl`)
+- Semantic color palette with dark/light variants
+- Button variants: primary, secondary, outline, ghost
+- Mobile-first responsive breakpoints
+- Consistent typography scale
 
-- `NEXT_PUBLIC_WORDPRESS_API_URL` - WordPress GraphQL endpoint (required for production)
+### Security Configuration
+Next.js config includes comprehensive security headers:
+- Content Security Policy with domain restrictions
+- X-Frame-Options, X-Content-Type-Options
+- Strict Transport Security
+- Image domain allowlist for WordPress media
 
-## Development Notes
+### Environment Setup
 
-- The site gracefully handles WordPress API failures with fallback content
-- All pages use `export const dynamic = 'force-dynamic'` for fresh data
-- Project pages use client-side fetching through API routes for better error handling
-- Static assets (images, fonts) are in `/public/` directory
+#### Required Environment Variables
+- `NEXT_PUBLIC_WORDPRESS_API_URL` - WordPress GraphQL endpoint URL
+  - Local: `https://cmsedrishuseincom.local/graphql`
+  - Production: `https://cms.edrishusein.com/graphql`
+
+#### WordPress Development Setup
+1. **Local Environment**: Uses Local by Flywheel (`blueprint.local`)
+2. **Database**: MySQL with `local` database, `root:root` credentials
+3. **Services**: Nginx (port 10048), PHP-FPM (port 10047), MySQL (port 10049)
+4. **GraphQL Testing**: Access WP GraphiQL at `/wp-admin/admin.php?page=graphiql-ide`
+5. **Security**: Custom theme includes CORS headers and security hardening
+
+### Development Patterns
+- All pages use `export const dynamic = 'force-dynamic'` for fresh content
+- Comprehensive error boundaries and fallback systems  
+- TypeScript strict mode with custom path aliases (`@/*`, `@/src/*`)
+- Parallel data fetching with `Promise.allSettled()`
+- Development-only logging and debugging features
+
+### Content Management
+
+#### WordPress Theme Features
+The `headless-wp-theme` provides:
+- **Security Hardening**: Disabled XML-RPC, WP version removal, security headers
+- **Performance Optimization**: Disabled emojis, dequeued unnecessary scripts/styles
+- **CORS Configuration**: Allowed origins for `localhost:3000`, `edrishusein.com`
+- **Admin Optimizations**: Cleaned menu pages, helpful admin notices
+
+#### ACF Field Groups Structure
+- **Homepage Sections**: Hero, About, Projects, Bookshelf, Tech Stack, Notebook, Contact
+- **Project Case Studies**: Basic info, technologies, content sections, links, gallery
+- **Blog Posts**: Reading time, conclusion sections, key takeaways, featured images
+- **Custom Post Types**: Books (Bookshelf), Projects with GraphQL integration
+
+#### Content Export Files
+- **ACF Blog Fields**: `/acf-blog-fields-export.json` - Blog post custom fields
+- **Custom Post Types**: `/wordpress-exports/acf-custom-post-types-2025-07-12.json`
+- **Homepage Sections**: Available in ACF exports for field group imports
+
+#### GraphQL Schema
+WordPress GraphQL exposes:
+- **Projects**: Custom post type with case study fields, featured images, technologies
+- **Books**: Bookshelf custom post type with category taxonomy
+- **Posts**: Blog content with custom fields and reading time
+- **Homepage Data**: ACF sections for dynamic homepage rendering
+- **Media**: WordPress media library with optimized image URLs
+
+#### Common Issues & Troubleshooting
+
+**Projects Not Loading from GraphQL:**
+If projects show in WordPress admin but GraphQL query fails with "Cannot query field 'projects'":
+
+1. **Check Custom Post Type Registration:**
+   - Go to WordPress Admin → ACF → Post Types
+   - Ensure "Projects" post type has these GraphQL settings:
+     - `show_in_graphql: true`
+     - `graphql_single_name: "project"`
+     - `graphql_plural_name: "projects"`
+
+2. **Import Custom Post Type Configuration:**
+   - Go to WordPress Admin → Custom Fields → Tools → Import
+   - Import `/wordpress-exports/acf-custom-post-types-2025-07-12.json`
+   - This contains the proper GraphQL configuration
+
+3. **Verify GraphQL Endpoint:**
+   - Test query at `https://cms.edrishusein.com/wp-admin/admin.php?page=graphiql-ide`
+   - Query: `{ projects(first: 1) { nodes { id title } } }`
+
+**Fallback System:**
+The application includes comprehensive fallback data in `src/lib/data-fetcher.ts` that displays sample projects when WordPress GraphQL fails, ensuring the site remains functional during configuration issues.
