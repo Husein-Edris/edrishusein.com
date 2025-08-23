@@ -2,10 +2,33 @@
 import Image from 'next/image';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
-import { client } from '@/src/lib/client';
-import { GET_ABOUT_PAGE } from '@/src/lib/queries';
 import { Metadata } from 'next';
 import '@/src/styles/pages/About.scss';
+
+// Types based on actual ACF field structure
+interface ExperienceItem {
+  company_name: string;
+  position: string;
+  duration: string;
+  description: string;
+  technologies?: string;
+}
+
+interface SkillPost {
+  ID: number;
+  post_title: string;
+  post_content?: string;
+  post_excerpt?: string;
+  // Add more fields as needed
+}
+
+interface HobbyPost {
+  ID: number;
+  post_title: string;
+  post_content?: string;
+  post_excerpt?: string;
+  // Add more fields as needed
+}
 
 interface AboutPageFields {
   aboutHeroTitle?: string;
@@ -22,23 +45,11 @@ interface AboutPageFields {
   };
   experienceSection?: {
     sectionTitle: string;
-    experienceItems: Array<{
-      companyName: string;
-      position: string;
-      duration: string;
-      description: string;
-      technologies: string;
-    }>;
+    experienceItems: ExperienceItem[];
   };
   skillsSection?: {
     sectionTitle: string;
-    skillCategories: Array<{
-      categoryName: string;
-      skills: Array<{
-        skillName: string;
-        proficiencyLevel: string;
-      }>;
-    }>;
+    selectedSkills: SkillPost[];
   };
   personalSection?: {
     sectionTitle: string;
@@ -53,6 +64,7 @@ interface AboutPageFields {
         };
       };
     };
+    selectedHobbies: HobbyPost[];
   };
 }
 
@@ -95,7 +107,7 @@ const FALLBACK_ABOUT_DATA = {
         sectionTitle: "Experience",
         experienceItems: [
           {
-            companyName: "Freelance",
+            company_name: "Freelance",
             position: "Full-Stack Developer",
             duration: "2020 - Present",
             description: "Developing modern web applications using React, Next.js, and WordPress",
@@ -105,29 +117,22 @@ const FALLBACK_ABOUT_DATA = {
       },
       skillsSection: {
         sectionTitle: "Skills & Technologies",
-        skillCategories: [
-          {
-            categoryName: "Frontend",
-            skills: [
-              { skillName: "React", proficiencyLevel: "Expert" },
-              { skillName: "Next.js", proficiencyLevel: "Expert" },
-              { skillName: "TypeScript", proficiencyLevel: "Advanced" },
-              { skillName: "SCSS", proficiencyLevel: "Expert" }
-            ]
-          },
-          {
-            categoryName: "Backend",
-            skills: [
-              { skillName: "Node.js", proficiencyLevel: "Advanced" },
-              { skillName: "WordPress", proficiencyLevel: "Expert" },
-              { skillName: "GraphQL", proficiencyLevel: "Advanced" }
-            ]
-          }
+        selectedSkills: [
+          { ID: 1, post_title: "React" },
+          { ID: 2, post_title: "Next.js" },
+          { ID: 3, post_title: "WordPress" },
+          { ID: 4, post_title: "TypeScript" },
+          { ID: 5, post_title: "SCSS" }
         ]
       },
       personalSection: {
         sectionTitle: "Personal",
-        personalContent: "When I'm not coding, I enjoy reading, exploring new technologies, and working on personal projects that challenge my creativity and technical skills."
+        personalContent: "<p>When I'm not coding, I enjoy reading, exploring new technologies, and working on personal projects that challenge my creativity and technical skills.</p>",
+        selectedHobbies: [
+          { ID: 1, post_title: "Reading" },
+          { ID: 2, post_title: "Technology Research" },
+          { ID: 3, post_title: "Personal Projects" }
+        ]
       }
     }
   }
@@ -135,16 +140,21 @@ const FALLBACK_ABOUT_DATA = {
 
 async function getAboutPageData(): Promise<AboutPageData> {
   try {
-    console.log('🔍 Fetching about page data from WordPress...');
-    const data: AboutPageData = await client.request(GET_ABOUT_PAGE);
+    console.log('🔍 Fetching about page data via REST API...');
     
-    if (!data.page) {
-      console.warn('⚠️ No about page found, using fallback data');
-      return FALLBACK_ABOUT_DATA;
+    // First try our REST API endpoint
+    const apiResponse = await fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : ''}/api/about`);
+    
+    if (apiResponse.ok) {
+      const result = await apiResponse.json();
+      if (result.data) {
+        console.log('✅ About page data loaded successfully from REST API');
+        return result.data;
+      }
     }
     
-    console.log('✅ About page data loaded successfully');
-    return data;
+    console.warn('⚠️ REST API failed, using fallback data');
+    return FALLBACK_ABOUT_DATA;
   } catch (error) {
     console.error('❌ Error fetching about page data:', error);
     console.log('🔄 Using fallback about page data');
@@ -219,7 +229,7 @@ export default async function AboutPage() {
         )}
 
         {/* Experience Section */}
-        {fields?.experienceSection && (
+        {fields?.experienceSection && fields.experienceSection.experienceItems.length > 0 && (
           <section className="about-experience">
             <div className="container">
               <h2 className="section-title">{fields.experienceSection.sectionTitle}</h2>
@@ -230,7 +240,7 @@ export default async function AboutPage() {
                       <h3 className="position">{item.position}</h3>
                       <span className="duration">{item.duration}</span>
                     </div>
-                    <h4 className="company">{item.companyName}</h4>
+                    <h4 className="company">{item.company_name}</h4>
                     <p className="description">{item.description}</p>
                     {item.technologies && (
                       <div className="technologies">
@@ -246,22 +256,17 @@ export default async function AboutPage() {
         )}
 
         {/* Skills Section */}
-        {fields?.skillsSection && (
+        {fields?.skillsSection && fields.skillsSection.selectedSkills.length > 0 && (
           <section className="about-skills">
             <div className="container">
               <h2 className="section-title">{fields.skillsSection.sectionTitle}</h2>
               <div className="skills-grid">
-                {fields.skillsSection.skillCategories.map((category, index) => (
-                  <div key={index} className="skill-category">
-                    <h3 className="category-title">{category.categoryName}</h3>
-                    <div className="skills-list">
-                      {category.skills.map((skill, skillIndex) => (
-                        <div key={skillIndex} className="skill-item">
-                          <span className="skill-name">{skill.skillName}</span>
-                          <span className="skill-level">{skill.proficiencyLevel}</span>
-                        </div>
-                      ))}
-                    </div>
+                {fields.skillsSection.selectedSkills.map((skill, index) => (
+                  <div key={skill.ID || index} className="skill-item">
+                    <h3 className="skill-name">{skill.post_title}</h3>
+                    {skill.post_excerpt && (
+                      <p className="skill-description">{skill.post_excerpt}</p>
+                    )}
                   </div>
                 ))}
               </div>
@@ -280,7 +285,22 @@ export default async function AboutPage() {
                     className="personal-description"
                     dangerouslySetInnerHTML={{ __html: fields.personalSection.personalContent }}
                   />
+                  
+                  {/* Hobbies */}
+                  {fields.personalSection.selectedHobbies && fields.personalSection.selectedHobbies.length > 0 && (
+                    <div className="hobbies-section">
+                      <h3 className="hobbies-title">Interests & Hobbies</h3>
+                      <div className="hobbies-list">
+                        {fields.personalSection.selectedHobbies.map((hobby, index) => (
+                          <div key={hobby.ID || index} className="hobby-item">
+                            <span className="hobby-name">{hobby.post_title}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
+                
                 {fields.personalSection.personalImage && (
                   <div className="personal-image">
                     <Image

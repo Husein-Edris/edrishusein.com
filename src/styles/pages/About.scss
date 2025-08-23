@@ -302,6 +302,65 @@
 
   // Skills Section
   .about-skills {
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: calc($spacing-unit * 3);
+      
+      .skill-item {
+        background: rgba($text-light-gray, 0.1);
+        padding: calc($spacing-unit * 2);
+        border-radius: 8px;
+        text-align: center;
+        
+        .skill-name {
+          font-weight: $font-weight-medium;
+          display: block;
+          margin-bottom: calc($spacing-unit);
+        }
+        
+        .skill-description {
+          font-size: $font-size-sm;
+          color: $text-light-gray;
+        }
+      }
+    }
+  }
+
+  // Personal Section
+  .about-personal {
+    .hobbies-section {
+      margin-top: calc($spacing-unit * 4);
+      
+      .hobbies-title {
+        font-size: $font-size-lg;
+        margin-bottom: calc($spacing-unit * 2);
+        color: $color-beige;
+      }
+      
+      .hobbies-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: calc($spacing-unit * 1.5);
+        
+        .hobby-item {
+          background: rgba($color-beige, 0.2);
+          padding: calc($spacing-unit * 0.75) calc($spacing-unit * 1.5);
+          border-radius: 20px;
+          border: 1px solid rgba($color-beige, 0.3);
+          
+          .hobby-name {
+            font-size: $font-size-sm;
+            color: $color-beige;
+            font-weight: $font-weight-medium;
+          }
+        }
+      }
+    }
+  }
+
+  // Skills Section
+  .about-skills {
     padding: calc($spacing-unit * 8) 0;
     border-top: 1px solid rgba($white, 0.1);
 
