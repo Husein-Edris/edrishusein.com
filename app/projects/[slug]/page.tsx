@@ -133,31 +133,6 @@ export default function ProjectPage() {
               />
             )}
             
-            {/* Project Links */}
-            {project.caseStudy?.projectLinks && (
-              <div className="project-links">
-                {project.caseStudy.projectLinks.liveSite && (
-                  <a
-                    href={project.caseStudy.projectLinks.liveSite}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="link-button primary"
-                  >
-                    View Live Site
-                  </a>
-                )}
-                {project.caseStudy.projectLinks.github && (
-                  <a
-                    href={project.caseStudy.projectLinks.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="link-button secondary"
-                  >
-                    View Code
-                  </a>
-                )}
-              </div>
-            )}
           </div>
         </div>
 
@@ -209,16 +184,7 @@ export default function ProjectPage() {
             ) : null;
           })()}
 
-          {/* Main Content (if available) */}
-          {project.content && (
-            <section className="project-content">
-              <h2>Project Overview</h2>
-              <div
-                className="content"
-                dangerouslySetInnerHTML={{ __html: project.content }}
-              />
-            </section>
-          )}
+
 
           {/* The Challenge */}
           {project.caseStudy?.projectContent?.challenge && (
