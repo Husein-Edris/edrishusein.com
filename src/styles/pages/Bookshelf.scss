@@ -54,16 +54,19 @@
     .book-card {
       display: flex;
       flex-direction: column;
+      align-items: center;
+      text-align: center;
       
       .book-cover, .image-wrapper {
-        width: 100%;
-        aspect-ratio: 3/4;
+        width: 160px;
+        height: 240px;
         border-radius: 8px;
         overflow: hidden;
-        margin-bottom: 16px;
+        margin: 0 auto 16px;
         position: relative;
         background: linear-gradient(135deg, #2563eb, #4f46e5);
         @include flex-center;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
         
         img, .book-image {
           width: 100%;
