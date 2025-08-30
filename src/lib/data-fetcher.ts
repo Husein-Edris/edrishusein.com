@@ -266,7 +266,7 @@ export class DataFetcher {
                     },
                     caseStudy: {
                       projectLinks: {
-                        liveSite: `/projects/${project.slug}`
+                        liveSite: project.acf_fields?.project_links?.live_site || project.acf?.project_links?.live_site || null
                       }
                     }
                   }))

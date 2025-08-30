@@ -143,12 +143,14 @@
 
       .tech-item {
         display: flex;
+        flex-direction: column;
         align-items: center;
         gap: $spacing-unit;
-        padding: calc($spacing-unit * 1.5);
+        padding: calc($spacing-unit * 2);
         background: rgba($text-light-gray, 0.1);
         border-radius: 8px;
         transition: transform 0.3s ease, background-color 0.3s ease;
+        text-align: center;
 
         &:hover {
           transform: translateY(-4px);
@@ -156,9 +158,11 @@
         }
 
         img {
-          width: 40px;
-          height: 40px;
+          width: 210px;
+          height: 210px;
           object-fit: contain;
+          margin: 0 auto;
+          display: block;
         }
 
         span {

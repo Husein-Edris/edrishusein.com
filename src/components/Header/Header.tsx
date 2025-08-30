@@ -38,7 +38,7 @@ const Header: FC = () => {
               <li className="navItem">
                 <Link href="/projects" className="navLink" onClick={toggleMenu}>
                   <span className="navNumber">02</span>
-                  <span className="navText">PORTFOLIO</span>
+                  <span className="navText">PROJECTS</span>
                 </Link>
               </li>
               <li className="navItem">

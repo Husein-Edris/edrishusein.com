@@ -34,7 +34,7 @@ export class SectionTransformers {
       description: project.excerpt || 'No description available',
       image: project.featuredImage?.node?.sourceUrl,
       variant: 'dark' as const,
-      visitLink: project.caseStudy?.projectLinks?.liveSite || '#',
+      visitLink: project.caseStudy?.projectLinks?.liveSite || null,
       caseStudyLink: project.slug ? `/projects/${project.slug}` : '#'
     }));
   }
