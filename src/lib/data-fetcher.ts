@@ -194,7 +194,9 @@ export class DataFetcher {
   static async getProjectsData(limit: number = 6): Promise<FetchResult<ProjectsResponse>> {
     return this.fetchWithFallback(
       async () => {
-        console.log('🔍 Attempting to fetch projects data from:', process.env.NEXT_PUBLIC_WORDPRESS_API_URL);
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🔍 Attempting to fetch projects data from:', process.env.NEXT_PUBLIC_WORDPRESS_API_URL);
+        }
         
         // First, try the custom post type query
         const PROJECTS_QUERY = `

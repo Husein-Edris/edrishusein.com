@@ -75,7 +75,7 @@ const Header: FC = () => {
 
         <div className="socialLinks">
           <a
-            href="https://linkedin.com"
+            href="https://www.linkedin.com/in/edris-husein/"
             target="_blank"
             rel="noopener noreferrer"
             className="socialLink linkedin"
@@ -83,25 +83,12 @@ const Header: FC = () => {
             <Image
               src="/icons/linkedin.svg"
               alt="LinkedIn"
-              width={24}
-              height={24}
+              width={32}
+              height={32}
             />
           </a>
           <a
-            href="https://twitter.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="socialLink twitter"
-          >
-            <Image
-              src="/icons/x.svg"
-              alt="Twitter"
-              width={24}
-              height={24}
-            />
-          </a>
-          <a
-            href="https://github.com"
+            href="https://github.com/Husein-Edris"
             target="_blank"
             rel="noopener noreferrer"
             className="socialLink github"
@@ -109,8 +96,8 @@ const Header: FC = () => {
             <Image
               src="/icons/github.svg"
               alt="GitHub"
-              width={24}
-              height={24}
+              width={32}
+              height={32}
             />
           </a>
         </div>
