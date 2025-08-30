@@ -48,14 +48,20 @@ const Header: FC = () => {
                 </Link>
               </li>
               <li className="navItem">
-                <Link href="/notebook" className="navLink" onClick={toggleMenu}>
+                <Link href="/bookshelf" className="navLink" onClick={toggleMenu}>
                   <span className="navNumber">04</span>
+                  <span className="navText">BOOKSHELF</span>
+                </Link>
+              </li>
+              <li className="navItem">
+                <Link href="/notebook" className="navLink" onClick={toggleMenu}>
+                  <span className="navNumber">05</span>
                   <span className="navText">NOTEBOOK</span>
                 </Link>
               </li>
               <li className="navItem">
                 <Link href="/contact" className="navLink" onClick={toggleMenu}>
-                  <span className="navNumber">05</span>
+                  <span className="navNumber">06</span>
                   <span className="navText">CONTACT</span>
                 </Link>
               </li>
