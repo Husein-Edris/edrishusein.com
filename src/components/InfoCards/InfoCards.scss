@@ -18,7 +18,7 @@
   // Grid styles with tablet support
   .cards-grid {
     display: grid;
-    gap: calc($spacing-unit * 4);
+    gap: calc($spacing-unit * 2);
     margin-bottom: calc($spacing-unit * 8);
     padding: calc($spacing-unit * 2);
 
@@ -235,7 +235,8 @@
 
     .project-links {
       display: flex;
-      justify-content: center;
+      justify-content: flex-start;
+      gap: $spacing-sm;
       opacity: 0.7;
       width: 100%;
       transform: translateY(10px);
@@ -407,7 +408,7 @@
 
     .card-title {
       font-family: $font-family-syncopate;
-      font-size: calc($font-size-base * 1.5);
+      font-size: $font-size-xxl;
       margin-bottom: $spacing-unit;
       text-transform: uppercase;
       letter-spacing: 0.05em;
