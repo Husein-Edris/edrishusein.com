@@ -77,17 +77,17 @@
       }
 
       .image-wrapper {
-        height: 180px;
+        height: 140px;
         width: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 30px;
+        padding: 0;
         background: #1a1a1a;
         position: relative;
         
         .tech-image {
-          width: auto;
+          width: 100%;
           height: 100%;
           object-fit: contain;
         }
@@ -107,7 +107,7 @@
       }
 
       .content {
-        padding: 24px;
+        padding: 20px;
         flex-grow: 1;
         display: flex;
         flex-direction: column;

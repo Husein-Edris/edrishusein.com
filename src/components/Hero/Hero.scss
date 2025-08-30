@@ -72,7 +72,7 @@
   .title {
     color: $white;
     font-family: $font-family-syncopate;
-    font-size: $font-size-4xl;
+    font-size: $font-size-h1;
     font-weight: $font-weight-bold;
     margin-bottom: $spacing-lg;
     display: flex;
@@ -99,10 +99,10 @@
       animation: wave 2s infinite;
       display: inline-block;
       transform-origin: 70% 70%;
-      font-size: $font-size-2xl;
+      font-size: $font-size-h1;
 
       @include mobile {
-        font-size: $font-size-xl;
+        font-size: $font-size-3xl;
       }
     }
   }
@@ -110,7 +110,7 @@
   .description {
     color: $text-light-gray;
     font-family: $font-family-base;
-    font-size: $font-size-lg;
+    font-size: $font-size-2xl;
     line-height: $line-height-base;
     max-width: 600px;
     opacity: 0.8;
