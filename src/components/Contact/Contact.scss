@@ -87,4 +87,45 @@
             font-size: $font-size-3xl;
         }
     }
+
+    .social-links {
+        display: flex;
+        gap: $spacing-lg;
+        justify-content: center;
+        margin-top: $spacing-xl;
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            border: 2px solid $white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            
+            &:hover {
+                background-color: $white;
+                transform: translateY(-4px);
+                
+                img {
+                    filter: invert(1);
+                }
+            }
+            
+            img {
+                transition: filter 0.3s ease;
+            }
+        }
+
+        @include mobile {
+            gap: $spacing-md;
+            margin-top: $spacing-lg;
+            
+            .social-link {
+                width: 50px;
+                height: 50px;
+            }
+        }
+    }
 }
