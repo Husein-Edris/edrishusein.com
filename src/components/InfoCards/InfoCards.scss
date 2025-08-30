@@ -378,12 +378,12 @@
       overflow: hidden;
 
       @include tablet {
-        padding: calc($spacing-unit * 2);
+        padding: 0;
         height: 250px;
       }
 
       @include mobile {
-        padding: calc($spacing-unit * 2);
+        padding: 0;
         height: 200px;
       }
 

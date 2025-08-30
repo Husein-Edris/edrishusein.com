@@ -5,14 +5,20 @@ import './Footer.scss';
 const Footer = () => {
     const currentYear = new Date().getFullYear();
     const mainLinks = [
+        { href: '/', label: 'Home' },
         { href: '/projects', label: 'Projects' },
         { href: '/about', label: 'About' },
-        { href: '/blog', label: 'Blog' },
+    ];
+
+    const secondaryLinks = [
+        { href: '/bookshelf', label: 'Bookshelf' },
+        { href: '/notebook', label: 'Notebook' },
+        { href: '/contact', label: 'Contact' },
     ];
 
     const legalLinks = [
-        { href: '/impressum', label: 'Impressum' },
-        { href: '/datenschutz', label: 'Datenschutz' },
+        { href: '/legal', label: 'Legal' },
+        { href: '/privacy', label: 'Privacy Policy' },
     ];
 
     return (
@@ -35,6 +41,13 @@ const Footer = () => {
                     <nav className="footer-nav">
                         <ul className="nav-list main-links">
                             {mainLinks.map((link) => (
+                                <li key={link.href}>
+                                    <Link href={link.href}>{link.label}</Link>
+                                </li>
+                            ))}
+                        </ul>
+                        <ul className="nav-list secondary-links">
+                            {secondaryLinks.map((link) => (
                                 <li key={link.href}>
                                     <Link href={link.href}>{link.label}</Link>
                                 </li>
