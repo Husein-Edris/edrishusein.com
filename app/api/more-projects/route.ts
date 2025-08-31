@@ -67,32 +67,21 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const excludeSlug = searchParams.get('exclude');
   
-  if (!excludeSlug) {
-    return NextResponse.json({ error: 'exclude parameter is required' }, { status: 400 });
+  if (!excludeSlug || typeof excludeSlug !== 'string' || excludeSlug.length > 100 || !/^[a-z0-9\-]+$/.test(excludeSlug)) {
+    return NextResponse.json({ error: 'Invalid exclude parameter' }, { status: 400 });
   }
   
   try {
-    console.log('🔍 Fetching other projects, excluding:', excludeSlug);
-    
     let data: { projects: { nodes: unknown[] } };
     
     try {
-      // Try the filtered query first
       data = await client.request(GET_OTHER_PROJECTS, { excludeSlug }) as { projects: { nodes: unknown[] } };
-      console.log('✅ Filtered query successful');
     } catch (filterError) {
-      console.warn('⚠️ Filtered query failed, falling back to get all projects:', filterError);
-      // Fall back to getting all projects and filtering client-side
       data = await client.request(GET_ALL_PROJECTS) as { projects: { nodes: unknown[] } };
-      // Filter out the current project
       data.projects.nodes = data.projects.nodes.filter(project => project.slug !== excludeSlug);
-      console.log('✅ Fallback query successful');
     }
     
-    // Limit to 3 projects
     const limitedProjects = data.projects.nodes.slice(0, 3);
-    
-    console.log('✅ Found', limitedProjects.length, 'other projects');
     
     return NextResponse.json({
       projects: {
@@ -100,21 +89,16 @@ export async function GET(request: NextRequest) {
       }
     });
   } catch (error) {
-    console.error('❌ GraphQL failed, trying REST API fallback:', error);
-    
     try {
-      // REST API fallback
       const restUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '')}/wp-json/wp/v2/project?_embed&per_page=10`;
       const restResponse = await fetch(restUrl);
       
       if (restResponse.ok) {
         const restProjects = await restResponse.json();
-        console.log('✅ REST API projects fetched for more-projects');
         
-        // Transform and filter projects
         const transformedProjects = restProjects
-          .filter((project: any) => project.slug !== excludeSlug) // Exclude current project
-          .slice(0, 3) // Limit to 3 projects
+          .filter((project: any) => project.slug !== excludeSlug)
+          .slice(0, 3)
           .map((project: any) => ({
             id: project.id.toString(),
             title: project.title?.rendered || project.title,
@@ -145,8 +129,6 @@ export async function GET(request: NextRequest) {
             }
           }));
         
-        console.log('✅ Transformed', transformedProjects.length, 'projects for more-projects');
-        
         return NextResponse.json({
           projects: {
             nodes: transformedProjects
@@ -157,12 +139,10 @@ export async function GET(request: NextRequest) {
       
       throw new Error('REST API also failed');
     } catch (restError) {
-      console.error('❌ REST API also failed:', restError);
+      console.error('REST API failed:', restError);
       return NextResponse.json(
         { 
-          error: 'Failed to fetch other projects from both GraphQL and REST API',
-          message: error instanceof Error ? error.message : 'Unknown error',
-          excludeSlug: excludeSlug
+          error: 'Failed to fetch projects'
         }, 
         { status: 500 }
       );

@@ -44,13 +44,8 @@ export default function MoreProjects({ currentProjectSlug }: MoreProjectsProps) 
   useEffect(() => {
     async function fetchOtherProjects() {
       try {
-        console.log('🔍 Fetching other projects, excluding:', currentProjectSlug);
-        
         const response = await fetch(`/api/more-projects?exclude=${currentProjectSlug}`);
         const data = await response.json();
-
-        console.log('📡 More projects API response:', response.status);
-        console.log('📄 More projects data:', data);
 
         if (!response.ok) {
           throw new Error(data.message || data.error || `HTTP error! Status: ${response.status}`);
@@ -66,10 +61,9 @@ export default function MoreProjects({ currentProjectSlug }: MoreProjectsProps) 
           caseStudyLink: `/projects/${project.slug}`
         }));
 
-        console.log('✅ Transformed', projectCards.length, 'project cards');
         setProjects(projectCards);
       } catch (err) {
-        console.error('❌ Error fetching other projects:', err);
+        console.error('Error fetching other projects:', err);
         setError(err instanceof Error ? err.message : 'Failed to load more projects');
       } finally {
         setLoading(false);
