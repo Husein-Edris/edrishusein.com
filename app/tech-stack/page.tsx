@@ -6,37 +6,38 @@ import '@/src/styles/pages/TechStack.scss';
 
 const client = new GraphQLClient(process.env.NEXT_PUBLIC_WORDPRESS_API_URL || '');
 
-const GET_TECH_STACK = `
-  query GetTechStack {
-    techs(first: 100) {
-      nodes {
-        id
-        title
-        excerpt
-        featuredImage {
-          node {
-            sourceUrl
-            altText
-            mediaDetails {
-              height
-              width
-            }
-          }
-        }
-      }
-    }
-  }
-`;
+// Note: 'techs' field doesn't exist in WordPress GraphQL schema
+// Using direct REST API call instead
 
 async function getTechStackData() {
   try {
-    console.log('🔍 Attempting to fetch tech stack from GraphQL...');
-    const data = await client.request(GET_TECH_STACK);
-    console.log('✅ GraphQL tech stack data:', data);
-    return data.techs.nodes;
+    console.log('🔍 Fetching tech stack directly from WordPress REST API...');
+    const response = await fetch(`${process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '')}/wp-json/wp/v2/tech?_embed&per_page=100`, {
+      next: { revalidate: 3600 }
+    });
+    
+    if (response.ok) {
+      const techs = await response.json();
+      console.log('✅ Tech stack data loaded via REST API');
+      
+      return techs.map((tech: any) => ({
+        id: tech.id.toString(),
+        title: tech.title?.rendered || tech.title,
+        excerpt: tech.excerpt?.rendered || tech.excerpt || '',
+        featuredImage: tech._embedded?.['wp:featuredmedia']?.[0] ? {
+          node: {
+            sourceUrl: tech._embedded['wp:featuredmedia'][0].source_url,
+            altText: tech._embedded['wp:featuredmedia'][0].alt_text || tech.title?.rendered || '',
+            mediaDetails: {
+              width: tech._embedded['wp:featuredmedia'][0].media_details?.width || 100,
+              height: tech._embedded['wp:featuredmedia'][0].media_details?.height || 100
+            }
+          }
+        } : null
+      }));
+    }
   } catch (error) {
-    console.error('❌ GraphQL tech stack failed:', error);
-    console.log('🔄 Trying REST API fallback...');
+    console.error('❌ Tech stack fetch failed:', error);
     
     try {
       const restUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '')}/wp-json/wp/v2/tech?_embed`;

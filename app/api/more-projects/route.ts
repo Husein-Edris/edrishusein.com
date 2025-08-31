@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
       data = await client.request(GET_OTHER_PROJECTS, { excludeSlug }) as { projects: { nodes: unknown[] } };
     } catch (filterError) {
       data = await client.request(GET_ALL_PROJECTS) as { projects: { nodes: unknown[] } };
-      data.projects.nodes = data.projects.nodes.filter(project => project.slug !== excludeSlug);
+      data.projects.nodes = data.projects.nodes.filter((project: any) => project.slug !== excludeSlug);
     }
     
     const limitedProjects = data.projects.nodes.slice(0, 3);

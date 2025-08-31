@@ -77,10 +77,10 @@ function InfoCards({
         )}
         <div className={`cards-grid columns-${columns}`}>
           {displayCards?.map((card, index) => {
-            // For project cards, make the entire card clickable to the case study page
-            const CardWrapper = skin === 'projects' ? Link : Link;
+            // For project cards, use div to avoid nested anchors, other cards use Link
+            const CardWrapper = skin === 'projects' ? 'div' : Link;
             const cardProps = skin === 'projects' 
-              ? { href: card.caseStudyLink || '#', className: `card ${card.variant || variant}` }
+              ? { className: `card ${card.variant || variant}` }
               : { href: card.link || '#', className: `card ${card.variant || variant}` };
 
             return (

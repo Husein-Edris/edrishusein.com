@@ -142,13 +142,15 @@ async function getAboutPageData(): Promise<AboutPageData> {
   try {
     console.log('🔍 Fetching about page data via REST API...');
     
-    // First try our REST API endpoint
-    const apiResponse = await fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : ''}/api/about`);
+    // Use our API endpoint for proper data transformation
+    const apiResponse = await fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:3001' : ''}/api/about`, {
+      next: { revalidate: 3600 }
+    });
     
     if (apiResponse.ok) {
       const result = await apiResponse.json();
       if (result.data) {
-        console.log('✅ About page data loaded successfully from REST API');
+        console.log('✅ About page data loaded successfully from API');
         return result.data;
       }
     }
