@@ -1,0 +1,182 @@
+@use '../src/styles/variables' as *;
+@use '../src/styles/mixins' as *;
+
+.loading-page {
+  background-color: $primary-color;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-xl;
+  }
+
+  .logo-spinner {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-circle {
+    width: 80px;
+    height: 80px;
+    background-color: $color-beige;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+    animation: logoFloat 3s ease-in-out infinite;
+  }
+
+  .logo-image {
+    filter: brightness(0) invert(1);
+    animation: logoGlow 2s ease-in-out infinite;
+  }
+
+  .pulse-rings {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .pulse-ring {
+    position: absolute;
+    border: 2px solid rgba($color-beige, 0.3);
+    border-radius: 50%;
+    animation: pulse 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+
+    &:nth-child(1) {
+      width: 100px;
+      height: 100px;
+      top: -50px;
+      left: -50px;
+      animation-delay: 0s;
+    }
+
+    &:nth-child(2) {
+      width: 120px;
+      height: 120px;
+      top: -60px;
+      left: -60px;
+      animation-delay: 0.3s;
+    }
+
+    &:nth-child(3) {
+      width: 140px;
+      height: 140px;
+      top: -70px;
+      left: -70px;
+      animation-delay: 0.6s;
+    }
+  }
+
+  .loading-text {
+    font-family: $font-family-base;
+    font-size: $font-size-lg;
+    color: $text-light-gray;
+    text-align: center;
+    opacity: 0.8;
+    animation: textFade 2s ease-in-out infinite;
+  }
+
+  @include mobile {
+    .logo-spinner {
+      width: 100px;
+      height: 100px;
+    }
+
+    .logo-circle {
+      width: 60px;
+      height: 60px;
+    }
+
+    .logo-text {
+      font-size: $font-size-lg;
+    }
+
+    .pulse-ring {
+      &:nth-child(1) {
+        width: 80px;
+        height: 80px;
+        top: -40px;
+        left: -40px;
+      }
+
+      &:nth-child(2) {
+        width: 100px;
+        height: 100px;
+        top: -50px;
+        left: -50px;
+      }
+
+      &:nth-child(3) {
+        width: 120px;
+        height: 120px;
+        top: -60px;
+        left: -60px;
+      }
+    }
+
+    .loading-text {
+      font-size: $font-size-base;
+    }
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+@keyframes logoFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes textFade {
+  0%, 100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes logoGlow {
+  0%, 100% {
+    filter: brightness(0) invert(1);
+  }
+  50% {
+    filter: brightness(0) invert(1) drop-shadow(0 0 10px rgba(178, 165, 155, 0.8));
+  }
+}

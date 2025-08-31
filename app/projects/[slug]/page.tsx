@@ -1,121 +1,84 @@
 // app/projects/[slug]/page.tsx
-"use client";
 
-import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
 import MoreProjects from '@/src/components/MoreProjects/MoreProjects';
 import '@/src/styles/pages/CaseStudy.scss';
 
-
-export default function ProjectPage() {
-  const params = useParams();
-  const [project, setProject] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [errorDetails, setErrorDetails] = useState(null);
-
-  const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        console.log('🔍 Fetching project data for slug:', slug);
-
-        const response = await fetch(`/api/project?slug=${slug}`);
-        const data = await response.json();
-
-        console.log('📡 API response status:', response.status);
-        console.log('📄 API response data:', data);
-
-        if (!response.ok) {
-          throw new Error(data.message || data.error || `HTTP error! Status: ${response.status}`);
-        }
-
-        if (!data.project) {
-          throw new Error('Project data is missing from response');
-        }
-
-        console.log('✅ Successfully received project data:', data.project.title);
-        console.log('🔍 Full project object:', data.project);
-        console.log('📋 Case study data:', data.project.caseStudy);
-        if (data.project.caseStudy) {
-          console.log('📊 Case study keys:', Object.keys(data.project.caseStudy));
-          if (data.project.caseStudy.projectOverview) {
-            console.log('🛠️ Project overview:', data.project.caseStudy.projectOverview);
-          }
-          if (data.project.caseStudy.projectContent) {
-            console.log('📝 Project content:', data.project.caseStudy.projectContent);
-          }
-          if (data.project.caseStudy.projectLinks) {
-            console.log('🔗 Project links:', data.project.caseStudy.projectLinks);
+async function getProject(slug: string) {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '')}/wp-json/wp/v2/project?slug=${slug}&_embed&acf_format=standard`, {
+      next: { revalidate: 3600 }
+    });
+    
+    if (!response.ok) return null;
+    
+    const projects = await response.json();
+    if (!Array.isArray(projects) || projects.length === 0) return null;
+    
+    const project = projects[0];
+    
+    return {
+      id: project.id.toString(),
+      title: project.title?.rendered || project.title,
+      slug: project.slug,
+      content: project.content?.rendered || project.content || '',
+      excerpt: project.excerpt?.rendered || project.excerpt || '',
+      featuredImage: project._embedded?.['wp:featuredmedia']?.[0] ? {
+        node: {
+          sourceUrl: project._embedded['wp:featuredmedia'][0].source_url,
+          altText: project._embedded['wp:featuredmedia'][0].alt_text,
+          mediaDetails: {
+            width: project._embedded['wp:featuredmedia'][0].media_details?.width,
+            height: project._embedded['wp:featuredmedia'][0].media_details?.height
           }
         }
-        setProject(data.project);
-      } catch (err) {
-        console.error('❌ Error fetching project:', err);
-        setError(err instanceof Error ? err.message : 'Unknown error occurred');
-        setErrorDetails(err.details || null);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    if (slug) {
-      fetchData();
-    } else {
-      setError('No project slug provided');
-      setLoading(false);
-    }
-  }, [slug]);
-
-  if (loading) {
-    return (
-      <>
-        <Header />
-        <main className="case-study">
-          <div className="container">
-            <h1 className="title">Loading project...</h1>
-          </div>
-        </main>
-        <Footer />
-      </>
-    );
+      } : null,
+      caseStudy: project.acf_fields || project.acf ? {
+        projectOverview: {
+          technologies: ((project.acf_fields || project.acf)?.project_overview?.tech_stack || []).map((tech: any) => ({
+            id: tech.ID || tech.id,
+            title: tech.post_title,
+            featuredImage: tech.featured_image ? {
+              node: {
+                sourceUrl: tech.featured_image.source_url || tech.featured_image,
+                altText: tech.post_title
+              }
+            } : null
+          }))
+        },
+        projectContent: {
+          challenge: (project.acf_fields || project.acf)?.project_content?.challenge || '',
+          solution: (project.acf_fields || project.acf)?.project_content?.solution || '',
+          keyFeatures: (project.acf_fields || project.acf)?.project_content?.key_features || []
+        },
+        projectLinks: {
+          liveSite: (project.acf_fields || project.acf)?.project_links?.live_site || '',
+          github: (project.acf_fields || project.acf)?.project_links?.github || ''
+        }
+      } : null
+    };
+  } catch (error) {
+    return null;
   }
+}
 
-  if (error || !project) {
-    return (
-      <>
-        <Header />
-        <main className="case-study">
-          <div className="container">
-            <h1 className="title">Project Not Found</h1>
-            <p>Sorry, we couldn&apos;t find the project you&apos;re looking for.</p>
-            <p>Requested slug: <code>{slug}</code></p>
-            {error && (
-              <div className="error-details">
-                <p><strong>Error:</strong> {error}</p>
-                {errorDetails && <p><strong>Details:</strong> {errorDetails}</p>}
-              </div>
-            )}
-            <div className="available-projects">
-              <h3>Available Projects:</h3>
-              <ul>
-                <li><Link href="/projects/beschutzerbox">Beschützerbox</Link></li>
-                <li><Link href="/projects/geschaftsbericht-fur-vorarlberger-landeskrankenhauser">Geschäftsbericht für Vorarlberger Landeskrankenhäuser</Link></li>
-              </ul>
-            </div>
-            <Link href="/projects" className="link-button">
-              Back to Projects
-            </Link>
-          </div>
-        </main>
-        <Footer />
-      </>
-    );
+export async function generateStaticParams() {
+  return [
+    { slug: 'beschutzerbox' },
+    { slug: 'geschaftsbericht-fur-vorarlberger-landeskrankenhauser' }
+  ];
+}
+
+export default async function ProjectPage({ params }: { params: { slug: string } }) {
+  const slug = params.slug;
+  const project = await getProject(slug);
+
+  if (!project) {
+    notFound();
   }
 
   return (

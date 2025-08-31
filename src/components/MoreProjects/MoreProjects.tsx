@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import InfoCards from '../InfoCards/InfoCards';
+import '../../../app/loading.scss';
 
 interface MoreProjectsProps {
   currentProjectSlug: string;
@@ -57,10 +59,10 @@ export default function MoreProjects({ currentProjectSlug }: MoreProjectsProps) 
         const projectCards: InfoCardProps[] = data.projects.nodes.map((project: any) => ({
           title: project.title,
           description: truncateExcerpt(project.excerpt, 120),
-          image: project.featuredImage?.node?.sourceUrl,
+          image: project.featuredImage?.node?.sourceUrl || '/images/Blog-sample-img.png',
           link: `/projects/${project.slug}`,
           variant: 'dark' as const,
-          visitLink: project.caseStudy?.projectLinks?.liveSite || '#',
+          visitLink: project.caseStudy?.projectLinks?.liveSite || null,
           caseStudyLink: `/projects/${project.slug}`
         }));
 
@@ -84,8 +86,26 @@ export default function MoreProjects({ currentProjectSlug }: MoreProjectsProps) 
 
   if (loading) {
     return (
-      <div className="more-projects-loading">
-        <p>Loading more projects...</p>
+      <div className="loading-page">
+        <div className="loading-container">
+          <div className="logo-spinner">
+            <div className="logo-circle">
+              <Image
+                src="/edrishusein-logo.svg"
+                alt="Edris Husein Logo"
+                width={60}
+                height={30}
+                className="logo-image"
+              />
+            </div>
+            <div className="pulse-rings">
+              <div className="pulse-ring"></div>
+              <div className="pulse-ring"></div>
+              <div className="pulse-ring"></div>
+            </div>
+          </div>
+          <p className="loading-text">Loading more projects...</p>
+        </div>
       </div>
     );
   }
