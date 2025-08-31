@@ -139,7 +139,7 @@
     overflow-x: hidden;
 
     .cards-grid {
-      // Removed hover effects for better performance
+      gap: $spacing-lg;
     }
 
     .card {

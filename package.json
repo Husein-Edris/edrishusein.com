@@ -4,12 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "build:prod": "next build",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
     "@apollo/client": "^3.13.0",
+    "critters": "^0.0.25",
     "graphql": "^16.10.0",
     "graphql-request": "^7.1.2",
     "next": "^15.5.2",

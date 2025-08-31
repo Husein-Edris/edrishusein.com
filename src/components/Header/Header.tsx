@@ -81,7 +81,7 @@ const Header: FC = () => {
             className="socialLink linkedin"
           >
             <Image
-              src="/icons/linkedin.svg"
+              src="/icons/LinkedIn.svg"
               alt="LinkedIn"
               width={32}
               height={32}
@@ -94,7 +94,7 @@ const Header: FC = () => {
             className="socialLink github"
           >
             <Image
-              src="/icons/github.svg"
+              src="/icons/Github.svg"
               alt="GitHub"
               width={32}
               height={32}

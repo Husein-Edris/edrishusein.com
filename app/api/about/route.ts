@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const WORDPRESS_REST_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '') || 'https://cms.edrishusein.com';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     console.log('🔍 Fetching About page data from WordPress REST API');
     
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
         console.log('✅ ACF fields retrieved:', acfData ? Object.keys(acfData) : 'none');
       }
     } catch (acfError) {
-      console.warn('⚠️ ACF data fetch failed:', acfError.message);
+      console.warn('⚠️ ACF data fetch failed:', acfError instanceof Error ? acfError.message : 'Unknown error');
     }
     
     // Transform the data to match the expected structure

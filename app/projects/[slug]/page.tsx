@@ -1,7 +1,6 @@
 // app/projects/[slug]/page.tsx
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
@@ -58,7 +57,8 @@ async function getProject(slug: string) {
         projectLinks: {
           liveSite: (project.acf_fields || project.acf)?.project_links?.live_site || '',
           github: (project.acf_fields || project.acf)?.project_links?.github || ''
-        }
+        },
+        projectGallery: (project.acf_fields || project.acf)?.project_gallery || []
       } : null
     };
   } catch (error) {
@@ -124,7 +124,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
               <section className="tech-stack">
                 <h2>Technologies Used</h2>
                 <div className="tech-grid">
-                  {technologies.map((tech) => (
+                  {technologies.map((tech: any) => (
                     <div key={tech.id} className="tech-item">
                       {tech.featuredImage?.node && (
                         <Image
@@ -205,7 +205,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
             <section className="key-features">
               <h2>Key Features</h2>
               <div className="features-grid">
-                {project.caseStudy.projectContent.keyFeatures.map((feature, index) => (
+                {project.caseStudy.projectContent.keyFeatures.map((feature: any, index: number) => (
                   <div key={index} className="feature-item">
                     {feature.image && (
                       <div className="feature-image">
@@ -233,7 +233,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
             <section className="project-gallery">
               <h2>Project Gallery</h2>
               <div className="gallery-grid">
-                {project.caseStudy.projectGallery.map((image, index) => (
+                {project.caseStudy.projectGallery.map((image: any, index: number) => (
                   <div key={index} className="gallery-item">
                     <Image
                       src={image.sourceUrl}
