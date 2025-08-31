@@ -17,6 +17,14 @@ export async function GET(request: NextRequest) {
   const slug = searchParams.get('slug');
   const limit = searchParams.get('limit');
 
+  if (slug && (typeof slug !== 'string' || slug.length > 100 || !/^[a-z0-9\-]+$/.test(slug))) {
+    return NextResponse.json({ error: 'Invalid slug parameter' }, { status: 400 });
+  }
+
+  if (limit && (typeof limit !== 'string' || !/^\d+$/.test(limit) || parseInt(limit) > 50)) {
+    return NextResponse.json({ error: 'Invalid limit parameter' }, { status: 400 });
+  }
+
   // If limit is provided, fetch multiple posts
   if (limit && !slug) {
     try {
