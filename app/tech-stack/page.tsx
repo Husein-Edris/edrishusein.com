@@ -2,7 +2,7 @@ import { GraphQLClient } from 'graphql-request';
 import Image from 'next/image';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
-import '@/src/styles/pages/TechStack.scss';
+import '@/src/styles/pages/CaseStudy.scss';
 
 const client = new GraphQLClient(process.env.NEXT_PUBLIC_WORDPRESS_API_URL || '');
 
@@ -79,40 +79,47 @@ export default async function TechStackPage() {
   return (
     <>
       <Header />
-      <main className="tech-stack-page">
-        <div className="container">
-          <div className="hero-section">
+      <main className="case-study">
+        {/* Hero Section */}
+        <div className="hero-section">
+          <div className="container">
             <h1 className="title">TECH STACK</h1>
-            <p className="description">
-              The dev tools, apps, devices, and games I use and play with
-            </p>
+            <div className="overview">
+              <p>The dev tools, apps, devices, and games I use and play with</p>
+            </div>
           </div>
+        </div>
 
-          <div className="tech-grid">
-            {techItems.map((tech: any) => (
-              <div key={tech.id} className="tech-card">
-                {tech.featuredImage?.node && (
-                  <div className="image-wrapper">
-                    <Image
-                      src={tech.featuredImage.node.sourceUrl}
-                      alt={tech.featuredImage.node.altText || tech.title}
-                      fill
-                      className="tech-image"
-                    />
-                  </div>
-                )}
-                <div className="content">
-                  <h3 className="tech-title">{tech.title}</h3>
-                  {tech.excerpt && (
-                    <div
-                      className="tech-description"
-                      dangerouslySetInnerHTML={{ __html: tech.excerpt }}
-                    />
+        <div className="container">
+          {/* Tech Grid */}
+          <section className="tech-section">
+            <div className="tech-grid">
+              {techItems.map((tech: any) => (
+                <div key={tech.id} className="tech-card">
+                  {tech.featuredImage?.node && (
+                    <div className="tech-image">
+                      <Image
+                        src={tech.featuredImage.node.sourceUrl}
+                        alt={tech.featuredImage.node.altText || tech.title}
+                        width={tech.featuredImage.node.mediaDetails?.width || 100}
+                        height={tech.featuredImage.node.mediaDetails?.height || 100}
+                        className="featured-image"
+                      />
+                    </div>
                   )}
+                  <div className="tech-content">
+                    <h3 className="tech-title">{tech.title}</h3>
+                    {tech.excerpt && (
+                      <div
+                        className="tech-description"
+                        dangerouslySetInnerHTML={{ __html: tech.excerpt }}
+                      />
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </section>
         </div>
       </main>
       <Footer />

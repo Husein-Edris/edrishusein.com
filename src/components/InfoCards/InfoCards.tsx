@@ -25,6 +25,8 @@ interface InfoCardsProps {
   skin?: 'projects' | 'blog' | 'default' | 'bookshelf' | 'techstack';
   className?: string;
   variant?: 'dark' | 'light';
+  viewMoreLink?: string;
+  viewMoreText?: string;
 }
 
 // Helper function to truncate text and strip HTML
@@ -53,7 +55,9 @@ function InfoCards({
   sectionTitle,
   skin = 'default',
   className = '',
-  variant = 'dark'
+  variant = 'dark',
+  viewMoreLink,
+  viewMoreText
 }: InfoCardsProps) {
   // For client component, we expect cards to be passed as props
   const displayCards = cards ? cards.map(card => ({
@@ -77,10 +81,10 @@ function InfoCards({
         )}
         <div className={`cards-grid columns-${columns}`}>
           {displayCards?.map((card, index) => {
-            // For project cards, use div to avoid nested anchors, other cards use Link
-            const CardWrapper = skin === 'projects' ? 'div' : Link;
+            // For project cards, wrap entire card in Link to case study
+            const CardWrapper = skin === 'projects' ? Link : Link;
             const cardProps = skin === 'projects' 
-              ? { className: `card ${card.variant || variant}` }
+              ? { href: card.caseStudyLink || '#', className: `card ${card.variant || variant}` }
               : { href: card.link || '#', className: `card ${card.variant || variant}` };
 
             if (skin !== 'projects' && !card.link) {
@@ -150,6 +154,14 @@ function InfoCards({
             );
           })}
         </div>
+
+        {viewMoreLink && (
+          <div className="view-more">
+            <Link href={viewMoreLink} className="view-more-link">
+              {viewMoreText || 'VIEW MORE'}
+            </Link>
+          </div>
+        )}
 
       </div>
     </section>
