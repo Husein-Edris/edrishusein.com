@@ -73,11 +73,20 @@ function InfoCards({
     <section className={sectionClass}>
       <div className="container">
         {(sectionNumber || displayTitle) && (
-          <SectionHeader
-            number={sectionNumber || ''}
-            title={displayTitle || ''}
-            variant={variant}
-          />
+          <div className="section-header-wrapper">
+            <SectionHeader
+              number={sectionNumber || ''}
+              title={displayTitle || ''}
+              variant={variant}
+            />
+            {viewMoreLink && (
+              <div className="view-more-inline">
+                <Link href={viewMoreLink} className="view-more-link">
+                  {viewMoreText || 'VIEW MORE'}
+                </Link>
+              </div>
+            )}
+          </div>
         )}
         <div className={`cards-grid columns-${columns}`}>
           {displayCards?.map((card, index) => {
@@ -154,14 +163,6 @@ function InfoCards({
             );
           })}
         </div>
-
-        {viewMoreLink && (
-          <div className="view-more">
-            <Link href={viewMoreLink} className="view-more-link">
-              {viewMoreText || 'VIEW MORE'}
-            </Link>
-          </div>
-        )}
 
       </div>
     </section>
