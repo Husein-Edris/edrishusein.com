@@ -399,6 +399,262 @@
     }
   }
 
+  // Article Content section (for notebook template)
+  .article-content {
+    .content {
+      p {
+        color: $text-light-gray;
+        line-height: 1.8;
+        margin-bottom: calc($spacing-unit * 1.5);
+        font-size: calc($font-size-base * 1.1);
+      }
+
+      h1, h2, h3, h4, h5, h6 {
+        color: $white;
+        font-family: $font-family-syncopate;
+        margin-top: calc($spacing-unit * 3);
+        margin-bottom: calc($spacing-unit * 2);
+      }
+
+      h2 {
+        font-size: calc($font-size-base * 1.8);
+        position: relative;
+        display: inline-block;
+
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: -10px;
+          left: 0;
+          width: 60px;
+          height: 3px;
+          background-color: $color-beige;
+        }
+      }
+
+      h3 {
+        font-size: calc($font-size-base * 1.4);
+      }
+
+      ul, ol {
+        color: $text-light-gray;
+        margin-left: calc($spacing-unit * 3);
+        margin-bottom: calc($spacing-unit * 2);
+
+        li {
+          margin-bottom: calc($spacing-unit);
+          line-height: 1.6;
+        }
+      }
+
+      blockquote {
+        border-left: 4px solid $color-beige;
+        padding-left: calc($spacing-unit * 2);
+        margin: calc($spacing-unit * 2) 0;
+        font-style: italic;
+        color: $text-light-gray;
+        background: rgba($text-light-gray, 0.05);
+        padding: calc($spacing-unit * 2);
+        border-radius: 0 8px 8px 0;
+      }
+
+      code {
+        background: rgba($text-light-gray, 0.2);
+        padding: calc($spacing-unit * 0.25) calc($spacing-unit * 0.5);
+        border-radius: 4px;
+        font-family: 'Monaco', 'Consolas', monospace;
+        color: $color-beige;
+      }
+
+      pre {
+        background: rgba($text-light-gray, 0.1);
+        padding: calc($spacing-unit * 2);
+        border-radius: 8px;
+        overflow-x: auto;
+        margin: calc($spacing-unit * 2) 0;
+
+        code {
+          background: none;
+          padding: 0;
+        }
+      }
+
+      strong {
+        color: $white;
+      }
+
+      a {
+        color: $color-beige;
+        text-decoration: underline;
+        
+        &:hover {
+          color: $white;
+        }
+      }
+    }
+  }
+
+  // Author Section (for notebook template)
+  .author-section {
+    background: rgba($text-light-gray, 0.1);
+    padding: calc($spacing-unit * 4);
+    border-radius: 12px;
+    margin-bottom: calc($spacing-unit * 6);
+
+    @include mobile {
+      padding: calc($spacing-unit * 3);
+      margin-bottom: calc($spacing-unit * 4);
+    }
+
+    h2 {
+      margin-bottom: calc($spacing-unit * 3);
+
+      &::after {
+        width: 60px;
+        bottom: -8px;
+      }
+    }
+
+    .author-info {
+      .author-details {
+        .author-name {
+          color: $white;
+          font-family: $font-family-syncopate;
+          font-size: calc($font-size-base * 1.2);
+          margin-bottom: calc($spacing-unit * 1.5);
+        }
+
+        .author-bio {
+          color: $text-light-gray;
+          line-height: 1.6;
+          margin: 0;
+        }
+      }
+    }
+  }
+
+  // Tags Section (for notebook template)
+  .tags-section {
+    h2 {
+      margin-bottom: calc($spacing-unit * 3);
+    }
+
+    .tags-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: calc($spacing-unit);
+
+      @include mobile {
+        gap: calc($spacing-unit * 0.75);
+      }
+
+      .tag {
+        background: rgba($text-light-gray, 0.2);
+        color: $color-beige;
+        padding: calc($spacing-unit * 0.75) calc($spacing-unit * 1.5);
+        border-radius: 20px;
+        font-size: calc($font-size-base * 0.9);
+        font-family: $font-family-syncopate;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: $color-beige;
+          color: $primary-color;
+          transform: translateY(-2px);
+        }
+      }
+    }
+  }
+
+  // Breadcrumbs styling for notebook template
+  .breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: calc($spacing-unit * 0.75);
+    margin-bottom: calc($spacing-unit * 2);
+    font-size: calc($font-size-base * 0.9);
+    color: $text-light-gray;
+
+    @include mobile {
+      margin-bottom: $spacing-unit;
+    }
+
+    a {
+      color: $text-light-gray;
+      text-decoration: none;
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: $color-beige;
+      }
+    }
+
+    .separator {
+      color: rgba($text-light-gray, 0.6);
+    }
+
+    .current {
+      color: $color-beige;
+      font-weight: 500;
+    }
+  }
+
+  // Meta info styling for notebook template
+  .meta-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc($spacing-unit * 1.5);
+    margin-top: calc($spacing-unit * 2);
+    font-size: calc($font-size-base * 0.9);
+    color: $text-light-gray;
+
+    @include mobile {
+      flex-direction: column;
+      gap: calc($spacing-unit * 0.75);
+      margin-top: $spacing-unit;
+    }
+
+    .post-date,
+    .reading-time {
+      padding: calc($spacing-unit * 0.5) calc($spacing-unit);
+      background: rgba($text-light-gray, 0.1);
+      border-radius: 20px;
+      font-family: $font-family-syncopate;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-size: calc($font-size-base * 0.8);
+    }
+  }
+
+  // Post categories styling
+  .post-categories {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: calc($spacing-unit);
+    margin-top: calc($spacing-unit * 2);
+
+    @include mobile {
+      gap: calc($spacing-unit * 0.75);
+      margin-top: $spacing-unit;
+    }
+
+    .category-tag {
+      background: rgba($color-beige, 0.2);
+      color: $color-beige;
+      padding: calc($spacing-unit * 0.75) calc($spacing-unit * 1.5);
+      border-radius: 20px;
+      font-size: calc($font-size-base * 0.9);
+      font-family: $font-family-syncopate;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border: 1px solid rgba($color-beige, 0.3);
+    }
+  }
+
   // More Projects section 
   .more-projects {
     background: rgba($text-light-gray, 0.05);
@@ -424,6 +680,191 @@
       text-align: center;
       color: $text-light-gray;
       padding: calc($spacing-unit * 4);
+    }
+  }
+
+  // Books Section (for bookshelf page)
+  .books-section {
+    .books-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: calc($spacing-unit * 3);
+      margin-bottom: calc($spacing-unit * 6);
+
+      @include mobile {
+        grid-template-columns: repeat(2, 1fr);
+        gap: calc($spacing-unit * 2);
+      }
+
+      .book-card {
+        background: rgba($text-light-gray, 0.1);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+
+        &:hover {
+          transform: translateY(-8px);
+          border-color: rgba($color-beige, 0.3);
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+
+          .book-image .featured-image {
+            transform: scale(1.05);
+          }
+
+          .book-title {
+            color: $color-beige;
+          }
+        }
+
+        .book-image {
+          height: 280px;
+          overflow: hidden;
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba($text-light-gray, 0.05);
+
+          @include mobile {
+            height: 250px;
+          }
+
+          .featured-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+          }
+        }
+
+        .book-content {
+          padding: calc($spacing-unit * 3);
+
+          .book-title {
+            font-family: $font-family-syncopate;
+            font-size: calc($font-size-base * 1.2);
+            color: $white;
+            margin-bottom: calc($spacing-unit * 1.5);
+            line-height: $line-height-tight;
+            transition: color 0.3s ease;
+          }
+
+          .book-description {
+            color: $text-light-gray;
+            line-height: 1.6;
+            font-size: calc($font-size-base * 0.95);
+
+            p {
+              margin: 0 0 calc($spacing-unit) 0;
+
+              &:last-child {
+                margin-bottom: 0;
+              }
+            }
+
+            strong {
+              color: $white;
+            }
+
+            em {
+              color: rgba($white, 0.8);
+              font-style: italic;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Tech Grid Section (for tech-stack page)
+  .tech-section {
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: calc($spacing-unit * 4);
+      margin-bottom: calc($spacing-unit * 6);
+
+      @include mobile {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: calc($spacing-unit * 3);
+      }
+
+      .tech-card {
+        background: rgba($text-light-gray, 0.1);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        text-align: center;
+
+        &:hover {
+          transform: translateY(-8px);
+          border-color: rgba($color-beige, 0.3);
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+
+          .tech-image .featured-image {
+            transform: scale(1.05);
+          }
+
+          .tech-title {
+            color: $color-beige;
+          }
+        }
+
+        .tech-image {
+          height: 200px;
+          overflow: hidden;
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba($text-light-gray, 0.05);
+          padding: calc($spacing-unit * 2);
+
+          @include mobile {
+            height: 180px;
+          }
+
+          .featured-image {
+            max-width: 80%;
+            max-height: 80%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+          }
+        }
+
+        .tech-content {
+          padding: calc($spacing-unit * 3);
+
+          .tech-title {
+            font-family: $font-family-syncopate;
+            font-size: calc($font-size-base * 1.1);
+            color: $white;
+            margin-bottom: calc($spacing-unit * 1.5);
+            line-height: $line-height-tight;
+            transition: color 0.3s ease;
+          }
+
+          .tech-description {
+            color: $text-light-gray;
+            line-height: 1.6;
+            font-size: calc($font-size-base * 0.9);
+
+            p {
+              margin: 0 0 calc($spacing-unit) 0;
+
+              &:last-child {
+                margin-bottom: 0;
+              }
+            }
+
+            strong {
+              color: $white;
+            }
+          }
+        }
+      }
     }
   }
 

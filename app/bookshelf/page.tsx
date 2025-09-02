@@ -2,7 +2,7 @@ import { GraphQLClient } from 'graphql-request';
 import Image from 'next/image';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
-import '@/src/styles/pages/Bookshelf.scss';
+import '@/src/styles/pages/CaseStudy.scss';
 
 const client = new GraphQLClient(process.env.NEXT_PUBLIC_WORDPRESS_API_URL || '');
 
@@ -44,40 +44,47 @@ export default async function BookshelfPage() {
   return (
     <>
       <Header />
-      <main className="bookshelf-page">
+      <main className="case-study">
+        {/* Hero Section */}
         <div className="hero-section">
-          <h1 className="title">BOOKSHELF</h1>
-          <p className="description">
-            Books and pieces of wisdom I've enjoyed reading
-          </p>
+          <div className="container">
+            <h1 className="title">BOOKSHELF</h1>
+            <div className="overview">
+              <p>Books and pieces of wisdom I've enjoyed reading</p>
+            </div>
+          </div>
         </div>
 
         <div className="container">
-          <div className="books-grid">
-            {books.map((book: any) => (
-              <div key={book.id} className="book-card">
-                {book.featuredImage?.node && (
-                  <div className="image-wrapper">
-                    <Image
-                      src={book.featuredImage.node.sourceUrl}
-                      alt={book.featuredImage.node.altText || book.title}
-                      fill
-                      className="book-image"
-                    />
-                  </div>
-                )}
-                <div className="content">
-                  <h3 className="book-title">{book.title}</h3>
-                  {book.excerpt && (
-                    <div 
-                      className="book-description"
-                      dangerouslySetInnerHTML={{ __html: book.excerpt }}
-                    />
+          {/* Books Grid */}
+          <section className="books-section">
+            <div className="books-grid">
+              {books.map((book: any) => (
+                <div key={book.id} className="book-card">
+                  {book.featuredImage?.node && (
+                    <div className="book-image">
+                      <Image
+                        src={book.featuredImage.node.sourceUrl}
+                        alt={book.featuredImage.node.altText || book.title}
+                        width={book.featuredImage.node.mediaDetails?.width || 300}
+                        height={book.featuredImage.node.mediaDetails?.height || 400}
+                        className="featured-image"
+                      />
+                    </div>
                   )}
+                  <div className="book-content">
+                    <h3 className="book-title">{book.title}</h3>
+                    {book.excerpt && (
+                      <div 
+                        className="book-description"
+                        dangerouslySetInnerHTML={{ __html: book.excerpt }}
+                      />
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </section>
         </div>
       </main>
       <Footer />

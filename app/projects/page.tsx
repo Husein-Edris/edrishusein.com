@@ -43,7 +43,6 @@ export default async function ProjectsPage() {
         <InfoCards
           skin="projects"
           variant="dark"
-          sectionNumber="02"
           sectionTitle="All Projects"
           columns={3}
           cards={transformedProjects}

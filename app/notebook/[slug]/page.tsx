@@ -8,7 +8,7 @@ import { useParams } from 'next/navigation';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
 import InfoCards from '@/src/components/InfoCards/InfoCards';
-import '@/src/styles/pages/BlogPost.scss';
+import '@/src/styles/pages/CaseStudy.scss';
 import { WordPressPost } from '@/src/types/api';
 
 export default function BlogPostPageSimple() {
@@ -81,117 +81,118 @@ export default function BlogPostPageSimple() {
   return (
     <>
       <Header />
-      <main className="blog-post">
-        <article className="post-article">
-          <header className="post-header">
-            <div className="container">
-              <div className="post-meta">
-                <nav className="breadcrumbs">
-                  <Link href="/">Home</Link>
-                  <span className="separator">/</span>
-                  <Link href="/notebook">Notebook</Link>
-                  <span className="separator">/</span>
-                  <span className="current">{post?.title || 'Post'}</span>
-                </nav>
-                <div className="meta-info">
-                  <time className="post-date">
-                    {post?.date ? new Date(post.date).toLocaleDateString('en-US', { 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
-                    }) : ''}
-                  </time>
-                  {post?.readingTime && (
-                    <span className="reading-time">{post.readingTime}</span>
-                  )}
-                </div>
-              </div>
-              
-              <h1 className="post-title">{post?.title}</h1>
-              
-              {post?.categories && post.categories.length > 0 && (
-                <div className="post-categories">
-                  {post.categories.map((category, index) => (
-                    <span key={index} className="category-tag">
-                      {category.name}
-                    </span>
-                  ))}
-                </div>
+      <main className="case-study">
+        {/* Hero Section */}
+        <div className="hero-section">
+          <div className="container">
+            <nav className="breadcrumbs">
+              <Link href="/">Home</Link>
+              <span className="separator">/</span>
+              <Link href="/notebook">Notebook</Link>
+              <span className="separator">/</span>
+              <span className="current">{post?.title || 'Post'}</span>
+            </nav>
+            <h1 className="title">{post?.title}</h1>
+            {post?.excerpt && (
+              <div
+                className="overview"
+                dangerouslySetInnerHTML={{ __html: post.excerpt }}
+              />
+            )}
+            <div className="meta-info">
+              <time className="post-date">
+                {post?.date ? new Date(post.date).toLocaleDateString('en-US', { 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                }) : ''}
+              </time>
+              {post?.readingTime && (
+                <span className="reading-time">{post.readingTime}</span>
               )}
             </div>
-          </header>
+            
+            {post?.categories && post.categories.length > 0 && (
+              <div className="post-categories">
+                {post.categories.map((category, index) => (
+                  <span key={index} className="category-tag">
+                    {category.name}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
 
+        <div className="container">
           {/* Featured Image */}
           {post?.featuredImage?.node ? (
-            <div className="post-featured-image">
+            <div className="featured-image">
               <Image
                 src={post.featuredImage.node.sourceUrl}
                 alt={post.featuredImage.node.altText || post?.title || ''}
                 width={post?.featuredImage?.node?.mediaDetails?.width || 1200}
                 height={post?.featuredImage?.node?.mediaDetails?.height || 600}
-                className="featured-image"
+                className="project-featured-image"
                 priority
               />
             </div>
           ) : (
-            <div className="post-featured-image">
+            <div className="featured-image">
               <Image
                 src="/images/Blog-sample-img.png"
                 alt={post?.title || 'Blog Post'}
                 width={1200}
                 height={600}
-                className="featured-image"
+                className="project-featured-image"
                 priority
               />
             </div>
           )}
 
-          <div className="post-content">
-            <div className="container">
-              <div className="content-wrapper">
-                <div
-                  className="prose"
-                  dangerouslySetInnerHTML={{ __html: post?.content || '' }}
-                />
+          {/* Article Content */}
+          <section className="article-content">
+            <div
+              className="content"
+              dangerouslySetInnerHTML={{ __html: post?.content || '' }}
+            />
+          </section>
+
+          {/* Author Section */}
+          {post?.author && (
+            <section className="author-section">
+              <h2>About the Author</h2>
+              <div className="author-info">
+                <div className="author-details">
+                  <h3 className="author-name">{post?.author?.name}</h3>
+                  <p className="author-bio">
+                    {post?.author?.bio || "Full-stack developer passionate about modern web technologies."}
+                  </p>
+                </div>
               </div>
-            </div>
-          </div>
+            </section>
+          )}
 
-          <footer className="post-footer">
-            <div className="container">
-              {post?.author && (
-                <div className="author-info">
-                  <div className="author-details">
-                    <h3 className="author-name">Written by {post?.author?.name}</h3>
-                    <p className="author-bio">
-                      {post?.author?.bio || "Full-stack developer passionate about modern web technologies."}
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {post?.tags && post.tags.length > 0 && (
-                <div className="post-tags">
-                  <h3>Tags</h3>
-                  <div className="tags-list">
-                    {post?.tags?.map((tag: any, index: number) => (
-                      <span key={index} className="tag">
-                        #{tag.name}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </footer>
-        </article>
+          {/* Tags Section */}
+          {post?.tags && post.tags.length > 0 && (
+            <section className="tags-section">
+              <h2>Tags</h2>
+              <div className="tags-list">
+                {post?.tags?.map((tag: any, index: number) => (
+                  <span key={index} className="tag">
+                    #{tag.name}
+                  </span>
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
 
         {/* More Articles Section */}
         {moreArticles.length > 0 && (
           <InfoCards
             skin="blog"
             variant="light"
-            sectionNumber="03"
             sectionTitle="More Articles"
             columns={3}
             cards={moreArticles.map((article: WordPressPost) => ({

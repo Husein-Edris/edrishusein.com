@@ -122,7 +122,9 @@ export class SectionFactory {
         sectionNumber: '01',
         sectionTitle: 'Projects',
         columns: 3,
-        cards: transformedProjects
+        cards: transformedProjects,
+        viewMoreLink: '/projects',
+        viewMoreText: 'VIEW ALL PROJECTS'
       }, 2),
 
       createSectionConfig('about', 'about', {
@@ -142,7 +144,9 @@ export class SectionFactory {
         sectionNumber: '03',
         sectionTitle: homepageData?.notebookSection?.title || 'NOTEBOOK',
         columns: 3,
-        cards: transformedPosts
+        cards: transformedPosts,
+        viewMoreLink: '/notebook',
+        viewMoreText: 'VIEW ALL ARTICLES'
       }, 5),
 
       createSectionConfig('contact', 'contact', {
