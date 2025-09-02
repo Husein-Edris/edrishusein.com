@@ -41,6 +41,26 @@
       }
     }
 
+    // Featured Image in Hero Section
+    .featured-image {
+      margin: calc($spacing-unit * 4) auto 0;
+      text-align: center;
+
+      .project-featured-image {
+        max-width: 900px;
+        width: 100%;
+        max-height: 500px;
+        height: auto;
+        object-fit: contain;
+        border-radius: 12px;
+
+        @include mobile {
+          max-width: 100%;
+          max-height: 350px;
+        }
+      }
+    }
+
     .project-links {
       display: flex;
       justify-content: center;
@@ -176,14 +196,21 @@
 
   // Featured Image section
   .featured-image {
-    margin-bottom: calc($spacing-unit * 8);
+    margin-bottom: calc($spacing-unit * 6);
     text-align: center;
 
     .project-featured-image {
+      max-width: 800px;
       width: 100%;
+      max-height: 400px;
       height: auto;
+      object-fit: contain;
       border-radius: 12px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+
+      @include mobile {
+        max-width: 100%;
+        max-height: 300px;
+      }
     }
   }
 
@@ -658,20 +685,20 @@
   // More Projects section 
   .more-projects {
     background: rgba($text-light-gray, 0.05);
-    padding: calc($spacing-unit * 8) 0;
-    margin-top: calc($spacing-unit * 8);
+    padding: calc($spacing-unit * 4) 0;
+    margin-top: calc($spacing-unit * 4);
 
     @include mobile {
-      padding: calc($spacing-unit * 6) 0;
-      margin-top: calc($spacing-unit * 6);
+      padding: calc($spacing-unit * 3) 0;
+      margin-top: calc($spacing-unit * 3);
     }
 
     h2 {
       text-align: center;
-      margin-bottom: calc($spacing-unit * 6);
+      margin-bottom: calc($spacing-unit * 3);
 
       @include mobile {
-        margin-bottom: calc($spacing-unit * 4);
+        margin-bottom: calc($spacing-unit * 2);
       }
     }
 

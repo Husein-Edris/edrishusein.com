@@ -96,22 +96,22 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
               />
             )}
             
+            {/* Featured Image in Hero */}
+            {project.featuredImage?.node && (
+              <div className="featured-image">
+                <Image
+                  src={project.featuredImage.node.sourceUrl}
+                  alt={project.featuredImage.node.altText || project.title}
+                  width={project.featuredImage.node.mediaDetails?.width || 1200}
+                  height={project.featuredImage.node.mediaDetails?.height || 600}
+                  className="project-featured-image"
+                />
+              </div>
+            )}
           </div>
         </div>
 
         <div className="container">
-          {/* Featured Image */}
-          {project.featuredImage?.node && (
-            <div className="featured-image">
-              <Image
-                src={project.featuredImage.node.sourceUrl}
-                alt={project.featuredImage.node.altText || project.title}
-                width={project.featuredImage.node.mediaDetails?.width || 1200}
-                height={project.featuredImage.node.mediaDetails?.height || 600}
-                className="project-featured-image"
-              />
-            </div>
-          )}
 
 
           {/* Technologies */}
