@@ -136,24 +136,26 @@ function InfoCards({
                     {skin === 'projects' && (card.caseStudyLink || card.visitLink) && (
                       <div className="project-links" onClick={(e) => e.stopPropagation()}>
                         {card.visitLink && card.visitLink !== '#' && (
-                          <Link 
-                            href={card.visitLink} 
+                          <button 
                             className="project-link visit-site-link"
-                            onClick={(e) => e.stopPropagation()}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              window.open(card.visitLink, '_blank', 'noopener,noreferrer');
+                            }}
                           >
                             VISIT LIVE SITE
-                          </Link>
+                          </button>
                         )}
                         {card.caseStudyLink && (
-                          <Link 
-                            href={card.caseStudyLink} 
+                          <button 
                             className="project-link case-study-link"
-                            onClick={(e) => e.stopPropagation()}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              window.location.href = card.caseStudyLink;
+                            }}
                           >
                             CASE STUDY
-                          </Link>
+                          </button>
                         )}
                       </div>
                     )}
