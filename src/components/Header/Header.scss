@@ -136,7 +136,7 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        gap: calc($spacing-unit * 3);
+        gap: $spacing-3xl;
         transform: translateY(20px);
         transition: transform 0.3s ease;
       }
@@ -144,12 +144,12 @@
       .navLink {
         font-family: $font-family-syncopate;
         font-size: $font-size-2xl;
-        color: $white !important;
+        color: $white;
         text-decoration: none;
-        transition: color 0.3s ease;
+        transition: color $transition-base;
 
         &:hover {
-          color: $text-light-gray !important;
+          color: $text-light-gray;
         }
 
         &::after {
@@ -162,7 +162,7 @@
   // Desktop nav styles
   .main-nav {
     flex: 1;
-    margin: 0 calc($spacing-unit * 2);
+    margin: 0 $spacing-md;
 
     .navList {
       display: flex;
@@ -175,10 +175,13 @@
       .navItem {
         position: relative;
 
-        &:hover *,
-        &:focus *,
-        &:active * {
-          color: $color-beige !important;
+        &:hover,
+        &:focus,
+        &:active {
+          .navNumber,
+          .navText {
+            color: $color-beige;
+          }
         }
 
         .navLink {
@@ -226,7 +229,7 @@
 
   .socialLinks {
     display: flex;
-    gap: $spacing-unit;
+    gap: $spacing-sm;
     align-items: center;
     z-index: 1001;
 
@@ -237,15 +240,15 @@
 
   .socialLink {
     color: $white;
-    transition: opacity 0.3s ease;
+    transition: opacity $transition-base;
 
     &:hover {
       opacity: 0.7;
     }
 
     svg {
-      width: calc($spacing-unit * 3);
-      height: calc($spacing-unit * 3);
+      width: $spacing-3xl;
+      height: $spacing-3xl;
     }
   }
 }
