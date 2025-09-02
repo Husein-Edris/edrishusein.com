@@ -15,6 +15,72 @@
     width: 100%;
   }
 
+  .section-header-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: $spacing-2xl;
+
+    @include mobile {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: $spacing-md;
+    }
+
+    .section-header {
+      margin-bottom: 0;
+    }
+
+    .view-more-inline {
+      .view-more-link {
+        @include button-secondary;
+        @include button-size('sm');
+        display: inline-flex;
+        align-items: center;
+        gap: $spacing-xs;
+        font-size: $font-size-sm;
+        text-decoration: none;
+
+        &::after {
+          content: '→';
+          font-size: $font-size-base;
+          transition: transform $transition-base;
+        }
+
+        &:hover::after {
+          transform: translateX(4px);
+        }
+      }
+    }
+  }
+
+  // Light mode styling for blog/notebook sections
+  &.blog.blog-light {
+    .section-header-wrapper {
+      .view-more-inline {
+        .view-more-link {
+          @include button-outline;
+          @include button-size('sm');
+          display: inline-flex;
+          align-items: center;
+          gap: $spacing-xs;
+          font-size: $font-size-sm;
+          text-decoration: none;
+
+          &::after {
+            content: '→';
+            font-size: $font-size-base;
+            transition: transform $transition-base;
+          }
+
+          &:hover::after {
+            transform: translateX(4px);
+          }
+        }
+      }
+    }
+  }
+
   // Grid styles with tablet support
   .cards-grid {
     display: grid;
