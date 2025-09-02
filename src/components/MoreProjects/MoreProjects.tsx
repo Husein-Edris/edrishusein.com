@@ -112,7 +112,7 @@ export default function MoreProjects({ currentProjectSlug }: MoreProjectsProps) 
         description: "Annual report design and development project for healthcare institutions.",
         image: "/images/Blog-sample-img.png",
         link: "/projects/geschaftsbericht-fur-vorarlberger-landeskrankenhauser",
-        variant: 'dark',
+        variant: 'dark' as 'dark' | 'light',
         visitLink: "#",
         caseStudyLink: "/projects/geschaftsbericht-fur-vorarlberger-landeskrankenhauser"
       }

@@ -65,7 +65,7 @@ const Hero = ({ data }: HeroProps) => {
         <div className="content">
           <h1 
             className="title"
-            dangerouslySetInnerHTML={{ __html: processedTitle }}
+            dangerouslySetInnerHTML={{ __html: processedTitle || '' }}
           />
           <p className="description">
             {cleanHeroCopy}

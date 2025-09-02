@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
 import '@/src/styles/pages/Blog.scss';
+import { PostsApiResponse } from '@/src/types/api';
 
 const client = new GraphQLClient(process.env.NEXT_PUBLIC_WORDPRESS_API_URL || '');
 
@@ -32,7 +33,7 @@ const GET_POSTS = `
 
 async function getPostsData() {
     try {
-        const data = await client.request(GET_POSTS);
+        const data = await client.request(GET_POSTS) as PostsApiResponse;
         return data.posts.nodes;
     } catch (error) {
         console.error('Error fetching posts:', error);
@@ -56,7 +57,7 @@ export default async function BlogArchivePage() {
 
                 <div className="container">
                     <div className="blog-grid">
-                        {posts.map((post: any) => (
+                        {posts.map((post) => (
                             <Link href={`/notebook/${post.slug}`} key={post.id} className="blog-card">
                                 <div className="card-content">
                                     {post.featuredImage?.node && (

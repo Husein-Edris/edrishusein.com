@@ -1,6 +1,7 @@
 // API route for fetching other projects (excluding current one)
 import { NextRequest, NextResponse } from 'next/server';
 import { GraphQLClient } from 'graphql-request';
+import { ProjectsApiResponse, WordPressProject } from '@/src/types/api';
 
 const client = new GraphQLClient(process.env.NEXT_PUBLIC_WORDPRESS_API_URL || '');
 
@@ -72,13 +73,13 @@ export async function GET(request: NextRequest) {
   }
   
   try {
-    let data: { projects: { nodes: unknown[] } };
+    let data: ProjectsApiResponse;
     
     try {
-      data = await client.request(GET_OTHER_PROJECTS, { excludeSlug }) as { projects: { nodes: unknown[] } };
-    } catch (filterError) {
-      data = await client.request(GET_ALL_PROJECTS) as { projects: { nodes: unknown[] } };
-      data.projects.nodes = data.projects.nodes.filter((project: any) => project.slug !== excludeSlug);
+      data = await client.request(GET_OTHER_PROJECTS, { excludeSlug }) as ProjectsApiResponse;
+    } catch {
+      data = await client.request(GET_ALL_PROJECTS) as ProjectsApiResponse;
+      data.projects.nodes = data.projects.nodes.filter((project: WordPressProject) => project.slug !== excludeSlug);
     }
     
     const limitedProjects = data.projects.nodes.slice(0, 3);
@@ -96,10 +97,10 @@ export async function GET(request: NextRequest) {
       if (restResponse.ok) {
         const restProjects = await restResponse.json();
         
-        const transformedProjects = restProjects
+        const transformedProjects = (restProjects as any[])
           .filter((project: any) => project.slug !== excludeSlug)
           .slice(0, 3)
-          .map((project: any) => ({
+          .map((project: any): WordPressProject => ({
             id: project.id.toString(),
             title: project.title?.rendered || project.title,
             excerpt: project.excerpt?.rendered || project.excerpt || '',

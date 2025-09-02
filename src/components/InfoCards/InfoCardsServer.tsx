@@ -113,7 +113,7 @@ async function getProjectsData() {
   try {
     const data = await client.request(GET_PROJECTS_DATA);
 
-    const projectCards: InfoCardProps[] = data.projects.nodes.map((project: { 
+    const projectCards: InfoCardProps[] = (data as any).projects.nodes.map((project: { 
       title: string; 
       excerpt: string; 
       slug: string; 
@@ -124,14 +124,14 @@ async function getProjectsData() {
       description: truncateExcerpt(project.excerpt, 120),
       image: project.featuredImage?.node?.sourceUrl,
       link: `/projects/${project.slug}`,
-      variant: 'dark',
+      variant: 'dark' as const,
       visitLink: project.caseStudy?.projectLinks?.liveSite || '#',
       caseStudyLink: `/projects/${project.slug}`
     }));
 
     return {
       cards: projectCards,
-      sectionTitle: data.page.homepageSections.projectsSection.title
+      sectionTitle: (data as any).page.homepageSections.projectsSection.title
     };
   } catch (error) {
     console.error('Error fetching projects:', error);
@@ -143,7 +143,7 @@ async function getPostsData() {
   try {
     const data = await client.request(GET_POSTS_DATA);
 
-    const postCards: InfoCardProps[] = data.posts.nodes.map((post: { 
+    const postCards: InfoCardProps[] = (data as any).posts.nodes.map((post: { 
       title: string; 
       excerpt: string; 
       uri: string; 
@@ -158,7 +158,7 @@ async function getPostsData() {
 
     return {
       cards: postCards,
-      sectionTitle: data.page.homepageSections.notebookSection.title
+      sectionTitle: (data as any).page.homepageSections.notebookSection.title
     };
   } catch (error) {
     console.error('Error fetching posts:', error);

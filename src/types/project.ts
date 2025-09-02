@@ -1,0 +1,9 @@
+export interface Project {
+  id: number;
+  title: string;
+  description: string;
+  image: string;
+  visitLink: string;
+  caseStudyLink: string;
+  variant: 'dark' | 'light';
+}

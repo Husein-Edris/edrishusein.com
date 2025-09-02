@@ -192,7 +192,7 @@ export class DataFetcher {
   }
 
   static async getProjectsData(limit: number = 6): Promise<FetchResult<ProjectsResponse>> {
-    return this.fetchWithFallback(
+    return this.fetchWithFallback<ProjectsResponse>(
       async () => {
         if (process.env.NODE_ENV === 'development') {
           console.log('🔍 Attempting to fetch projects data from:', process.env.NEXT_PUBLIC_WORDPRESS_API_URL);
@@ -230,8 +230,8 @@ export class DataFetcher {
         try {
           const response = await client.request(PROJECTS_QUERY, { limit });
           console.log('✅ WordPress projects data loaded successfully:', response);
-          return response;
-        } catch (error: any) {
+          return response as ProjectsResponse;
+        } catch (error: unknown) {
           console.warn('⚠️ GraphQL projects query failed, trying REST API...');
           
           // Try to get projects via WordPress REST API directly
@@ -276,10 +276,10 @@ export class DataFetcher {
               };
               
               console.log('✅ WordPress REST projects data transformed successfully');
-              return transformedResponse;
+              return transformedResponse as ProjectsResponse;
             }
           } catch (restError) {
-            console.warn('⚠️ REST API also failed:', restError.message);
+            console.warn('⚠️ REST API also failed:', restError instanceof Error ? restError.message : 'Unknown error');
           }
           
           console.error('❌ Both GraphQL and REST API failed for projects');
