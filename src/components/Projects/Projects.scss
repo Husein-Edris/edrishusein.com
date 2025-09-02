@@ -30,12 +30,12 @@
   .projects-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: calc($spacing-unit * 3);
+    gap: $spacing-3xl;
     margin-bottom: $spacing-3xl;
 
     @include mobile {
       grid-template-columns: 1fr;
-      gap: calc($spacing-unit * 4);
+      gap: $spacing-3xl;
     }
 
     // Hover effects only on desktop
@@ -44,7 +44,7 @@
         transform: scale(0.9);
         opacity: 0.5;
         filter: grayscale(100%);
-        transition: all 0.3s ease;
+        transition: all $transition-base;
       }
     }
   }
@@ -59,7 +59,7 @@
     // Desktop-only effects
     @media (min-width: $mobile) {
       filter: grayscale(100%);
-      transition: all 0.3s ease;
+      transition: all $transition-base;
       cursor: pointer;
 
       &:hover {
@@ -103,42 +103,42 @@
   }
 
   .project-content {
-    padding: calc($spacing-unit * 3);
-    transition: all 0.3s ease;
+    padding: $spacing-3xl;
+    transition: all $transition-base;
   }
 
   .project-title {
     font-family: $font-family-syncopate;
-    font-size: calc($font-size-base * 1.5);
+    font-size: $font-size-xl;
     margin-bottom: $spacing-unit;
     color: rgba($white, 0.7);
-    transition: all 0.3s ease;
+    transition: all $transition-base;
   }
 
   .project-description {
     font-family: $font-family-base;
     font-size: $font-size-base;
     line-height: $line-height-base;
-    margin-bottom: calc($spacing-unit * 2);
+    margin-bottom: $spacing-md;
     color: $white;
     opacity: 0.6;
-    transition: all 0.3s ease;
+    transition: all $transition-base;
   }
 
   .project-links {
     display: flex;
-    gap: $spacing-unit;
+    gap: $spacing-sm;
   }
 
   .project-link {
     font-family: $font-family-syncopate;
-    font-size: calc($font-size-base * 0.875);
+    font-size: $font-size-sm;
     color: $white;
     text-decoration: none;
-    padding: calc($spacing-unit * 0.75) calc($spacing-unit * 1.5);
+    padding: $spacing-sm $spacing-lg;
     border: 1px solid $white;
-    border-radius: 4px;
-    transition: all 0.3s ease;
+    border-radius: $border-radius-sm;
+    transition: all $transition-base;
     opacity: 0.6;
     transform: translateY(10px);
 
@@ -150,7 +150,7 @@
 
   .view-more {
     text-align: center;
-    margin-top: calc($spacing-unit * 6);
+    margin-top: $spacing-4xl;
   }
 
   .view-more-link {

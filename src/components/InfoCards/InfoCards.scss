@@ -2,12 +2,12 @@
 @use '../../styles/mixins' as *;
 
 .info-cards {
-  padding: calc($spacing-unit * 8) $container-padding;
+  padding: $spacing-5xl $container-padding;
   display: flex;
   justify-content: center;
 
   @include mobile {
-    padding: calc($spacing-unit * 4) calc($spacing-unit * 2);
+    padding: $spacing-3xl $container-padding-mobile;
   }
 
   .container {
@@ -18,9 +18,9 @@
   // Grid styles with tablet support
   .cards-grid {
     display: grid;
-    gap: calc($spacing-unit * 2);
-    margin-bottom: calc($spacing-unit * 8);
-    padding: calc($spacing-unit * 2);
+    gap: $spacing-md;
+    margin-bottom: $spacing-5xl;
+    padding: $spacing-md;
 
     &.columns-1 {
       grid-template-columns: 1fr;
@@ -28,11 +28,6 @@
 
     &.columns-2 {
       grid-template-columns: repeat(2, 1fr);
-
-      @include tablet {
-        grid-template-columns: repeat(2, 1fr);
-        gap: calc($spacing-unit * 2);
-      }
     }
 
     &.columns-3 {
@@ -40,14 +35,13 @@
 
       @include tablet {
         grid-template-columns: repeat(2, 1fr);
-        gap: calc($spacing-unit * 2);
       }
     }
 
     @include mobile {
-      grid-template-columns: 1fr !important;
-      gap: calc($spacing-unit * 6);
-      margin-bottom: calc($spacing-unit * 4);
+      grid-template-columns: 1fr;
+      gap: $spacing-4xl;
+      margin-bottom: $spacing-3xl;
     }
   }
 
@@ -57,6 +51,8 @@
       background-color: $primary-color;
 
       .card {
+        border: 2px solid $white;
+        
         .card-info {
           background-color: $bg-dark;
         }
@@ -79,6 +75,8 @@
       background-color: $white;
 
       .card {
+        border: 2px solid $light-black;
+        
         .card-info {
           background-color: $primary-color;
         }
@@ -130,6 +128,12 @@
 
     .card {
       @include card-hover-effect;
+      
+      &:hover {
+        .card-image img {
+          transform: scale(1.05);
+        }
+      }
     }
   }
 
@@ -143,7 +147,7 @@
     }
 
     .card {
-      border-radius: 12px;
+      border-radius: $border-radius-lg;
       overflow: hidden;
       background-color: rgba($text-light-gray, 0.1);
       border: 1px solid $white;
@@ -151,7 +155,7 @@
       width: 100%;
       cursor: pointer;
       filter: grayscale(100%);
-      transition: all 0.3s ease;
+      transition: all $transition-base;
 
       .card-title {
         word-wrap: break-word;
@@ -161,11 +165,14 @@
 
       @include mobile {
         filter: grayscale(0%);
-
       }
 
       @media (min-width: $mobile) {
         @include card-hover-effect;
+        
+        &:hover {
+          box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+        }
       }
 
       &.light {
@@ -209,17 +216,17 @@
     }
 
     .card-info {
-      padding: calc($spacing-unit * 3) !important;
+      padding: $spacing-lg !important;
       background-color: rgba($text-light-gray, 0.1);
-      transition: all 0.3s ease;
-      display: flex !important;
+      transition: all $transition-base;
+      display: flex;
       flex-direction: column;
       justify-content: space-between;
       min-height: 160px;
 
       @include mobile {
         min-height: 140px;
-        padding: calc($spacing-unit * 2.5) !important;
+        padding: $spacing-xl;
       }
     }
 
@@ -241,8 +248,8 @@
       opacity: 0.7;
       width: 100%;
       transform: translateY(10px);
-      transition: all 0.3s ease;
-      margin-top: calc($spacing-unit * 1.25);
+      transition: all $transition-base;
+      margin-top: $spacing-md;
       position: relative;
       z-index: 10;
     }
@@ -263,10 +270,10 @@
 
     .view-more {
       text-align: center;
-      margin-top: calc($spacing-unit * 6);
+      margin-top: $spacing-4xl;
 
       @include mobile {
-        margin-top: calc($spacing-unit * 4);
+        margin-top: $spacing-3xl;
       }
     }
 
@@ -277,13 +284,13 @@
       align-items: center;
       gap: $spacing-sm;
       font-size: $font-size-base;
-      
+
       &::after {
         content: '→';
         font-size: $font-size-lg;
         transition: transform $transition-base;
       }
-      
+
       &:hover::after {
         transform: translateX(4px);
       }
@@ -294,8 +301,8 @@
   &.blog {
     &.blog-light {
       background-color: $white;
-      border-radius: 16px;
-      margin: calc($spacing-unit * 2);
+      border-radius: $border-radius-xl;
+      margin: $spacing-md;
 
       @include mobile {
         margin: $spacing-unit;
@@ -333,7 +340,7 @@
 
     .card-image {
       margin-bottom: 0;
-      border-radius: 8px;
+      border-radius: $border-radius-md;
     }
 
     // View more button styling for light blog section
@@ -344,13 +351,13 @@
       align-items: center;
       gap: $spacing-sm;
       font-size: $font-size-base;
-      
+
       &::after {
         content: '→';
         font-size: $font-size-lg;
         transition: transform $transition-base;
       }
-      
+
       &:hover::after {
         transform: translateX(4px);
       }
@@ -359,10 +366,10 @@
 
   // Common card styles
   .card {
-    border-radius: 12px;
+    border-radius: $border-radius-lg;
     overflow: hidden;
     text-decoration: none;
-    transition: all 0.3s ease;
+    transition: all $transition-base;
     height: 100%;
 
     .card-content {
@@ -388,22 +395,22 @@
       }
 
       img {
-        border-radius: 4px;
+        border-radius: $border-radius-sm;
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.3s ease;
+        transition: transform $transition-base;
       }
     }
 
     .card-info {
-      padding: calc($spacing-unit * 3);
+      padding: $spacing-xl;
       display: flex;
       flex-wrap: wrap;
       flex: 1;
 
       @include mobile {
-        padding: calc($spacing-unit * 2);
+        padding: $spacing-lg;
       }
     }
 
@@ -427,7 +434,7 @@
       font-family: $font-family-base;
       font-size: $font-size-base;
       line-height: $line-height-base;
-      margin-bottom: calc($spacing-unit * 2);
+      margin-bottom: $spacing-md;
       width: 100%;
 
       @include mobile {

@@ -41,7 +41,7 @@
             }
             img {
                 @include tablet {
-                    height: 120px !important;
+                    height: 120px;
                 }
             }
         }

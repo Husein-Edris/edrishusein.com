@@ -219,7 +219,12 @@
 // Global card hover effect for consistent behavior
 @mixin card-hover-effect {
   &:hover {
+    transform: translateY(-8px);
     filter: grayscale(0%);
+
+    .card-image img {
+      transform: scale(1.05);
+    }
 
     .card-title {
       color: $white;
@@ -238,18 +243,18 @@
 }
 
 @mixin section-header {
-  margin-bottom: calc($spacing-unit * 8);
+  margin-bottom: $spacing-5xl;
   position: relative;
 
   .section-number {
     font-family: $font-family-syncopate;
     font-size: calc($font-size-h1 * 0.8);
-    margin-bottom: $spacing-unit;
+    margin-bottom: $spacing-sm;
     color: $color-beige;
   }
 
   .section-title {
-    color: $primary-color;
+    color: $white;
     font-family: $font-family-syncopate;
     font-size: $font-size-3xl;
     text-transform: uppercase;
@@ -265,7 +270,7 @@
       content: '';
       position: absolute;
       top: 50%;
-      left: calc(100% + #{$spacing-unit * 2});
+      left: calc(100% + #{$spacing-md});
       width: 100px;
       height: 2px;
       background-color: $white;
@@ -274,10 +279,10 @@
 
   &.dark {
     .section-title {
-      color: #fff;
+      color: $white;
 
       &::after {
-        background-color: #ffff;
+        background-color: $white;
       }
     }
   }
@@ -293,12 +298,12 @@
   }
 
   @include mobile {
-    margin-bottom: calc($spacing-unit * 4);
+    margin-bottom: $spacing-3xl;
 
     .section-title {
       &::after {
         width: 60px;
-        left: calc(100% + #{$spacing-unit});
+        left: calc(100% + #{$spacing-sm});
       }
     }
   }
