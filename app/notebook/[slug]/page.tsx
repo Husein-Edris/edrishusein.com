@@ -121,34 +121,35 @@ export default function BlogPostPageSimple() {
                 ))}
               </div>
             )}
+
+            {/* Featured Image in Hero */}
+            {post?.featuredImage?.node ? (
+              <div className="featured-image">
+                <Image
+                  src={post.featuredImage.node.sourceUrl}
+                  alt={post.featuredImage.node.altText || post?.title || ''}
+                  width={post?.featuredImage?.node?.mediaDetails?.width || 1200}
+                  height={post?.featuredImage?.node?.mediaDetails?.height || 600}
+                  className="project-featured-image"
+                  priority
+                />
+              </div>
+            ) : (
+              <div className="featured-image">
+                <Image
+                  src="/images/Blog-sample-img.png"
+                  alt={post?.title || 'Blog Post'}
+                  width={1200}
+                  height={600}
+                  className="project-featured-image"
+                  priority
+                />
+              </div>
+            )}
           </div>
         </div>
 
         <div className="container">
-          {/* Featured Image */}
-          {post?.featuredImage?.node ? (
-            <div className="featured-image">
-              <Image
-                src={post.featuredImage.node.sourceUrl}
-                alt={post.featuredImage.node.altText || post?.title || ''}
-                width={post?.featuredImage?.node?.mediaDetails?.width || 1200}
-                height={post?.featuredImage?.node?.mediaDetails?.height || 600}
-                className="project-featured-image"
-                priority
-              />
-            </div>
-          ) : (
-            <div className="featured-image">
-              <Image
-                src="/images/Blog-sample-img.png"
-                alt={post?.title || 'Blog Post'}
-                width={1200}
-                height={600}
-                className="project-featured-image"
-                priority
-              />
-            </div>
-          )}
 
           {/* Article Content */}
           <section className="article-content">

@@ -2,12 +2,12 @@
 @use '../../styles/mixins' as *;
 
 .info-cards {
-  padding: $spacing-5xl $container-padding;
+  padding: $spacing-2xl $container-padding;
   display: flex;
   justify-content: center;
 
   @include mobile {
-    padding: $spacing-3xl $container-padding-mobile;
+    padding: $spacing-xl $container-padding-mobile;
   }
 
   .container {
