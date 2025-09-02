@@ -9,6 +9,7 @@ import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
 import InfoCards from '@/src/components/InfoCards/InfoCards';
 import '@/src/styles/pages/CaseStudy.scss';
+import '../../loading.scss';
 import { WordPressPost } from '@/src/types/api';
 
 export default function BlogPostPageSimple() {
@@ -53,15 +54,27 @@ export default function BlogPostPageSimple() {
   }, [slug]);
 
   if (loading) return (
-    <>
-      <Header />
-      <main style={{ padding: '2rem', minHeight: '60vh' }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <p>Loading...</p>
+    <div className="loading-page">
+      <div className="loading-container">
+        <div className="logo-spinner">
+          <div className="logo-circle">
+            <Image
+              src="/edrishusein-logo.svg"
+              alt="Edris Husein Logo"
+              width={60}
+              height={30}
+              className="logo-image"
+            />
+          </div>
+          <div className="pulse-rings">
+            <div className="pulse-ring"></div>
+            <div className="pulse-ring"></div>
+            <div className="pulse-ring"></div>
+          </div>
         </div>
-      </main>
-      <Footer />
-    </>
+        <p className="loading-text">Loading article...</p>
+      </div>
+    </div>
   );
 
   if (error) return (
