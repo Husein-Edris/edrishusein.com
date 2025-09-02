@@ -1,5 +1,5 @@
-// app/projects/[slug]/page.tsx
-
+// Server Component for project pages with SSG
+import { Suspense } from 'react';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import Header from '@/src/components/Header/Header';
@@ -7,10 +7,65 @@ import Footer from '@/src/components/Footer/Footer';
 import MoreProjects from '@/src/components/MoreProjects/MoreProjects';
 import '@/src/styles/pages/CaseStudy.scss';
 
+// Generate static params for all projects
+export async function generateStaticParams() {
+  // Add known project slugs and try to fetch from API
+  const knownSlugs = [
+    { slug: 'beschutzerbox' },
+    { slug: 'geschaftsbericht-fur-vorarlberger-landeskrankenhauser' }
+  ];
+
+  try {
+    // Try to fetch more projects from API
+    const response = await fetch(`${process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '')}/wp-json/wp/v2/project?per_page=20`);
+    if (response.ok) {
+      const projects = await response.json();
+      const apiSlugs = projects.map((project: any) => ({ slug: project.slug }));
+      return [...knownSlugs, ...apiSlugs];
+    }
+  } catch (error) {
+    console.error('Error fetching projects for static generation:', error);
+  }
+
+  return knownSlugs;
+}
+
+// Generate metadata for SEO
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  
+  try {
+    const project = await getProject(slug);
+    
+    return {
+      title: `${project.title} | Projects - Edris Husein`,
+      description: project.excerpt?.replace(/<[^>]*>/g, '').substring(0, 160) || `${project.title} - A project by Edris Husein`,
+      openGraph: {
+        title: project.title,
+        description: project.excerpt?.replace(/<[^>]*>/g, '').substring(0, 160),
+        images: project.featuredImage?.node?.sourceUrl ? [project.featuredImage.node.sourceUrl] : [],
+        type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: project.title,
+        description: project.excerpt?.replace(/<[^>]*>/g, '').substring(0, 160),
+        images: project.featuredImage?.node?.sourceUrl ? [project.featuredImage.node.sourceUrl] : [],
+      },
+    };
+  } catch (error) {
+    return {
+      title: 'Project | Projects - Edris Husein',
+      description: 'View this project by Edris Husein',
+    };
+  }
+}
+
+// Server-side data fetching
 async function getProject(slug: string) {
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '')}/wp-json/wp/v2/project?slug=${slug}&_embed&acf_format=standard`, {
-      next: { revalidate: 3600 }
+      next: { revalidate: 3600 } // Revalidate every hour
     });
     
     if (!response.ok) return null;
@@ -62,17 +117,12 @@ async function getProject(slug: string) {
       } : null
     };
   } catch (error) {
+    console.error('Error fetching project:', error);
     return null;
   }
 }
 
-export async function generateStaticParams() {
-  return [
-    { slug: 'beschutzerbox' },
-    { slug: 'geschaftsbericht-fur-vorarlberger-landeskrankenhauser' }
-  ];
-}
-
+// Server Component
 export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const project = await getProject(slug);
@@ -105,6 +155,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                   width={project.featuredImage.node.mediaDetails?.width || 1200}
                   height={project.featuredImage.node.mediaDetails?.height || 600}
                   className="project-featured-image"
+                  priority
+                  placeholder="blur"
+                  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
                 />
               </div>
             )}
@@ -112,7 +165,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         </div>
 
         <div className="container">
-
 
           {/* Technologies */}
           {(() => {
@@ -146,8 +198,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
               </section>
             ) : null;
           })()}
-
-
 
           {/* The Challenge */}
           {project.caseStudy?.projectContent?.challenge && (
@@ -250,9 +300,14 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         </div>
 
         {/* More Projects Section */}
-        <MoreProjects currentProjectSlug={slug} />
+        <Suspense fallback={<div className="loading-more">Loading more projects...</div>}>
+          <MoreProjects currentProjectSlug={slug} />
+        </Suspense>
       </main>
       <Footer />
     </>
   );
 }
+
+// Enable ISR (Incremental Static Regeneration)
+export const revalidate = 3600; // Revalidate every hour
