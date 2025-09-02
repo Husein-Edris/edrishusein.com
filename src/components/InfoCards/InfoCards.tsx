@@ -19,7 +19,7 @@ interface InfoCardProps {
 
 interface InfoCardsProps {
   cards?: InfoCardProps[];
-  columns: 1 | 2 | 3;
+  columns?: 1 | 2 | 3;
   sectionNumber?: string;
   sectionTitle?: string;
   skin?: 'projects' | 'blog' | 'default' | 'bookshelf' | 'techstack';
@@ -48,7 +48,7 @@ function truncateExcerpt(html: string, maxLength = 120): string {
 // Modified InfoCards component
 function InfoCards({
   cards,
-  columns,
+  columns = 1,
   sectionNumber,
   sectionTitle,
   skin = 'default',
@@ -70,8 +70,8 @@ function InfoCards({
       <div className="container">
         {(sectionNumber || displayTitle) && (
           <SectionHeader
-            number={sectionNumber}
-            title={displayTitle}
+            number={sectionNumber || ''}
+            title={displayTitle || ''}
             variant={variant}
           />
         )}
@@ -83,8 +83,12 @@ function InfoCards({
               ? { className: `card ${card.variant || variant}` }
               : { href: card.link || '#', className: `card ${card.variant || variant}` };
 
+            if (skin !== 'projects' && !card.link) {
+              return null; // Skip cards without links for non-project skins
+            }
+
             return (
-              <CardWrapper key={index} {...cardProps}>
+              <CardWrapper key={index} {...(cardProps as any)}>
                 <div className="card-content">
                   {card.image && (
                     <div className="card-image">

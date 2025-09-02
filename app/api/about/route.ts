@@ -1,5 +1,6 @@
 // REST API endpoint for About page data
 import { NextRequest, NextResponse } from 'next/server';
+import { AboutPageACF, ACFImageField } from '@/src/types/api';
 
 const WORDPRESS_REST_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '') || 'https://cms.edrishusein.com';
 
@@ -79,7 +80,7 @@ export async function GET() {
 }
 
 // Transform ACF data to match expected structure
-async function transformACFData(acf: any) {
+async function transformACFData(acf: AboutPageACF) {
   if (!acf) return null;
   
   console.log('🔄 Transforming ACF data for About page:', Object.keys(acf));
@@ -89,7 +90,7 @@ async function transformACFData(acf: any) {
     aboutHeroSubtitle: acf.about_hero_subtitle || '',
     aboutHeroImage: acf.about_hero_image ? {
       node: {
-        sourceUrl: acf.about_hero_image.url || acf.about_hero_image.source_url || acf.about_hero_image,
+        sourceUrl: acf.about_hero_image.url || acf.about_hero_image.source_url || '',
         altText: acf.about_hero_image.alt || acf.about_hero_image.alt_text || 'About Hero Image',
         mediaDetails: {
           width: acf.about_hero_image.width || 400,
@@ -110,7 +111,7 @@ async function transformACFData(acf: any) {
       personalContent: acf.personal_content || '',
       personalImage: acf.personal_image ? {
         node: {
-          sourceUrl: acf.personal_image.url || acf.personal_image.source_url || acf.personal_image,
+          sourceUrl: acf.personal_image.url || acf.personal_image.source_url || '',
           altText: acf.personal_image.alt || acf.personal_image.alt_text || 'Personal Image',
           mediaDetails: {
             width: acf.personal_image.width || 400,

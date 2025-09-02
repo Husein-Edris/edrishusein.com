@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { client } from '@/src/lib/client';
 import { GET_POST_BY_SLUG } from '@/src/lib/queries';
+import { PostsApiResponse, WordPressPost } from '@/src/types/api';
 
 // Helper function to calculate reading time
 function calculateReadingTime(content: string): string {
@@ -51,10 +52,10 @@ export async function GET(request: NextRequest) {
         }
       `;
 
-      const response = await client.request(GET_MULTIPLE_POSTS, { limit: parseInt(limit) });
+      const response = await client.request(GET_MULTIPLE_POSTS, { limit: parseInt(limit) }) as PostsApiResponse;
       
       if (response.posts?.nodes) {
-        const posts = response.posts.nodes.map(post => ({
+        const posts = response.posts.nodes.map((post: WordPressPost) => ({
           ...post,
           readingTime: calculateReadingTime(post.excerpt || '')
         }));
@@ -129,18 +130,18 @@ export async function GET(request: NextRequest) {
     `;
 
     // Try to fetch with ACF fields first, fallback to basic query
-    let response;
+    let response: { post?: WordPressPost };
     try {
       response = await client.request(GET_POST_BY_SLUG, { slug });
       console.log('✅ Successfully fetched with ACF fields');
     } catch (acfError) {
-      console.log('⚠️ ACF fields not available, using basic query:', acfError.message);
+      console.log('⚠️ ACF fields not available, using basic query:', acfError instanceof Error ? acfError.message : 'Unknown error');
       response = await client.request(BASIC_POST_QUERY, { slug });
     }
     
     console.log('📡 WordPress response:', response);
 
-    if (!response.post) {
+    if (!response?.post) {
       console.log('⚠️ No post found for slug:', slug);
       return NextResponse.json(
         { error: 'Post not found' },
@@ -158,13 +159,13 @@ export async function GET(request: NextRequest) {
     const enhancedPost = {
       ...post,
       readingTime,
-      author: post.author?.node ? {
-        name: post.author.node.name,
-        avatar: post.author.node.avatar,
-        bio: post.blogPostFields?.authorBioOverride || post.author.node.description
+      author: (post as any).author?.node ? {
+        name: (post as any).author.node.name,
+        avatar: (post as any).author.node.avatar,
+        bio: (post as any).blogPostFields?.authorBioOverride || (post as any).author.node.description
       } : null,
-      categories: post.categories?.nodes || [],
-      tags: post.tags?.nodes || [],
+      categories: (post as any).categories?.nodes || [],
+      tags: (post as any).tags?.nodes || [],
       customTags: post.blogPostFields?.customTags || [],
       conclusionSection: post.blogPostFields?.conclusionSection || null
     };

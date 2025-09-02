@@ -6,12 +6,13 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
+import { WordPressPost } from '@/src/types/api';
 
 export default function BlogPostPageSimple() {
   const params = useParams();
-  const [post, setPost] = useState(null);
+  const [post, setPost] = useState<WordPressPost | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   
   const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
 
@@ -26,7 +27,7 @@ export default function BlogPostPageSimple() {
         }
         setLoading(false);
       })
-      .catch(err => {
+      .catch(() => {
         setError('Failed to load post');
         setLoading(false);
       });
@@ -69,13 +70,13 @@ export default function BlogPostPageSimple() {
           
           {post && (
             <>
-              <h1 style={{ marginBottom: '1rem' }}>{post.title}</h1>
+              <h1 style={{ marginBottom: '1rem' }}>{post?.title}</h1>
               <div style={{ marginBottom: '2rem', color: '#666' }}>
-                {post.readingTime} • {new Date(post.date).toLocaleDateString()}
+                {post?.readingTime} • {post?.date ? new Date(post.date).toLocaleDateString() : ''}
               </div>
               <div 
                 style={{ lineHeight: '1.6' }}
-                dangerouslySetInnerHTML={{ __html: post.content }} 
+                dangerouslySetInnerHTML={{ __html: post?.content || '' }} 
               />
             </>
           )}

@@ -31,7 +31,7 @@ export default async function ProjectsPage() {
     title: project.title,
     description: project.excerpt || '',
     image: project.featuredImage?.node?.sourceUrl || '/images/Blog-sample-img.png',
-    variant: 'dark',
+    variant: 'dark' as 'dark' | 'light',
     visitLink: project.caseStudy?.projectLinks?.liveSite || '#',
     caseStudyLink: `/projects/${project.slug}`
   })) || [];

@@ -9,13 +9,14 @@ import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
 import InfoCards from '@/src/components/InfoCards/InfoCards';
 import '@/src/styles/pages/BlogPost.scss';
+import { WordPressPost } from '@/src/types/api';
 
 export default function BlogPostPageSimple() {
   const params = useParams();
-  const [post, setPost] = useState(null);
+  const [post, setPost] = useState<WordPressPost | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [moreArticles, setMoreArticles] = useState([]);
+  const [error, setError] = useState<string | null>(null);
+  const [moreArticles, setMoreArticles] = useState<WordPressPost[]>([]);
   
   const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
 
@@ -31,7 +32,7 @@ export default function BlogPostPageSimple() {
         }
         setLoading(false);
       })
-      .catch(err => {
+      .catch(() => {
         setError('Failed to load post');
         setLoading(false);
       });
@@ -42,7 +43,7 @@ export default function BlogPostPageSimple() {
       .then(data => {
         if (data.success && data.posts) {
           // Filter out current post
-          const otherPosts = data.posts.filter(p => p.slug !== slug);
+          const otherPosts = data.posts.filter((p: WordPressPost) => p.slug !== slug);
           setMoreArticles(otherPosts.slice(0, 3));
         }
       })
@@ -94,21 +95,21 @@ export default function BlogPostPageSimple() {
                 </nav>
                 <div className="meta-info">
                   <time className="post-date">
-                    {new Date(post.date).toLocaleDateString('en-US', { 
+                    {post?.date ? new Date(post.date).toLocaleDateString('en-US', { 
                       year: 'numeric', 
                       month: 'long', 
                       day: 'numeric' 
-                    })}
+                    }) : ''}
                   </time>
-                  {post.readingTime && (
+                  {post?.readingTime && (
                     <span className="reading-time">{post.readingTime}</span>
                   )}
                 </div>
               </div>
               
-              <h1 className="post-title">{post.title}</h1>
+              <h1 className="post-title">{post?.title}</h1>
               
-              {post.categories && post.categories.length > 0 && (
+              {post?.categories && post.categories.length > 0 && (
                 <div className="post-categories">
                   {post.categories.map((category, index) => (
                     <span key={index} className="category-tag">
@@ -121,13 +122,13 @@ export default function BlogPostPageSimple() {
           </header>
 
           {/* Featured Image */}
-          {post.featuredImage?.node ? (
+          {post?.featuredImage?.node ? (
             <div className="post-featured-image">
               <Image
                 src={post.featuredImage.node.sourceUrl}
-                alt={post.featuredImage.node.altText || post.title}
-                width={post.featuredImage.node.mediaDetails?.width || 1200}
-                height={post.featuredImage.node.mediaDetails?.height || 600}
+                alt={post.featuredImage.node.altText || post?.title || ''}
+                width={post?.featuredImage?.node?.mediaDetails?.width || 1200}
+                height={post?.featuredImage?.node?.mediaDetails?.height || 600}
                 className="featured-image"
                 priority
               />
@@ -136,7 +137,7 @@ export default function BlogPostPageSimple() {
             <div className="post-featured-image">
               <Image
                 src="/images/Blog-sample-img.png"
-                alt={post.title}
+                alt={post?.title || 'Blog Post'}
                 width={1200}
                 height={600}
                 className="featured-image"
@@ -150,7 +151,7 @@ export default function BlogPostPageSimple() {
               <div className="content-wrapper">
                 <div
                   className="prose"
-                  dangerouslySetInnerHTML={{ __html: post.content }}
+                  dangerouslySetInnerHTML={{ __html: post?.content || '' }}
                 />
               </div>
             </div>
@@ -158,22 +159,22 @@ export default function BlogPostPageSimple() {
 
           <footer className="post-footer">
             <div className="container">
-              {post.author && (
+              {post?.author && (
                 <div className="author-info">
                   <div className="author-details">
-                    <h3 className="author-name">Written by {post.author.name}</h3>
+                    <h3 className="author-name">Written by {post?.author?.name}</h3>
                     <p className="author-bio">
-                      {post.author.bio || "Full-stack developer passionate about modern web technologies."}
+                      {post?.author?.bio || "Full-stack developer passionate about modern web technologies."}
                     </p>
                   </div>
                 </div>
               )}
 
-              {post.tags && post.tags.length > 0 && (
+              {post?.tags && post.tags.length > 0 && (
                 <div className="post-tags">
                   <h3>Tags</h3>
                   <div className="tags-list">
-                    {post.tags.map((tag, index) => (
+                    {post?.tags?.map((tag: any, index: number) => (
                       <span key={index} className="tag">
                         #{tag.name}
                       </span>
@@ -193,11 +194,11 @@ export default function BlogPostPageSimple() {
             sectionNumber="03"
             sectionTitle="More Articles"
             columns={3}
-            cards={moreArticles.map((article) => ({
-              title: article.title,
-              description: article.excerpt?.replace(/<[^>]*>/g, '').substring(0, 120) + '...' || '',
-              image: article.featuredImage?.node?.sourceUrl || "/images/Blog-sample-img.png",
-              link: `/notebook/${article.slug}`,
+            cards={moreArticles.map((article: WordPressPost) => ({
+              title: article?.title || 'Untitled',
+              description: article?.excerpt?.replace(/<[^>]*>/g, '').substring(0, 120) + '...' || '',
+              image: article?.featuredImage?.node?.sourceUrl || "/images/Blog-sample-img.png",
+              link: `/notebook/${article?.slug}`,
               variant: 'light' as const
             }))}
           />
