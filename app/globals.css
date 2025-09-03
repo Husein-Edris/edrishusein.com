@@ -1,34 +1,4 @@
-@font-face {
-  font-family: 'Syncopate';
-  src: url('/fonts/Syncopate-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Syncopate';
-  src: url('/fonts/Syncopate-Bold.ttf') format('truetype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Inter';
-  src: url('/fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype-variations');
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Inter';
-  src: url('/fonts/Inter-Italic-VariableFont_opsz,wght.ttf') format('truetype-variations');
-  font-weight: 100 900;
-  font-style: italic;
-  font-display: swap;
-}
+/* Using Google Fonts for better performance and caching */
 
 :root {
   --background: #ffffff;
@@ -53,7 +23,8 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-feature-settings: 'liga' 1, 'calt' 1;
-  font-family: 'inter', sans-serif;
+  font-family: 'Inter', sans-serif;
+  font-optical-sizing: auto;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -132,21 +103,51 @@ a {
   }
 }
 
-/* Section skeleton styles */
-.section-skeleton {
-  padding: 2rem 0;
+/* Performance optimizations */
+.loading-skeleton {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+  margin: 0;
 }
 
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
+/* Critical rendering optimizations */
+.hero {
+  contain: layout style;
+}
+
+.info-cards {
+  contain: layout style;
+}
+
+.card-image {
+  contain: layout;
+}
+
+/* Performance hints */
+.card-image img {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.project-links button {
+  will-change: transform;
+}
+
+/* Reduce repaints */
+* {
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 

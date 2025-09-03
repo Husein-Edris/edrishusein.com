@@ -140,26 +140,48 @@ const FALLBACK_ABOUT_DATA = {
 
 async function getAboutPageData(): Promise<AboutPageData> {
   try {
-    console.log('🔍 Fetching about page data via REST API...');
+    // During build time, use WordPress directly to avoid API route issues
+    const WORDPRESS_REST_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '') || 'https://cms.edrishusein.com';
     
-    // Use our API endpoint for proper data transformation
-    const apiResponse = await fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:3001' : ''}/api/about`, {
+    // Get the About page by slug
+    const aboutResponse = await fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/pages?slug=about-me`, {
       next: { revalidate: 3600 }
     });
     
-    if (apiResponse.ok) {
-      const result = await apiResponse.json();
-      if (result.data) {
-        console.log('✅ About page data loaded successfully from API');
-        return result.data;
-      }
+    if (!aboutResponse.ok) {
+      throw new Error(`About page fetch failed: ${aboutResponse.status}`);
     }
     
-    console.warn('⚠️ REST API failed, using fallback data');
+    const aboutPages = await aboutResponse.json();
+    if (!aboutPages || aboutPages.length === 0) {
+      throw new Error('About page not found');
+    }
+    
+    const aboutPage = aboutPages[0];
+    
+    // Get ACF fields
+    try {
+      const acfResponse = await fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/pages/${aboutPage.id}?acf_format=standard`);
+      if (acfResponse.ok) {
+        const acfPage = await acfResponse.json();
+        const acfData = acfPage.acf_fields || acfPage.acf;
+        
+        if (acfData) {
+          return {
+            success: true,
+            data: transformACFData(acfData)
+          };
+        }
+      }
+    } catch (acfError) {
+      // ACF fetch failed, continue with fallback
+    }
+    
     return FALLBACK_ABOUT_DATA;
   } catch (error) {
-    console.error('❌ Error fetching about page data:', error);
-    console.log('🔄 Using fallback about page data');
+    if (process.env.NODE_ENV === 'development') {
+      console.error('❌ Error fetching about page data:', error);
+    }
     return FALLBACK_ABOUT_DATA;
   }
 }
