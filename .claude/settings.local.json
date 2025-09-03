@@ -6,8 +6,10 @@
       "Bash(curl:*)",
       "Bash(rg:*)",
       "Bash(npm run build:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(gtimeout 30 npm run build)"
     ],
-    "deny": []
+    "deny": [],
+    "defaultMode": "acceptEdits"
   }
 }

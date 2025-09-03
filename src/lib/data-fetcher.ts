@@ -29,7 +29,7 @@ const FALLBACK_HOMEPAGE_DATA: HomepageSections = {
     description: "Books and pieces of wisdom I've enjoyed reading",
     featuredImage: {
       node: {
-        sourceUrl: "/images/books-bg.png",
+        sourceUrl: "/images/books-bg-optimized.webp",
         altText: "Books Background",
         mediaDetails: { width: 400, height: 300 }
       }
@@ -40,7 +40,7 @@ const FALLBACK_HOMEPAGE_DATA: HomepageSections = {
     description: "The dev tools, apps, devices, and games I use and play with",
     featuredImage: {
       node: {
-        sourceUrl: "/images/tech-bg.png",
+        sourceUrl: "/images/tech-bg-optimized.webp",
         altText: "Tech Background",
         mediaDetails: { width: 400, height: 300 }
       }
@@ -68,7 +68,7 @@ const FALLBACK_PROJECTS_DATA = {
         content: "<p>This is a fallback message. Real project data will come from WordPress once the setup is complete.</p>",
         featuredImage: {
           node: {
-            sourceUrl: "/images/Blog-sample-img.png",
+            sourceUrl: "/images/Blog-sample-img-optimized.webp",
             altText: "Configuration Required",
             mediaDetails: { height: 600, width: 800 }
           }
@@ -98,7 +98,7 @@ const FALLBACK_POSTS_DATA = {
         date: "2024-01-15",
         featuredImage: {
           node: {
-            sourceUrl: "/images/Blog-sample-img.png",
+            sourceUrl: "/images/Blog-sample-img-optimized.webp",
             altText: "Next.js Blog Post",
             mediaDetails: { height: 400, width: 600 }
           }
@@ -112,7 +112,7 @@ const FALLBACK_POSTS_DATA = {
         date: "2024-01-10",
         featuredImage: {
           node: {
-            sourceUrl: "/images/Blog-sample-img.png",
+            sourceUrl: "/images/Blog-sample-img-optimized.webp",
             altText: "WordPress CMS Blog Post",
             mediaDetails: { height: 400, width: 600 }
           }
@@ -126,7 +126,7 @@ const FALLBACK_POSTS_DATA = {
         date: "2024-01-05",
         featuredImage: {
           node: {
-            sourceUrl: "/images/Blog-sample-img.png",
+            sourceUrl: "/images/Blog-sample-img-optimized.webp",
             altText: "Design Systems Blog Post",
             mediaDetails: { height: 400, width: 600 }
           }
@@ -156,10 +156,8 @@ export class DataFetcher {
         source: 'wordpress'
       };
     } catch (error) {
-      console.error(`${errorContext}:`, error);
-      
-      // In development, log more details
       if (process.env.NODE_ENV === 'development') {
+        console.error(`${errorContext}:`, error);
         console.warn(`Using fallback data for ${errorContext}`);
       }
 
@@ -174,13 +172,15 @@ export class DataFetcher {
   static async getHomepageData(): Promise<FetchResult<HomepageSections>> {
     return this.fetchWithFallback(
       async () => {
-        console.log('🔍 Attempting to fetch homepage data from:', process.env.NEXT_PUBLIC_WORDPRESS_API_URL);
-        // Try the ACF-based homepage query
         const response: HomepageResponse = await client.request(GET_HOMEPAGE_DATA);
-        console.log('✅ WordPress ACF data loaded successfully:', response);
+        if (process.env.NODE_ENV === 'development') {
+          console.log('✅ WordPress ACF data loaded successfully');
+        }
         
         if (!response.page?.homepageSections) {
-          console.warn('⚠️ No homepage sections found in response');
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('⚠️ No homepage sections found in response');
+          }
           throw new Error('No homepage sections in response');
         }
         
@@ -194,9 +194,6 @@ export class DataFetcher {
   static async getProjectsData(limit: number = 6): Promise<FetchResult<ProjectsResponse>> {
     return this.fetchWithFallback<ProjectsResponse>(
       async () => {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('🔍 Attempting to fetch projects data from:', process.env.NEXT_PUBLIC_WORDPRESS_API_URL);
-        }
         
         // First, try the custom post type query
         const PROJECTS_QUERY = `
@@ -229,10 +226,14 @@ export class DataFetcher {
 
         try {
           const response = await client.request(PROJECTS_QUERY, { limit });
-          console.log('✅ WordPress projects data loaded successfully:', response);
+          if (process.env.NODE_ENV === 'development') {
+            console.log('✅ WordPress projects data loaded successfully');
+          }
           return response as ProjectsResponse;
         } catch (error: unknown) {
-          console.warn('⚠️ GraphQL projects query failed, trying REST API...');
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('⚠️ GraphQL projects query failed, trying REST API...');
+          }
           
           // Try to get projects via WordPress REST API directly
           try {
@@ -240,7 +241,9 @@ export class DataFetcher {
             
             if (restResponse.ok) {
               const restProjects = await restResponse.json();
-              console.log(`✅ Found ${restProjects.length} projects via REST API`);
+              if (process.env.NODE_ENV === 'development') {
+                console.log(`✅ Found ${restProjects.length} projects via REST API`);
+              }
               
               // Transform REST API data to match GraphQL structure
               const transformedResponse = {
@@ -275,15 +278,21 @@ export class DataFetcher {
                 }
               };
               
-              console.log('✅ WordPress REST projects data transformed successfully');
+              if (process.env.NODE_ENV === 'development') {
+                console.log('✅ WordPress REST projects data transformed successfully');
+              }
               return transformedResponse as ProjectsResponse;
             }
           } catch (restError) {
-            console.warn('⚠️ REST API also failed:', restError instanceof Error ? restError.message : 'Unknown error');
+            if (process.env.NODE_ENV === 'development') {
+              console.warn('⚠️ REST API also failed:', restError instanceof Error ? restError.message : 'Unknown error');
+            }
           }
           
-          console.error('❌ Both GraphQL and REST API failed for projects');
-          console.error('   Using minimal fallback data');
+          if (process.env.NODE_ENV === 'development') {
+            console.error('❌ Both GraphQL and REST API failed for projects');
+            console.error('   Using minimal fallback data');
+          }
           throw error; // Use fallback data
         }
       },
@@ -295,7 +304,6 @@ export class DataFetcher {
   static async getPostsData(limit: number = 6): Promise<FetchResult<any>> {
     return this.fetchWithFallback(
       async () => {
-        console.log('🔍 Attempting to fetch posts data from:', process.env.NEXT_PUBLIC_WORDPRESS_API_URL);
         
         // Use optimized query with pagination
         const OPTIMIZED_POSTS_QUERY = `
@@ -323,7 +331,9 @@ export class DataFetcher {
         `;
         
         const response = await client.request(OPTIMIZED_POSTS_QUERY, { limit });
-        console.log('✅ WordPress posts data loaded successfully:', response);
+        if (process.env.NODE_ENV === 'development') {
+          console.log('✅ WordPress posts data loaded successfully');
+        }
         return response;
       },
       FALLBACK_POSTS_DATA,
@@ -359,16 +369,18 @@ export class DataFetcher {
 
 // Debug helper for development
 export function logDataSources(results: Record<string, FetchResult<unknown>>) {
-  console.group('🔍 Data Sources');
-  Object.entries(results).forEach(([key, result]) => {
-    const icon = result.source === 'wordpress' ? '✅' : '⚠️';
-    console.log(`${icon} ${key}: ${result.source}`);
-    if (result.error) {
-      console.warn(`   Error: ${result.error}`);
-    }
-    if (result.source === 'wordpress' && result.data) {
-      console.log(`   Data preview:`, Object.keys(result.data as any));
-    }
-  });
-  console.groupEnd();
+  if (process.env.NODE_ENV === 'development') {
+    console.group('🔍 Data Sources');
+    Object.entries(results).forEach(([key, result]) => {
+      const icon = result.source === 'wordpress' ? '✅' : '⚠️';
+      console.log(`${icon} ${key}: ${result.source}`);
+      if (result.error) {
+        console.warn(`   Error: ${result.error}`);
+      }
+      if (result.source === 'wordpress' && result.data) {
+        console.log(`   Data preview:`, Object.keys(result.data as any));
+      }
+    });
+    console.groupEnd();
+  }
 }

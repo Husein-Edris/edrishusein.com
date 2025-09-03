@@ -45,7 +45,7 @@ export class SectionTransformers {
     return posts.map((post: any) => ({
       title: post.title || 'Untitled Post',
       description: post.excerpt || 'No description available',
-      image: post.featuredImage?.node?.sourceUrl || '/images/Blog-sample-img.png',
+      image: post.featuredImage?.node?.sourceUrl || '/images/Blog-sample-img-optimized.webp',
       link: post.slug ? `/notebook/${post.slug}` : '#',
       variant: 'light' as const
     }));
@@ -56,13 +56,13 @@ export class SectionTransformers {
       {
         title: "BOOKSHELF",
         description: "Books and pieces of wisdom I've enjoyed reading",
-        image: "/images/books-bg.png",
+        image: "/images/books-bg-optimized.webp",
         link: "/bookshelf"
       },
       {
         title: "TECH STACK",
         description: "The dev tools, apps, devices, and games I use and play with",
-        image: "/images/tech-bg.png",
+        image: "/images/tech-bg-optimized.webp",
         link: "/tech-stack"
       }
     ];
