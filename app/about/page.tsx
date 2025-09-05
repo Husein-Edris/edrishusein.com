@@ -140,48 +140,28 @@ const FALLBACK_ABOUT_DATA = {
 
 async function getAboutPageData(): Promise<AboutPageData> {
   try {
-    // During build time, use WordPress directly to avoid API route issues
-    const WORDPRESS_REST_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '') || 'https://cms.edrishusein.com';
+    console.log('🔍 About page: Calling /api/about endpoint');
     
-    // Get the About page by slug
-    const aboutResponse = await fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/pages?slug=about-me`, {
+    // Use the API route instead of direct WordPress calls
+    const baseUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:3002' : process.env.NEXT_PUBLIC_SITE_URL;
+    const response = await fetch(`${baseUrl}/api/about`, {
       next: { revalidate: 3600 }
     });
     
-    if (!aboutResponse.ok) {
-      throw new Error(`About page fetch failed: ${aboutResponse.status}`);
+    if (!response.ok) {
+      throw new Error(`About API failed: ${response.status}`);
     }
     
-    const aboutPages = await aboutResponse.json();
-    if (!aboutPages || aboutPages.length === 0) {
-      throw new Error('About page not found');
+    const result = await response.json();
+    console.log('✅ About page: API response received');
+    
+    if (result.data) {
+      return result.data;
     }
     
-    const aboutPage = aboutPages[0];
-    
-    // Get ACF fields
-    try {
-      const acfResponse = await fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/pages/${aboutPage.id}?acf_format=standard`);
-      if (acfResponse.ok) {
-        const acfPage = await acfResponse.json();
-        const acfData = acfPage.acf_fields || acfPage.acf;
-        
-        if (acfData) {
-          return {
-            success: true,
-            data: transformACFData(acfData)
-          };
-        }
-      }
-    } catch (acfError) {
-      // ACF fetch failed, continue with fallback
-    }
-    
-    return FALLBACK_ABOUT_DATA;
+    throw new Error('No data in API response');
   } catch (error) {
-    if (process.env.NODE_ENV === 'development') {
-      console.error('❌ Error fetching about page data:', error);
-    }
+    console.error('❌ About page: API error, using fallback:', error);
     return FALLBACK_ABOUT_DATA;
   }
 }
