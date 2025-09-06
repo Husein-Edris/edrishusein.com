@@ -20,9 +20,11 @@
   .logo {
     display: block;
     z-index: 1001;
+    position: relative;
 
     img {
       height: 90px;
+      pointer-events: auto;
     }
 
     &:hover {
@@ -48,11 +50,13 @@
     width: var(--bar-width);
     height: var(--menu-height);
     position: relative;
+    pointer-events: auto;
 
     @include mobile {
       display: flex;
       flex-direction: column;
       gap: var(--bar-gap);
+      z-index: 1002;
     }
 
     &::before,
@@ -89,11 +93,13 @@
       left: 0;
       width: 100%;
       height: 100vh;
+      height: 100dvh; // Dynamic viewport height for mobile browsers
       background-color: $primary-color;
       z-index: 1000;
       opacity: 0;
       visibility: hidden;
       transition: all 0.3s ease;
+      overflow: hidden; // Prevent scrolling
 
       &.active {
         opacity: 1;
@@ -128,6 +134,8 @@
       .main-nav {
         display: block;
         height: 100%;
+        padding: $spacing-2xl $spacing-lg;
+        overflow: hidden; // Prevent any scrolling within the menu
       }
 
       .navList {
@@ -136,17 +144,31 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        gap: $spacing-3xl;
+        gap: $spacing-lg;
         transform: translateY(20px);
         transition: transform 0.3s ease;
+        overflow: hidden; // Ensure no scrolling
+
+        @media (max-height: 600px) {
+          gap: $spacing-md;
+        }
+
+        @media (max-height: 500px) {
+          gap: $spacing-sm;
+        }
       }
 
       .navLink {
         font-family: $font-family-syncopate;
-        font-size: $font-size-2xl;
+        font-size: $font-size-xl;
         color: $white;
         text-decoration: none;
         transition: color $transition-base;
+        text-align: center;
+
+        @media (max-height: 600px) {
+          font-size: $font-size-lg;
+        }
 
         &:hover {
           color: $text-light-gray;
@@ -154,6 +176,17 @@
 
         &::after {
           display: none;
+        }
+
+        .navNumber {
+          display: block;
+          font-size: $font-size-sm;
+          color: $text-light-gray;
+          margin-bottom: $spacing-xs;
+        }
+
+        .navText {
+          display: block;
         }
       }
     }

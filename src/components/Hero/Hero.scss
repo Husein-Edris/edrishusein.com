@@ -11,7 +11,7 @@
 
   @include mobile {
     padding: $spacing-xl $container-padding-mobile;
-    min-height: 100vh;
+    min-height: 60vh;
   }
 
   .container {
@@ -72,7 +72,7 @@
   .title {
     color: $white;
     font-family: $font-family-syncopate;
-    font-size: $font-size-h1;
+    font-size: $font-size-5xl;
     font-weight: $font-weight-bold;
     margin-bottom: $spacing-lg;
     display: flex;
@@ -80,29 +80,53 @@
     gap: $spacing-sm;
 
     @include tablet {
-      font-size: $font-size-3xl;
+      font-size: $font-size-4xl;
     }
 
     @include mobile {
-      font-size: $font-size-h1;
-      justify-content: center;
-      flex-wrap: wrap;
+      font-size: $font-size-3xl;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
       gap: $spacing-xs;
+    }
+
+    // First line: "Hi" + wave (mobile only)
+    .first-line {
+      display: inline;
+
+      @include mobile {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: $spacing-sm;
+      }
+    }
+
+    // Second line: "I'm EDRIS" (mobile only)
+    .second-line {
+      display: inline;
+
+      @include mobile {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: $spacing-sm;
+      }
     }
 
     .subTitle {
       color: $text-light-gray;
-      margin-right: $spacing-xs;
     }
 
     .wave {
       animation: wave 2s infinite;
       display: inline-block;
       transform-origin: 70% 70%;
-      font-size: $font-size-h1;
+      font-size: inherit;
 
       @include mobile {
-        font-size: $font-size-3xl;
+        font-size: inherit;
       }
     }
   }

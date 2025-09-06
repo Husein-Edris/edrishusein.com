@@ -1,6 +1,6 @@
 'use client';
 
-import { FC, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import './Header.scss';
@@ -10,8 +10,53 @@ const Header: FC = () => {
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
-    document.body.style.overflow = !isMenuOpen ? 'hidden' : 'auto';
   };
+
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+  };
+
+  // Handle body scroll locking and cleanup
+  useEffect(() => {
+    if (isMenuOpen) {
+      // Prevent scrolling on body and html
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+      document.documentElement.style.overflow = 'hidden';
+    } else {
+      // Restore scrolling
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.documentElement.style.overflow = '';
+    }
+
+    // Cleanup function to reset scroll on unmount
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.documentElement.style.overflow = '';
+    };
+  }, [isMenuOpen]);
+
+  // Handle escape key to close menu
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isMenuOpen) {
+        closeMenu();
+      }
+    };
+
+    if (isMenuOpen) {
+      document.addEventListener('keydown', handleEscape);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isMenuOpen]);
 
   return (
     <header className="header">
@@ -26,41 +71,49 @@ const Header: FC = () => {
           />
         </Link>
 
-        <div className={`mobile-menu ${isMenuOpen ? 'active' : ''}`}>
-          <nav className="main-nav">
+        <div 
+          className={`mobile-menu ${isMenuOpen ? 'active' : ''}`} 
+          onClick={closeMenu}
+          onTouchMove={(e) => e.preventDefault()} // Prevent touch scrolling
+        >
+          <nav 
+            className="main-nav" 
+            onClick={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()} // Allow navigation area to be touchable
+          >
             <ul className="navList">
               <li className="navItem">
-                <Link href="/" className="navLink" onClick={toggleMenu}>
+                <Link href="/" className="navLink" onClick={closeMenu}>
                   <span className="navNumber">01</span>
                   <span className="navText">HOME</span>
                 </Link>
               </li>
               <li className="navItem">
-                <Link href="/projects" className="navLink" onClick={toggleMenu}>
+                <Link href="/projects" className="navLink" onClick={closeMenu}>
                   <span className="navNumber">02</span>
                   <span className="navText">PROJECTS</span>
                 </Link>
               </li>
               <li className="navItem">
-                <Link href="/about" className="navLink" onClick={toggleMenu}>
+                <Link href="/about" className="navLink" onClick={closeMenu}>
                   <span className="navNumber">03</span>
                   <span className="navText">ABOUT</span>
                 </Link>
               </li>
               <li className="navItem">
-                <Link href="/bookshelf" className="navLink" onClick={toggleMenu}>
+                <Link href="/bookshelf" className="navLink" onClick={closeMenu}>
                   <span className="navNumber">04</span>
                   <span className="navText">BOOKSHELF</span>
                 </Link>
               </li>
               <li className="navItem">
-                <Link href="/notebook" className="navLink" onClick={toggleMenu}>
+                <Link href="/notebook" className="navLink" onClick={closeMenu}>
                   <span className="navNumber">05</span>
                   <span className="navText">NOTEBOOK</span>
                 </Link>
               </li>
               <li className="navItem">
-                <Link href="/contact" className="navLink" onClick={toggleMenu}>
+                <Link href="/contact" className="navLink" onClick={closeMenu}>
                   <span className="navNumber">06</span>
                   <span className="navText">CONTACT</span>
                 </Link>

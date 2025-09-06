@@ -58,7 +58,6 @@ const Hero = ({ data }: HeroProps) => {
               sizes="(max-width: 768px) 280px, 450px"
               placeholder="blur"
               blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAECASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkbHB0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8A2gA="
-              style={{ width: 'auto', height: 'auto' }}
               onError={() => setImageError(true)}
             />
           ) : (
@@ -68,10 +67,14 @@ const Hero = ({ data }: HeroProps) => {
           )}
         </div>
         <div className="content">
-          <h1 
-            className="title"
-            dangerouslySetInnerHTML={{ __html: processedTitle || '' }}
-          />
+          <h1 className="title">
+            <div className="first-line">
+              Hi<span className="wave">👋🏻</span>
+            </div>
+            <div className="second-line">
+              <span className="subTitle">I'm</span>EDRIS
+            </div>
+          </h1>
           <p className="description">
             {cleanHeroCopy}
           </p>
