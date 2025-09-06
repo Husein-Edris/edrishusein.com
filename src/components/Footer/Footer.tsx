@@ -17,8 +17,8 @@ const Footer = () => {
     ];
 
     const legalLinks = [
-        { href: '/legal', label: 'Legal' },
-        { href: '/privacy', label: 'Privacy Policy' },
+        { href: '/imprint', label: 'Imprint' },
+        { href: '/privacy-policy', label: 'Privacy Policy' },
     ];
 
     return (
