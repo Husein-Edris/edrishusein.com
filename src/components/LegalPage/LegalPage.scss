@@ -1,0 +1,369 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.legal-page {
+  min-height: 100vh;
+  background-color: $primary-color;
+  color: $text-light-gray;
+
+  // Breadcrumb Navigation
+  .breadcrumb {
+    background-color: rgba($white, 0.05);
+    padding: $spacing-sm 0;
+    border-bottom: 1px solid rgba($white, 0.1);
+
+    .container {
+      @include container;
+    }
+
+    .breadcrumb-list {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: $spacing-xs;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      font-size: $font-size-sm;
+    }
+
+    .breadcrumb-item {
+      display: flex;
+      align-items: center;
+
+      &:not(:last-child)::after {
+        content: '/';
+        margin-left: $spacing-xs;
+        color: rgba($text-light-gray, 0.6);
+      }
+
+      a {
+        color: $color-beige;
+        text-decoration: none;
+        transition: color 0.2s ease;
+
+        &:hover {
+          color: $white;
+          text-decoration: underline;
+        }
+      }
+
+      &[aria-current="page"] {
+        color: $text-light-gray;
+      }
+    }
+  }
+
+  // Hero Section
+  .legal-hero {
+    padding: $spacing-2xl 0 $spacing-xl;
+    background: linear-gradient(135deg, rgba($white, 0.05) 0%, rgba($white, 0.02) 100%);
+    color: $white;
+    text-align: center;
+
+    .container {
+      @include container;
+    }
+
+    .legal-hero-content {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .legal-title {
+      font-size: $font-size-3xl;
+      font-weight: $font-weight-bold;
+      margin-bottom: $spacing-md;
+      font-family: $font-family-syncopate;
+
+      @include mobile {
+        font-size: $font-size-2xl;
+      }
+    }
+
+    .last-updated {
+      font-size: $font-size-sm;
+      opacity: 0.9;
+      margin: 0;
+    }
+  }
+
+  // Content Section
+  .legal-content {
+    padding: $spacing-3xl 0;
+
+    .container {
+      @include container;
+    }
+
+    .content-wrapper {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .legal-article {
+      line-height: 1.7;
+      font-size: $font-size-base;
+      color: $text-light-gray;
+
+      // Typography styles for WordPress content
+      h1, h2, h3, h4, h5, h6 {
+        font-family: $font-family-syncopate;
+        font-weight: $font-weight-semibold;
+        line-height: 1.3;
+        margin-top: $spacing-xl;
+        margin-bottom: $spacing-md;
+        color: $white;
+      }
+
+      h1 {
+        font-size: $font-size-2xl;
+        border-bottom: 2px solid $color-beige;
+        padding-bottom: $spacing-sm;
+      }
+
+      h2 {
+        font-size: $font-size-xl;
+        color: $color-beige;
+        margin-top: $spacing-2xl;
+      }
+
+      h3 {
+        font-size: $font-size-lg;
+        margin-top: $spacing-lg;
+      }
+
+      h4, h5, h6 {
+        font-size: $font-size-base;
+        margin-top: $spacing-md;
+      }
+
+      // First heading should have less top margin
+      h1:first-child,
+      h2:first-child,
+      h3:first-child {
+        margin-top: 0;
+      }
+
+      p {
+        margin-bottom: $spacing-md;
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+
+      // Lists
+      ul, ol {
+        margin: $spacing-md 0;
+        padding-left: $spacing-lg;
+
+        li {
+          margin-bottom: $spacing-xs;
+        }
+
+        // Nested lists
+        ul, ol {
+          margin: $spacing-xs 0;
+        }
+      }
+
+      ul {
+        li {
+          list-style-type: disc;
+        }
+      }
+
+      ol {
+        li {
+          list-style-type: decimal;
+        }
+      }
+
+      // Links
+      a {
+        color: $color-beige;
+        text-decoration: underline;
+        transition: color 0.2s ease;
+
+        &:hover {
+          color: $white;
+        }
+      }
+
+      // Strong and emphasis
+      strong, b {
+        font-weight: $font-weight-semibold;
+        color: $white;
+      }
+
+      em, i {
+        font-style: italic;
+      }
+
+      // Code
+      code {
+        background-color: rgba($white, 0.1);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9em;
+        color: $color-beige;
+      }
+
+      pre {
+        background-color: rgba($white, 0.05);
+        padding: $spacing-md;
+        border-radius: 8px;
+        overflow-x: auto;
+        margin: $spacing-md 0;
+
+        code {
+          background: none;
+          padding: 0;
+          color: $text-light-gray;
+        }
+      }
+
+      // Blockquotes
+      blockquote {
+        border-left: 4px solid $color-beige;
+        padding-left: $spacing-md;
+        margin: $spacing-lg 0;
+        font-style: italic;
+        color: rgba($text-light-gray, 0.8);
+        background-color: rgba($white, 0.05);
+        padding: $spacing-md;
+        border-radius: 4px;
+      }
+
+      // Tables
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: $spacing-lg 0;
+        font-size: $font-size-sm;
+
+        th, td {
+          padding: $spacing-sm;
+          text-align: left;
+          border-bottom: 1px solid rgba($white, 0.1);
+        }
+
+        th {
+          font-weight: $font-weight-semibold;
+          background-color: rgba($white, 0.05);
+          color: $white;
+        }
+
+        tr:hover {
+          background-color: rgba($white, 0.03);
+        }
+      }
+
+      // Horizontal rule
+      hr {
+        border: none;
+        height: 1px;
+        background-color: rgba($white, 0.2);
+        margin: $spacing-xl 0;
+      }
+
+      // Images
+      img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        margin: $spacing-md 0;
+      }
+
+      // WordPress specific classes
+      .wp-block-quote {
+        @extend blockquote;
+      }
+
+      .wp-block-code {
+        @extend pre;
+      }
+
+      // Responsive adjustments
+      @include mobile {
+        font-size: $font-size-sm;
+
+        h1 { font-size: $font-size-xl; }
+        h2 { font-size: $font-size-lg; }
+        h3 { font-size: $font-size-base; }
+        
+        table {
+          font-size: $font-size-xs;
+          
+          th, td {
+            padding: $spacing-xs;
+          }
+        }
+      }
+    }
+
+    // Back to top button
+    .back-to-top {
+      text-align: center;
+      margin-top: $spacing-2xl;
+      padding-top: $spacing-xl;
+      border-top: 1px solid rgba($white, 0.1);
+
+      .back-to-top-btn {
+        @include button-ghost;
+        font-size: $font-size-sm;
+        padding: $spacing-sm $spacing-md;
+        
+        &:hover {
+          transform: translateY(-2px);
+        }
+      }
+    }
+  }
+}
+
+// Dark mode adjustments
+@media (prefers-color-scheme: dark) {
+  .legal-page {
+    .legal-hero {
+      background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+    }
+  }
+}
+
+// Print styles
+@media print {
+  .legal-page {
+    .breadcrumb,
+    .back-to-top {
+      display: none;
+    }
+
+    .legal-hero {
+      background: none !important;
+      color: black !important;
+      padding: $spacing-md 0;
+    }
+
+    .legal-content {
+      padding: $spacing-md 0;
+    }
+
+    .legal-article {
+      font-size: 12pt;
+      line-height: 1.5;
+      color: black;
+
+      h1, h2, h3, h4, h5, h6 {
+        color: black;
+        page-break-after: avoid;
+      }
+
+      p, li {
+        page-break-inside: avoid;
+      }
+    }
+  }
+}
