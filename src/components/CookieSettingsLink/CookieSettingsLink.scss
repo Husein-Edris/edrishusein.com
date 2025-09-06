@@ -1,0 +1,21 @@
+@use '../../styles/variables' as *;
+
+.cookie-settings-link {
+  // Reset button styles
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  
+  // Match footer link styles exactly
+  color: $white;
+  text-decoration: none;
+  font-family: $font-family-base;
+  font-size: $font-size-base;
+  transition: color $transition-base;
+
+  &:hover {
+    color: $text-light-gray;
+  }
+}
