@@ -20,10 +20,16 @@
       font-family: $font-family-syncopate;
       font-size: $font-size-4xl;
       margin-bottom: $spacing-md;
+      word-wrap: break-word;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      max-width: 100%;
 
       @include mobile {
-        font-size: $font-size-3xl;
+        font-size: $font-size-2xl;
         margin-bottom: $spacing-sm;
+        line-height: 1.2;
+        padding: 0 $spacing-md;
       }
     }
 
@@ -116,7 +122,7 @@
   .container {
     max-width: $desktop;
     margin: 0 auto;
-    padding: $spacing-xl;
+    padding: 0 $spacing-xl $spacing-xl $spacing-xl;
 
     @include mobile {
       padding: calc($spacing-unit * 4) calc($spacing-unit * 2);
@@ -136,16 +142,6 @@
       margin-bottom: calc($spacing-unit * 4);
       position: relative;
       display: inline-block;
-
-      &::after {
-        content: '';
-        position: absolute;
-        bottom: -10px;
-        left: 0;
-        width: 80px;
-        height: 4px;
-        background-color: $color-beige;
-      }
 
       @include mobile {
         font-size: calc($font-size-base * 1.5);
