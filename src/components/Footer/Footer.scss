@@ -18,11 +18,12 @@
 
     .footer-content {
         display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: $spacing-2xl;
 
         @include mobile {
-            flex-direction: row;
             gap: $spacing-xl;
         }
     }
@@ -30,7 +31,8 @@
     .footer-left {
         display: flex;
         flex-direction: column;
-        gap: $spacing-md;
+        align-items: center;
+        gap: $spacing-lg;
 
         .logo {
             display: block;
@@ -39,9 +41,14 @@
                 opacity: 0.8;
                 transition: opacity $transition-base;
             }
+            
             img {
-                @include tablet {
-                    height: 120px;
+                width: 120px;
+                height: 120px;
+
+                @include mobile {
+                    width: 100px;
+                    height: 100px;
                 }
             }
         }
@@ -49,17 +56,24 @@
         .copyright {
             color: $text-light-gray;
             font-family: $font-family-base;
-            font-size: $font-size-sm;
+            font-size: $font-size-base;
+            margin: 0;
+
+            @include mobile {
+                font-size: $font-size-sm;
+            }
         }
     }
 
     .footer-nav {
         display: flex;
+        justify-content: center;
         gap: $spacing-3xl;
 
         @include mobile {
             flex-direction: column;
-            gap: $spacing-xl;
+            gap: $spacing-lg;
+            align-items: center;
         }
 
         .nav-list {
@@ -69,8 +83,13 @@
             list-style: none;
             margin: 0;
             padding: 0;
+            align-items: center;
 
-            a {
+            @include mobile {
+                gap: $spacing-sm;
+            }
+
+            a, button {
                 color: $white;
                 text-decoration: none;
                 font-family: $font-family-base;
@@ -84,7 +103,7 @@
         }
 
         .main-links {
-            margin-right: $spacing-xl;
+            margin-right: 0;
         }
     }
 }

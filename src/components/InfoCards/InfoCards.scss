@@ -7,7 +7,7 @@
   justify-content: center;
 
   @include mobile {
-    padding: $spacing-xl $container-padding-mobile;
+    padding: $spacing-lg $container-padding-mobile;
   }
 
   .container {
@@ -94,6 +94,10 @@
 
     &.columns-2 {
       grid-template-columns: repeat(2, 1fr);
+
+      @include mobile {
+        grid-template-columns: 1fr !important;
+      }
     }
 
     &.columns-3 {
@@ -102,12 +106,18 @@
       @include tablet {
         grid-template-columns: repeat(2, 1fr);
       }
+
+      @include mobile {
+        grid-template-columns: 1fr !important;
+      }
     }
 
+    // Force single column on mobile regardless of class
     @include mobile {
-      grid-template-columns: 1fr;
-      gap: $spacing-4xl;
+      grid-template-columns: 1fr !important;
+      gap: $spacing-xl;
       margin-bottom: $spacing-3xl;
+      padding: $spacing-sm;
     }
   }
 
@@ -457,7 +467,7 @@
 
       @include mobile {
         padding: 0;
-        height: 200px;
+        height: 220px; // Slightly taller for single column
       }
 
       img {

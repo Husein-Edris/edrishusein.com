@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import CookieSettingsLink from '@/src/components/CookieSettingsLink/CookieSettingsLink';
 import './Footer.scss';
 
 const Footer = () => {
@@ -30,8 +31,8 @@ const Footer = () => {
                             <Image
                                 src="/edrishusein-logo.svg"
                                 alt="Edris Husein Logo"
-                                width={60}
-                                height={60}
+                                width={120}
+                                height={120}
                                 priority
                             />
                         </Link>
@@ -59,6 +60,9 @@ const Footer = () => {
                                     <Link href={link.href}>{link.label}</Link>
                                 </li>
                             ))}
+                            <li>
+                                <CookieSettingsLink>Cookie Settings</CookieSettingsLink>
+                            </li>
                         </ul>
                     </nav>
                 </div>
