@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import CookieBanner from "@/src/components/CookieBanner/CookieBanner";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -39,7 +40,10 @@ export default function RootLayout({
         <meta name="theme-color" content="#ffffff" />
         <meta name="description" content="Full-stack developer and digital creative specializing in modern web applications, UI/UX design, and WordPress development." />
       </head>
-      <body suppressHydrationWarning={true}>{children}</body>
+      <body suppressHydrationWarning={true}>
+        {children}
+        <CookieBanner />
+      </body>
     </html>
   );
 }
