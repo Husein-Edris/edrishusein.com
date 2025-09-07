@@ -39,6 +39,7 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="theme-color" content="#ffffff" />
         <meta name="description" content="Full-stack developer and digital creative specializing in modern web applications, UI/UX design, and WordPress development." />
+        {/* Recent updates: Footer layout, cookie settings, case-study spacing */}
       </head>
       <body suppressHydrationWarning={true}>
         {children}
