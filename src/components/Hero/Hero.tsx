@@ -15,7 +15,7 @@ const Hero = ({ data }: HeroProps) => {
 
   // Fallback data
   const fallbackData: HeroSection = {
-    title: "<span class=\"subTitle\">I'm</span>EDRIS<span class=\"wave\">👋🏻</span>",
+    title: "<span class=\"subTitle\">I'm</span>EDRIS<span class=\"wave\">👋🏻<span>test</span></span>",
     heroCopy: "Full-stack developer crafting digital experiences with modern technologies. Testing CI/CD deployment pipeline!",
     heroImage: {
       node: {
