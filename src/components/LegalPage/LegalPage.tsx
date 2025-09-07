@@ -11,6 +11,7 @@ interface LegalPageProps {
   content: string;
   lastUpdated?: string;
   breadcrumb?: string;
+  showCookieSettings?: boolean;
 }
 
 interface LegalPageData {
@@ -198,7 +199,7 @@ function formatDate(dateString?: string): string {
 }
 
 // Legal page component
-export default function LegalPage({ title, content, lastUpdated, breadcrumb }: LegalPageProps) {
+export default function LegalPage({ title, content, lastUpdated, breadcrumb, showCookieSettings = true }: LegalPageProps) {
   return (
     <>
       <Header />
@@ -243,14 +244,16 @@ export default function LegalPage({ title, content, lastUpdated, breadcrumb }: L
               />
               
               {/* Cookie Settings Link */}
-              <div className="cookie-settings-section">
-                <p>
-                  You can manage your cookie preferences at any time by clicking{' '}
-                  <CookieSettingsLink>
-                    <strong>Cookie Settings</strong>
-                  </CookieSettingsLink>.
-                </p>
-              </div>
+              {showCookieSettings && (
+                <div className="cookie-settings-section">
+                  <p>
+                    You can manage your cookie preferences at any time by clicking{' '}
+                    <CookieSettingsLink>
+                      <strong>Cookie Settings</strong>
+                    </CookieSettingsLink>.
+                  </p>
+                </div>
+              )}
 
               {/* Back to top */}
               <div className="back-to-top">

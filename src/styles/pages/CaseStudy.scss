@@ -122,10 +122,10 @@
   .container {
     max-width: $desktop;
     margin: 0 auto;
-    padding: 0 $spacing-xl $spacing-xl $spacing-xl;
+    padding: calc($spacing-unit * 6) $spacing-xl $spacing-xl $spacing-xl;
 
     @include mobile {
-      padding: calc($spacing-unit * 4) calc($spacing-unit * 2);
+      padding: calc($spacing-unit * 5) calc($spacing-unit * 2) calc($spacing-unit * 4) calc($spacing-unit * 2);
     }
   }
 

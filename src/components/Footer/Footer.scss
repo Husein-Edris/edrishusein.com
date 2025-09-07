@@ -18,12 +18,14 @@
 
     .footer-content {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
+        justify-content: space-around;
         text-align: center;
         gap: $spacing-2xl;
 
         @include mobile {
+            flex-direction: column;
             gap: $spacing-xl;
         }
     }

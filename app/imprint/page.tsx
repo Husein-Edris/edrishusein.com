@@ -21,6 +21,7 @@ export default async function ImprintPage() {
       content={page.content}
       lastUpdated={page.modified}
       breadcrumb="Imprint"
+      showCookieSettings={false}
     />
   );
 }
