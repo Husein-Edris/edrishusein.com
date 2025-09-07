@@ -39,5 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-docs/CLAUDE.md
-docs/CLAUDE.md
+
+# Development and deployment files (not needed in production)
+acf-exports/
+wordpress-exports/
+.claude/
+deploy.sh
+ssl-setup.sh
+docs/
+*.tar.gz
