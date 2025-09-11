@@ -49,3 +49,4 @@ ssl-setup.sh
 docs/
 *.tar.gz
 claude.json
+TODO.md
