@@ -74,7 +74,7 @@ async function getTechStackData() {
 }
 
 export default async function TechStackPage() {
-  const techItems = await getTechStackData();
+  const techItems = await getTechStackData() || [];
 
   return (
     <>
@@ -94,30 +94,36 @@ export default async function TechStackPage() {
           {/* Tech Grid */}
           <section className="tech-section">
             <div className="tech-grid">
-              {techItems.map((tech: any) => (
-                <div key={tech.id} className="tech-card">
-                  {tech.featuredImage?.node && (
-                    <div className="tech-image">
-                      <Image
-                        src={tech.featuredImage.node.sourceUrl}
-                        alt={tech.featuredImage.node.altText || tech.title}
-                        width={tech.featuredImage.node.mediaDetails?.width || 100}
-                        height={tech.featuredImage.node.mediaDetails?.height || 100}
-                        className="featured-image"
-                      />
-                    </div>
-                  )}
-                  <div className="tech-content">
-                    <h3 className="tech-title">{tech.title}</h3>
-                    {tech.excerpt && (
-                      <div
-                        className="tech-description"
-                        dangerouslySetInnerHTML={{ __html: tech.excerpt }}
-                      />
+              {techItems.length > 0 ? (
+                techItems.map((tech: any) => (
+                  <div key={tech.id} className="tech-card">
+                    {tech.featuredImage?.node && (
+                      <div className="tech-image">
+                        <Image
+                          src={tech.featuredImage.node.sourceUrl}
+                          alt={tech.featuredImage.node.altText || tech.title}
+                          width={tech.featuredImage.node.mediaDetails?.width || 100}
+                          height={tech.featuredImage.node.mediaDetails?.height || 100}
+                          className="featured-image"
+                        />
+                      </div>
                     )}
+                    <div className="tech-content">
+                      <h3 className="tech-title">{tech.title}</h3>
+                      {tech.excerpt && (
+                        <div
+                          className="tech-description"
+                          dangerouslySetInnerHTML={{ __html: tech.excerpt }}
+                        />
+                      )}
+                    </div>
                   </div>
+                ))
+              ) : (
+                <div className="no-tech-message" style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+                  <p>Tech stack information is currently being updated. Please check back later.</p>
                 </div>
-              ))}
+              )}
             </div>
           </section>
         </div>
