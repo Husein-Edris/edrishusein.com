@@ -140,28 +140,52 @@ const FALLBACK_ABOUT_DATA = {
 
 async function getAboutPageData(): Promise<AboutPageData> {
   try {
-    console.log('🔍 About page: Calling /api/about endpoint');
+    console.log('🔍 About page: Fetching directly from WordPress REST API');
     
-    // Use the API route instead of direct WordPress calls
-    const baseUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:3002' : process.env.NEXT_PUBLIC_SITE_URL;
-    const response = await fetch(`${baseUrl}/api/about`, {
+    // Call WordPress REST API directly instead of our own API route during build
+    const WORDPRESS_REST_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '') || 'https://cms.edrishusein.com';
+    
+    const aboutResponse = await fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/pages?slug=about-me`, {
       next: { revalidate: 3600 }
     });
     
-    if (!response.ok) {
-      throw new Error(`About API failed: ${response.status}`);
+    if (!aboutResponse.ok) {
+      throw new Error(`WordPress REST API failed: ${aboutResponse.status}`);
     }
     
-    const result = await response.json();
-    console.log('✅ About page: API response received');
+    const aboutPages = await aboutResponse.json();
     
-    if (result.data) {
-      return result.data;
+    if (!aboutPages || aboutPages.length === 0) {
+      throw new Error('About page not found in WordPress');
     }
     
-    throw new Error('No data in API response');
+    const aboutPage = aboutPages[0];
+    console.log('✅ About page: WordPress data loaded');
+    
+    // Transform WordPress REST data to expected format
+    const transformedData = {
+      page: {
+        id: aboutPage.id.toString(),
+        title: aboutPage.title?.rendered || 'About',
+        content: aboutPage.content?.rendered || '',
+        featuredImage: aboutPage._embedded?.['wp:featuredmedia']?.[0] ? {
+          node: {
+            sourceUrl: aboutPage._embedded['wp:featuredmedia'][0].source_url,
+            altText: aboutPage._embedded['wp:featuredmedia'][0].alt_text || 'About',
+            mediaDetails: {
+              width: aboutPage._embedded['wp:featuredmedia'][0].media_details?.width || 400,
+              height: aboutPage._embedded['wp:featuredmedia'][0].media_details?.height || 400
+            }
+          }
+        } : null,
+        aboutPageFields: FALLBACK_ABOUT_DATA.page.aboutPageFields // Use fallback for ACF fields during build
+      }
+    };
+    
+    return transformedData;
+    
   } catch (error) {
-    console.error('❌ About page: API error, using fallback:', error);
+    console.error('❌ About page: WordPress API error, using fallback:', error);
     return FALLBACK_ABOUT_DATA;
   }
 }
