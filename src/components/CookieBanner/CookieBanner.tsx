@@ -45,7 +45,7 @@ const CookieBanner = () => {
     };
 
     window.addEventListener('showCookieSettings', handleShowCookieSettings);
-    
+
     return () => {
       window.removeEventListener('showCookieSettings', handleShowCookieSettings);
     };
@@ -81,7 +81,7 @@ const CookieBanner = () => {
       timestamp: new Date().toISOString(),
     }));
     setIsVisible(false);
-    
+
     // Trigger analytics initialization if consented
     if (consentData.analytics) {
       // Initialize Google Analytics or other analytics here
@@ -91,7 +91,7 @@ const CookieBanner = () => {
 
   const toggleConsent = (type: keyof CookieConsent) => {
     if (type === 'essential') return; // Essential cookies can't be disabled
-    
+
     setConsent(prev => ({
       ...prev,
       [type]: !prev[type]
@@ -104,26 +104,26 @@ const CookieBanner = () => {
     <div className="cookie-banner">
       <div className="cookie-banner-content">
         <div className="cookie-banner-main">
-          <h3 className="cookie-title">We use cookies</h3>
+          <h3 className="cookie-title"> 1111 We use cookies</h3>
           <p className="cookie-description">
-            We use cookies to enhance your browsing experience, serve personalized content, 
+            We use cookies to enhance your browsing experience, serve personalized content,
             and analyze our traffic. By clicking "Accept All", you consent to our use of cookies.
           </p>
-          
+
           <div className="cookie-buttons">
-            <button 
+            <button
               className="cookie-btn cookie-btn-accept"
               onClick={handleAcceptAll}
             >
               Accept All
             </button>
-            <button 
+            <button
               className="cookie-btn cookie-btn-reject"
               onClick={handleRejectAll}
             >
               Reject All
             </button>
-            <button 
+            <button
               className="cookie-btn cookie-btn-settings"
               onClick={() => setShowDetails(!showDetails)}
             >
@@ -220,13 +220,13 @@ const CookieBanner = () => {
             </div>
 
             <div className="cookie-details-buttons">
-              <button 
+              <button
                 className="cookie-btn cookie-btn-save"
                 onClick={handleAcceptSelected}
               >
                 Save Preferences
               </button>
-              <button 
+              <button
                 className="cookie-btn cookie-btn-cancel"
                 onClick={() => setShowDetails(false)}
               >
