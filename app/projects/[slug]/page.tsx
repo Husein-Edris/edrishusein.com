@@ -310,4 +310,4 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 }
 
 // Enable ISR (Incremental Static Regeneration)
-export const revalidate = 3600; // Revalidate every hour
+export const dynamic = 'force-dynamic'; // Always fetch fresh project data

@@ -65,7 +65,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 async function getPost(slug: string): Promise<WordPressPost> {
   const response = await fetch(
     `${process.env.NODE_ENV === 'development' ? 'http://localhost:3001' : process.env.NEXT_PUBLIC_SITE_URL}/api/post?slug=${slug}`,
-    { next: { revalidate: 3600 } } // Revalidate every hour
+    { cache: 'no-store' } // Always fetch fresh data
   );
   
   if (!response.ok) {
@@ -84,7 +84,7 @@ async function getMoreArticles(excludeSlug: string): Promise<WordPressPost[]> {
   try {
     const response = await fetch(
       `${process.env.NODE_ENV === 'development' ? 'http://localhost:3001' : process.env.NEXT_PUBLIC_SITE_URL}/api/post?limit=4`,
-      { next: { revalidate: 3600 } }
+      { cache: 'no-store' }
     );
     
     if (!response.ok) return [];
@@ -282,4 +282,4 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 }
 
 // Enable ISR (Incremental Static Regeneration)
-export const revalidate = 3600; // Revalidate every hour
+export const dynamic = 'force-dynamic'; // Always fetch fresh blog data

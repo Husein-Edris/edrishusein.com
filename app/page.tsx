@@ -12,7 +12,7 @@ const SectionRenderer = dynamic(() => import('@/src/components/SectionRenderer/S
 
 const Footer = dynamic(() => import('@/src/components/Footer/Footer'));
 
-export const revalidate = 3600; // Revalidate every hour
+export const dynamic = 'force-dynamic'; // Always fetch fresh data from WordPress
 
 export default async function HomePage() {
   // Fetch all data with enhanced error handling
