@@ -65,7 +65,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 async function getProject(slug: string) {
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '')}/wp-json/wp/v2/project?slug=${slug}&_embed&acf_format=standard`, {
-      next: { revalidate: 3600 } // Revalidate every hour
+      cache: 'no-store' // Always fetch fresh data
     });
     
     if (!response.ok) return null;
