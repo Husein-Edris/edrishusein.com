@@ -144,7 +144,7 @@ export async function GET(request: NextRequest) {
             })(),
             caseStudy: {
               projectLinks: {
-                liveSite: project.acf_fields?.project_links?.live_site || project.acf?.project_links?.live_site || null,
+                liveSite: project.acf_fields?.project_links?.live_site || project.acf?.project_links?.live_site || project.acf_fields?.live_site || project.acf?.live_site || null,
                 github: project.acf_fields?.project_links?.github || project.acf?.project_links?.github || null
               }
             }
