@@ -271,7 +271,7 @@ export class DataFetcher {
                     },
                     caseStudy: {
                       projectLinks: {
-                        liveSite: project.acf_fields?.project_links?.live_site || project.acf?.project_links?.live_site || null
+                        liveSite: project.acf_fields?.project_links?.live_site || project.acf?.project_links?.live_site || project.acf_fields?.live_site || project.acf?.live_site || null
                       }
                     }
                   }))

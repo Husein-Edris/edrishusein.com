@@ -96,7 +96,7 @@ async function getAllProjectsForMoreProjects() {
           })(),
           caseStudy: {
             projectLinks: {
-              liveSite: project.acf_fields?.project_links?.live_site || project.acf?.project_links?.live_site || null,
+              liveSite: project.acf_fields?.project_links?.live_site || project.acf?.project_links?.live_site || project.acf_fields?.live_site || project.acf?.live_site || null,
               github: project.acf_fields?.project_links?.github || project.acf?.project_links?.github || null
             }
           }
@@ -158,7 +158,7 @@ async function getProject(slug: string) {
           keyFeatures: (project.acf_fields || project.acf)?.project_content?.key_features || []
         },
         projectLinks: {
-          liveSite: (project.acf_fields || project.acf)?.project_links?.live_site || '',
+          liveSite: (project.acf_fields || project.acf)?.project_links?.live_site || (project.acf_fields || project.acf)?.live_site || '',
           github: (project.acf_fields || project.acf)?.project_links?.github || ''
         },
         projectGallery: (project.acf_fields || project.acf)?.project_gallery || []
