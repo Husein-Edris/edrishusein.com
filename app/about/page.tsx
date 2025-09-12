@@ -5,6 +5,8 @@ import Footer from '@/src/components/Footer/Footer';
 import { Metadata } from 'next';
 import '@/src/styles/pages/About.scss';
 
+export const dynamic = 'force-dynamic'; // Always fetch fresh data from WordPress
+
 // Types based on actual ACF field structure
 interface ExperienceItem {
   company_name: string;
@@ -146,7 +148,7 @@ async function getAboutPageData(): Promise<AboutPageData> {
     const WORDPRESS_REST_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '') || 'https://cms.edrishusein.com';
     
     const aboutResponse = await fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/pages?slug=about-me`, {
-      next: { revalidate: 3600 }
+      cache: 'no-store'
     });
     
     if (!aboutResponse.ok) {

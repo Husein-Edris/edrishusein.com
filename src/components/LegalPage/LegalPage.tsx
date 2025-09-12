@@ -125,7 +125,7 @@ async function getLegalPageData(slug: string, fallbackType: 'imprint' | 'privacy
     
     const WORDPRESS_REST_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '') || 'https://cms.edrishusein.com';
     const response = await fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/pages?slug=${slug}`, {
-      next: { revalidate: 3600 } // Revalidate every hour
+      cache: 'no-store' // Always fetch fresh data
     });
 
     if (!response.ok) {
