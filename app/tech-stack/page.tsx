@@ -4,6 +4,8 @@ import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
 import '@/src/styles/pages/CaseStudy.scss';
 
+export const dynamic = 'force-dynamic'; // Always fetch fresh data from WordPress
+
 const client = new GraphQLClient(process.env.NEXT_PUBLIC_WORDPRESS_API_URL || '');
 
 // Note: 'techs' field doesn't exist in WordPress GraphQL schema
@@ -13,7 +15,7 @@ async function getTechStackData() {
   try {
     console.log('🔍 Fetching tech stack directly from WordPress REST API...');
     const response = await fetch(`${process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '')}/wp-json/wp/v2/tech?_embed&per_page=100`, {
-      next: { revalidate: 3600 }
+      cache: 'no-store'
     });
     
     if (response.ok) {
