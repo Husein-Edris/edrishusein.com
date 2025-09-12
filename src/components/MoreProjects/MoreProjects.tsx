@@ -44,8 +44,12 @@ export default function MoreProjects({ currentProjectSlug }: MoreProjectsProps) 
   useEffect(() => {
     async function fetchOtherProjects() {
       try {
+        console.log(`🔍 Fetching more projects, excluding: ${currentProjectSlug}`);
         const response = await fetch(`/api/more-projects?exclude=${currentProjectSlug}`);
+        console.log(`📡 API response status: ${response.status}`);
+        
         const data = await response.json();
+        console.log('📊 API response data:', data);
 
         if (!response.ok) {
           throw new Error(data.message || data.error || `HTTP error! Status: ${response.status}`);
