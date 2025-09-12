@@ -6,6 +6,8 @@ import Footer from '@/src/components/Footer/Footer';
 import '@/src/styles/pages/Blog.scss';
 import { PostsApiResponse } from '@/src/types/api';
 
+export const dynamic = 'force-dynamic'; // Always fetch fresh blog data
+
 const client = new GraphQLClient(process.env.NEXT_PUBLIC_WORDPRESS_API_URL || '');
 
 const GET_POSTS = `
@@ -51,7 +53,9 @@ async function getPostsData() {
             const WORDPRESS_REST_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '') || 'https://cms.edrishusein.com';
             console.log('🔄 Falling back to WordPress REST API...');
             
-            const restResponse = await fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/posts?_embed&per_page=100`);
+            const restResponse = await fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/posts?_embed&per_page=100`, {
+                cache: 'no-store'
+            });
             
             if (restResponse.ok) {
                 const restPosts = await restResponse.json();

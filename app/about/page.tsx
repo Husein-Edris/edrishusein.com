@@ -147,9 +147,12 @@ async function getAboutPageData(): Promise<AboutPageData> {
     // Call WordPress REST API directly instead of our own API route during build
     const WORDPRESS_REST_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '') || 'https://cms.edrishusein.com';
     
-    const aboutResponse = await fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/pages?slug=about-me`, {
-      cache: 'no-store'
-    });
+    // Fetch about page, skills, and hobbies in parallel
+    const [aboutResponse, skillsResponse, hobbiesResponse] = await Promise.all([
+      fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/pages?slug=about-me&acf_format=standard`, { cache: 'no-store' }),
+      fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/skill?per_page=50`, { cache: 'no-store' }),
+      fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/hobby?per_page=50`, { cache: 'no-store' })
+    ]);
     
     if (!aboutResponse.ok) {
       throw new Error(`WordPress REST API failed: ${aboutResponse.status}`);
@@ -159,6 +162,24 @@ async function getAboutPageData(): Promise<AboutPageData> {
     
     if (!aboutPages || aboutPages.length === 0) {
       throw new Error('About page not found in WordPress');
+    }
+    
+    // Get skills and hobbies data
+    let skillsData: any[] = [];
+    let hobbiesData: any[] = [];
+    
+    if (skillsResponse.ok) {
+      skillsData = await skillsResponse.json();
+      console.log(`✅ Found ${skillsData.length} skills from WordPress`);
+    } else {
+      console.warn('⚠️ Skills data not available from WordPress');
+    }
+    
+    if (hobbiesResponse.ok) {
+      hobbiesData = await hobbiesResponse.json();
+      console.log(`✅ Found ${hobbiesData.length} hobbies from WordPress`);
+    } else {
+      console.warn('⚠️ Hobbies data not available from WordPress');
     }
     
     const aboutPage = aboutPages[0];
@@ -180,7 +201,29 @@ async function getAboutPageData(): Promise<AboutPageData> {
             }
           }
         } : null,
-        aboutPageFields: FALLBACK_ABOUT_DATA.page.aboutPageFields // Use fallback for ACF fields during build
+        aboutPageFields: {
+          // Use WordPress data if available, otherwise fallback
+          ...FALLBACK_ABOUT_DATA.page.aboutPageFields,
+          skillsSection: {
+            sectionTitle: "Skills & Technologies",
+            selectedSkills: skillsData.map(skill => ({
+              ID: skill.id,
+              post_title: skill.title?.rendered || skill.title,
+              post_content: skill.content?.rendered || skill.content,
+              post_excerpt: skill.excerpt?.rendered || skill.excerpt
+            }))
+          },
+          personalSection: {
+            sectionTitle: "Personal",
+            personalContent: aboutPage.acf?.personal_content || FALLBACK_ABOUT_DATA.page.aboutPageFields?.personalSection?.personalContent || "",
+            selectedHobbies: hobbiesData.map(hobby => ({
+              ID: hobby.id,
+              post_title: hobby.title?.rendered || hobby.title,
+              post_content: hobby.content?.rendered || hobby.content,
+              post_excerpt: hobby.excerpt?.rendered || hobby.excerpt
+            }))
+          }
+        }
       }
     };
     
