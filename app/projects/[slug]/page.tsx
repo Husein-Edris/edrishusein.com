@@ -61,6 +61,54 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 }
 
+// Fetch all projects for "More Projects" section
+async function getAllProjectsForMoreProjects() {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '')}/wp-json/wp/v2/project?_embed&per_page=10`, {
+      cache: 'no-store'
+    });
+    
+    if (!response.ok) return null;
+    
+    const projects = await response.json();
+    if (!Array.isArray(projects)) return null;
+    
+    // Transform to match GraphQL structure
+    return {
+      projects: {
+        nodes: projects.map((project: any) => ({
+          id: project.id.toString(),
+          title: project.title?.rendered || project.title,
+          excerpt: project.excerpt?.rendered || project.excerpt || '',
+          slug: project.slug,
+          featuredImage: (() => {
+            const featuredMedia = project._embedded && project._embedded['wp:featuredmedia'] && project._embedded['wp:featuredmedia'][0];
+            return featuredMedia ? {
+              node: {
+                sourceUrl: featuredMedia.source_url,
+                altText: featuredMedia.alt_text || project.title?.rendered || '',
+                mediaDetails: {
+                  width: featuredMedia.media_details?.width || 800,
+                  height: featuredMedia.media_details?.height || 600
+                }
+              }
+            } : null;
+          })(),
+          caseStudy: {
+            projectLinks: {
+              liveSite: project.acf_fields?.project_links?.live_site || project.acf?.project_links?.live_site || null,
+              github: project.acf_fields?.project_links?.github || project.acf?.project_links?.github || null
+            }
+          }
+        }))
+      }
+    };
+  } catch (error) {
+    console.error('Error fetching projects for MoreProjects:', error);
+    return null;
+  }
+}
+
 // Server-side data fetching
 async function getProject(slug: string) {
   try {
@@ -125,7 +173,14 @@ async function getProject(slug: string) {
 // Server Component
 export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const project = await getProject(slug);
+  
+  // Fetch both current project and all projects for "More Projects" section
+  const [project, allProjectsData] = await Promise.all([
+    getProject(slug),
+    getAllProjectsForMoreProjects()
+  ]);
+  
+  const allProjects = allProjectsData?.projects?.nodes || [];
 
   if (!project) {
     notFound();
@@ -300,7 +355,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         </div>
 
         {/* More Projects Section */}
-        <MoreProjects currentProjectSlug={slug} />
+        <MoreProjects currentProjectSlug={slug} allProjects={allProjects} />
       </main>
       <Footer />
     </>
