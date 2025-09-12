@@ -172,19 +172,113 @@ export class DataFetcher {
   static async getHomepageData(): Promise<FetchResult<HomepageSections>> {
     return this.fetchWithFallback(
       async () => {
-        const response: HomepageResponse = await client.request(GET_HOMEPAGE_DATA);
-        if (process.env.NODE_ENV === 'development') {
-          console.log('✅ WordPress ACF data loaded successfully');
-        }
-        
-        if (!response.page?.homepageSections) {
+        try {
+          const response: HomepageResponse = await client.request(GET_HOMEPAGE_DATA);
           if (process.env.NODE_ENV === 'development') {
-            console.warn('⚠️ No homepage sections found in response');
+            console.log('✅ WordPress ACF data loaded successfully');
           }
-          throw new Error('No homepage sections in response');
+          
+          if (!response.page?.homepageSections) {
+            if (process.env.NODE_ENV === 'development') {
+              console.warn('⚠️ No homepage sections found in GraphQL response, trying REST API...');
+            }
+            throw new Error('No homepage sections in GraphQL response');
+          }
+          
+          return response.page.homepageSections;
+        } catch (error) {
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('⚠️ GraphQL homepage query failed, trying REST API...');
+          }
+          
+          // Try WordPress REST API as fallback
+          try {
+            const WORDPRESS_REST_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '') || 'https://cms.edrishusein.com';
+            
+            // Fetch homepage data from REST API
+            const restResponse = await fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/pages?slug=home&acf_format=standard`, {
+              cache: 'no-store'
+            });
+            
+            if (restResponse.ok) {
+              const restPages = await restResponse.json();
+              
+              if (restPages && restPages.length > 0) {
+                const homePage = restPages[0];
+                
+                if (process.env.NODE_ENV === 'development') {
+                  console.log('✅ Found homepage data via REST API');
+                }
+                
+                // Transform REST API data to match GraphQL structure
+                const transformedData: HomepageSections = {
+                  heroSection: {
+                    title: homePage.acf?.hero_title || FALLBACK_HOMEPAGE_DATA.heroSection.title,
+                    heroCopy: homePage.acf?.hero_copy || FALLBACK_HOMEPAGE_DATA.heroSection.heroCopy,
+                    heroImage: homePage.acf?.hero_image ? {
+                      node: {
+                        sourceUrl: homePage.acf.hero_image.url || homePage.acf.hero_image.source_url,
+                        altText: homePage.acf.hero_image.alt || homePage.acf.hero_image.alt_text || 'Hero Image',
+                        mediaDetails: {
+                          width: homePage.acf.hero_image.width || 450,
+                          height: homePage.acf.hero_image.height || 450
+                        }
+                      }
+                    } : FALLBACK_HOMEPAGE_DATA.heroSection.heroImage
+                  },
+                  aboutSection: {
+                    title: homePage.acf?.about_title || FALLBACK_HOMEPAGE_DATA.aboutSection.title,
+                    aboutMeText: homePage.acf?.about_text || FALLBACK_HOMEPAGE_DATA.aboutSection.aboutMeText
+                  },
+                  bookshelfSection: {
+                    title: homePage.acf?.bookshelf_title || FALLBACK_HOMEPAGE_DATA.bookshelfSection?.title,
+                    description: homePage.acf?.bookshelf_description || FALLBACK_HOMEPAGE_DATA.bookshelfSection?.description,
+                    featuredImage: homePage.acf?.bookshelf_image ? {
+                      node: {
+                        sourceUrl: homePage.acf.bookshelf_image.url || homePage.acf.bookshelf_image.source_url,
+                        altText: homePage.acf.bookshelf_image.alt || homePage.acf.bookshelf_image.alt_text || 'Bookshelf',
+                        mediaDetails: {
+                          width: homePage.acf.bookshelf_image.width || 400,
+                          height: homePage.acf.bookshelf_image.height || 300
+                        }
+                      }
+                    } : FALLBACK_HOMEPAGE_DATA.bookshelfSection?.featuredImage
+                  },
+                  techstackSection: {
+                    title: homePage.acf?.techstack_title || FALLBACK_HOMEPAGE_DATA.techstackSection?.title,
+                    description: homePage.acf?.techstack_description || FALLBACK_HOMEPAGE_DATA.techstackSection?.description,
+                    featuredImage: homePage.acf?.techstack_image ? {
+                      node: {
+                        sourceUrl: homePage.acf.techstack_image.url || homePage.acf.techstack_image.source_url,
+                        altText: homePage.acf.techstack_image.alt || homePage.acf.techstack_image.alt_text || 'Tech Stack',
+                        mediaDetails: {
+                          width: homePage.acf.techstack_image.width || 400,
+                          height: homePage.acf.techstack_image.height || 300
+                        }
+                      }
+                    } : FALLBACK_HOMEPAGE_DATA.techstackSection?.featuredImage
+                  },
+                  notebookSection: {
+                    title: homePage.acf?.notebook_title || FALLBACK_HOMEPAGE_DATA.notebookSection?.title
+                  },
+                  contactSection: {
+                    subTitle: homePage.acf?.contact_subtitle || FALLBACK_HOMEPAGE_DATA.contactSection?.subTitle,
+                    title: homePage.acf?.contact_title || FALLBACK_HOMEPAGE_DATA.contactSection?.title,
+                    email: homePage.acf?.contact_email || FALLBACK_HOMEPAGE_DATA.contactSection?.email
+                  }
+                };
+                
+                return transformedData;
+              }
+            }
+          } catch (restError) {
+            if (process.env.NODE_ENV === 'development') {
+              console.warn('⚠️ REST API also failed:', restError instanceof Error ? restError.message : 'Unknown error');
+            }
+          }
+          
+          throw error; // Use fallback data
         }
-        
-        return response.page.homepageSections;
       },
       FALLBACK_HOMEPAGE_DATA,
       'Error fetching homepage data'
@@ -330,11 +424,67 @@ export class DataFetcher {
           }
         `;
         
-        const response = await client.request(OPTIMIZED_POSTS_QUERY, { limit });
-        if (process.env.NODE_ENV === 'development') {
-          console.log('✅ WordPress posts data loaded successfully');
+        try {
+          const response = await client.request(OPTIMIZED_POSTS_QUERY, { limit });
+          if (process.env.NODE_ENV === 'development') {
+            console.log('✅ WordPress posts data loaded successfully');
+          }
+          return response;
+        } catch (error) {
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('⚠️ GraphQL posts query failed, trying REST API...');
+          }
+          
+          // Try WordPress REST API as fallback
+          try {
+            const WORDPRESS_REST_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '') || 'https://cms.edrishusein.com';
+            
+            const restResponse = await fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/posts?_embed&per_page=${limit}`, {
+              cache: 'no-store'
+            });
+            
+            if (restResponse.ok) {
+              const restPosts = await restResponse.json();
+              if (process.env.NODE_ENV === 'development') {
+                console.log(`✅ Found ${restPosts.length} posts via REST API`);
+              }
+              
+              // Transform REST API data to match GraphQL structure
+              const transformedResponse = {
+                posts: {
+                  nodes: restPosts.map((post: any) => ({
+                    id: post.id.toString(),
+                    title: post.title?.rendered || post.title,
+                    excerpt: post.excerpt?.rendered || post.excerpt || '',
+                    slug: post.slug,
+                    date: post.date,
+                    featuredImage: post._embedded?.['wp:featuredmedia']?.[0] ? {
+                      node: {
+                        sourceUrl: post._embedded['wp:featuredmedia'][0].source_url,
+                        altText: post._embedded['wp:featuredmedia'][0].alt_text || post.title?.rendered || '',
+                        mediaDetails: {
+                          width: post._embedded['wp:featuredmedia'][0].media_details?.width || 400,
+                          height: post._embedded['wp:featuredmedia'][0].media_details?.height || 400
+                        }
+                      }
+                    } : null
+                  }))
+                }
+              };
+              
+              if (process.env.NODE_ENV === 'development') {
+                console.log('✅ WordPress REST posts data transformed successfully');
+              }
+              return transformedResponse;
+            }
+          } catch (restError) {
+            if (process.env.NODE_ENV === 'development') {
+              console.warn('⚠️ REST API also failed:', restError instanceof Error ? restError.message : 'Unknown error');
+            }
+          }
+          
+          throw error; // Use fallback data
         }
-        return response;
       },
       FALLBACK_POSTS_DATA,
       'Error fetching posts data'
