@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import InfoCards from '../InfoCards/InfoCards';
-import '../../../app/loading.scss';
+// Removed loading.scss import to prevent full-page overlay issues
 
 interface MoreProjectsProps {
   currentProjectSlug: string;
@@ -80,26 +80,28 @@ export default function MoreProjects({ currentProjectSlug }: MoreProjectsProps) 
 
   if (loading) {
     return (
-      <div className="loading-page">
-        <div className="loading-container">
-          <div className="logo-spinner">
-            <div className="logo-circle">
-              <Image
-                src="/edrishusein-logo.svg"
-                alt="Edris Husein Logo"
-                width={60}
-                height={30}
-                className="logo-image"
-              />
-            </div>
-            <div className="pulse-rings">
-              <div className="pulse-ring"></div>
-              <div className="pulse-ring"></div>
-              <div className="pulse-ring"></div>
-            </div>
-          </div>
-          <p className="loading-text">Loading more projects...</p>
-        </div>
+      <div style={{ 
+        padding: '2rem', 
+        textAlign: 'center', 
+        color: '#666',
+        fontFamily: 'Inter, sans-serif'
+      }}>
+        <div style={{
+          display: 'inline-block',
+          width: '20px',
+          height: '20px',
+          border: '2px solid #f3f3f3',
+          borderTop: '2px solid #B2A59B',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite'
+        }}></div>
+        <p style={{ marginTop: '1rem' }}>Loading more projects...</p>
+        <style jsx>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
       </div>
     );
   }

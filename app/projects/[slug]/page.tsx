@@ -300,9 +300,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         </div>
 
         {/* More Projects Section */}
-        <Suspense fallback={<div className="loading-more">Loading more projects...</div>}>
-          <MoreProjects currentProjectSlug={slug} />
-        </Suspense>
+        <MoreProjects currentProjectSlug={slug} />
       </main>
       <Footer />
     </>
