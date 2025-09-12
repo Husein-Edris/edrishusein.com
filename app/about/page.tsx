@@ -202,26 +202,71 @@ async function getAboutPageData(): Promise<AboutPageData> {
           }
         } : null,
         aboutPageFields: {
-          // Use WordPress data if available, otherwise fallback
-          ...FALLBACK_ABOUT_DATA.page.aboutPageFields,
-          skillsSection: {
-            sectionTitle: "Skills & Technologies",
-            selectedSkills: skillsData.map(skill => ({
-              ID: skill.id,
-              post_title: skill.title?.rendered || skill.title,
-              post_content: skill.content?.rendered || skill.content,
-              post_excerpt: skill.excerpt?.rendered || skill.excerpt
-            }))
+          // Hero Section
+          aboutHeroTitle: aboutPage.acf?.about_hero_title || FALLBACK_ABOUT_DATA.page.aboutPageFields?.aboutHeroTitle,
+          aboutHeroSubtitle: aboutPage.acf?.about_hero_subtitle || FALLBACK_ABOUT_DATA.page.aboutPageFields?.aboutHeroSubtitle,
+          aboutHeroImage: aboutPage.acf?.about_hero_image ? {
+            node: {
+              sourceUrl: aboutPage.acf.about_hero_image.url || aboutPage.acf.about_hero_image.source_url,
+              altText: aboutPage.acf.about_hero_image.alt || aboutPage.acf.about_hero_image.alt_text || 'About Hero Image',
+              mediaDetails: {
+                width: aboutPage.acf.about_hero_image.width || 400,
+                height: aboutPage.acf.about_hero_image.height || 400
+              }
+            }
+          } : null,
+          
+          // Experience Section
+          experienceSection: {
+            sectionTitle: aboutPage.acf?.experience_section_title || "Experience",
+            experienceItems: aboutPage.acf?.experience_items || FALLBACK_ABOUT_DATA.page.aboutPageFields?.experienceSection?.experienceItems || []
           },
+          
+          // Skills Section
+          skillsSection: {
+            sectionTitle: aboutPage.acf?.skills_section_title || "Skills & Technologies",
+            selectedSkills: aboutPage.acf?.selected_skills?.length > 0 
+              ? aboutPage.acf.selected_skills.map((skill: any) => ({
+                  ID: skill.ID || skill.id,
+                  post_title: skill.post_title || skill.title?.rendered || skill.title,
+                  post_content: skill.post_content || skill.content?.rendered || skill.content,
+                  post_excerpt: skill.post_excerpt || skill.excerpt?.rendered || skill.excerpt
+                }))
+              : skillsData.map(skill => ({
+                  ID: skill.id,
+                  post_title: skill.title?.rendered || skill.title,
+                  post_content: skill.content?.rendered || skill.content,
+                  post_excerpt: skill.excerpt?.rendered || skill.excerpt
+                }))
+          },
+          
+          // Personal Section
           personalSection: {
-            sectionTitle: "Personal",
+            sectionTitle: aboutPage.acf?.personal_section_title || "Personal",
             personalContent: aboutPage.acf?.personal_content || FALLBACK_ABOUT_DATA.page.aboutPageFields?.personalSection?.personalContent || "",
-            selectedHobbies: hobbiesData.map(hobby => ({
-              ID: hobby.id,
-              post_title: hobby.title?.rendered || hobby.title,
-              post_content: hobby.content?.rendered || hobby.content,
-              post_excerpt: hobby.excerpt?.rendered || hobby.excerpt
-            }))
+            personalImage: aboutPage.acf?.personal_image ? {
+              node: {
+                sourceUrl: aboutPage.acf.personal_image.url || aboutPage.acf.personal_image.source_url,
+                altText: aboutPage.acf.personal_image.alt || aboutPage.acf.personal_image.alt_text || 'Personal Image',
+                mediaDetails: {
+                  width: aboutPage.acf.personal_image.width || 400,
+                  height: aboutPage.acf.personal_image.height || 400
+                }
+              }
+            } : null,
+            selectedHobbies: aboutPage.acf?.selected_hobbies?.length > 0
+              ? aboutPage.acf.selected_hobbies.map((hobby: any) => ({
+                  ID: hobby.ID || hobby.id,
+                  post_title: hobby.post_title || hobby.title?.rendered || hobby.title,
+                  post_content: hobby.post_content || hobby.content?.rendered || hobby.content,
+                  post_excerpt: hobby.post_excerpt || hobby.excerpt?.rendered || hobby.excerpt
+                }))
+              : hobbiesData.map(hobby => ({
+                  ID: hobby.id,
+                  post_title: hobby.title?.rendered || hobby.title,
+                  post_content: hobby.content?.rendered || hobby.content,
+                  post_excerpt: hobby.excerpt?.rendered || hobby.excerpt
+                }))
           }
         }
       }
