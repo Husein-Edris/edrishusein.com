@@ -11,6 +11,16 @@ const client = new GraphQLClient(process.env.NEXT_PUBLIC_WORDPRESS_API_URL || ''
 // Note: 'techs' field doesn't exist in WordPress GraphQL schema
 // Using direct REST API call instead
 
+// Fisher-Yates shuffle algorithm for random array ordering
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array]; // Create a copy to avoid mutating original
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 async function getTechStackData() {
   try {
     console.log('🔍 Fetching tech stack directly from WordPress REST API...');
@@ -77,6 +87,9 @@ async function getTechStackData() {
 
 export default async function TechStackPage() {
   const techItems = await getTechStackData() || [];
+  
+  // Randomize the order of tech items on each page load
+  const randomizedTechItems = shuffleArray(techItems);
 
   return (
     <>
@@ -96,8 +109,8 @@ export default async function TechStackPage() {
           {/* Tech Grid */}
           <section className="tech-section">
             <div className="tech-grid">
-              {techItems.length > 0 ? (
-                techItems.map((tech: any) => (
+              {randomizedTechItems.length > 0 ? (
+                randomizedTechItems.map((tech: any) => (
                   <div key={tech.id} className="tech-card">
                     {tech.featuredImage?.node && (
                       <div className="tech-image">
