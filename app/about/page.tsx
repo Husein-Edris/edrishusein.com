@@ -140,22 +140,173 @@ const FALLBACK_ABOUT_DATA = {
   }
 };
 
+// Helper function to test WordPress API endpoint
+async function testWordPressAPI(baseUrl: string): Promise<{success: boolean, issue?: string}> {
+  try {
+    console.log(`🔍 Testing WordPress API at: ${baseUrl}`);
+    
+    // Test basic WordPress API
+    const testResponse = await fetch(`${baseUrl}/wp-json/wp/v2/`, { 
+      cache: 'no-store',
+      headers: {
+        'Accept': 'application/json',
+      }
+    });
+    
+    if (!testResponse.ok) {
+      return { success: false, issue: `API returned ${testResponse.status} ${testResponse.statusText}` };
+    }
+    
+    const contentType = testResponse.headers.get('content-type');
+    if (!contentType?.includes('application/json')) {
+      const responseText = await testResponse.text();
+      return { 
+        success: false, 
+        issue: `Non-JSON response (${contentType}). Preview: ${responseText.substring(0, 100)}` 
+      };
+    }
+    
+    const apiData = await testResponse.json();
+    console.log(`✅ WordPress API is accessible. Routes available:`, Object.keys(apiData.routes || {}).length);
+    return { success: true };
+    
+  } catch (error) {
+    return { 
+      success: false, 
+      issue: `Connection failed: ${error instanceof Error ? error.message : 'Unknown error'}` 
+    };
+  }
+}
+
 async function getAboutPageData(): Promise<AboutPageData> {
   try {
-    console.log('🔍 About page: Fetching directly from WordPress REST API');
+    console.log('🔍 About page: Trying GraphQL first, then REST API fallback');
     
-    // Call WordPress REST API directly instead of our own API route during build
+    // Try GraphQL first
+    try {
+      const { client } = await import('@/src/lib/client');
+      const { GET_ABOUT_PAGE_DATA, GET_ALL_SKILLS, GET_ALL_HOBBIES } = await import('@/src/lib/queries/about');
+      
+      // Fetch all data in parallel via GraphQL
+      const [aboutResponse, skillsResponse, hobbiesResponse] = await Promise.allSettled([
+        client.request(GET_ABOUT_PAGE_DATA),
+        client.request(GET_ALL_SKILLS),
+        client.request(GET_ALL_HOBBIES)
+      ]);
+      
+      let aboutData = null;
+      let skillsData: any[] = [];
+      let hobbiesData: any[] = [];
+      
+      if (aboutResponse.status === 'fulfilled' && aboutResponse.value?.page) {
+        aboutData = aboutResponse.value.page;
+        console.log('✅ About page: GraphQL data loaded successfully');
+      }
+      
+      if (skillsResponse.status === 'fulfilled' && skillsResponse.value?.skills?.nodes) {
+        skillsData = skillsResponse.value.skills.nodes;
+        console.log(`✅ Found ${skillsData.length} skills via GraphQL`);
+      }
+      
+      if (hobbiesResponse.status === 'fulfilled' && hobbiesResponse.value?.hobbies?.nodes) {
+        hobbiesData = hobbiesResponse.value.hobbies.nodes;
+        console.log(`✅ Found ${hobbiesData.length} hobbies via GraphQL`);
+      }
+      
+      if (aboutData) {
+        // Transform GraphQL response
+        const transformedData = {
+          page: {
+            id: aboutData.id,
+            title: aboutData.title,
+            content: aboutData.content,
+            featuredImage: aboutData.featuredImage,
+            aboutPageFields: {
+              ...aboutData.aboutPageFields,
+              // Handle experience section with validation
+              experienceSection: aboutData.aboutPageFields?.experienceSection?.experienceItems?.length > 0
+                ? aboutData.aboutPageFields.experienceSection
+                : FALLBACK_ABOUT_DATA.page.aboutPageFields?.experienceSection,
+              // If selected skills/hobbies are empty, use all available ones
+              skillsSection: {
+                ...aboutData.aboutPageFields?.skillsSection,
+                selectedSkills: aboutData.aboutPageFields?.skillsSection?.selectedSkills?.length > 0
+                  ? aboutData.aboutPageFields.skillsSection.selectedSkills
+                  : skillsData.map(skill => ({
+                      ID: skill.id,
+                      post_title: skill.title,
+                      post_content: skill.content,
+                      post_excerpt: skill.excerpt
+                    }))
+              },
+              personalSection: {
+                ...aboutData.aboutPageFields?.personalSection,
+                selectedHobbies: aboutData.aboutPageFields?.personalSection?.selectedHobbies?.length > 0
+                  ? aboutData.aboutPageFields.personalSection.selectedHobbies
+                  : hobbiesData.map(hobby => ({
+                      ID: hobby.id,
+                      post_title: hobby.title,
+                      post_content: hobby.content,
+                      post_excerpt: hobby.excerpt
+                    }))
+              }
+            },
+            seo: aboutData.seo
+          }
+        };
+        
+        return transformedData;
+      }
+    } catch (graphqlError) {
+      console.warn('⚠️ GraphQL failed, falling back to REST API:', graphqlError);
+    }
+    
+    // Fallback to REST API
+    console.log('🔍 About page: Using REST API fallback');
     const WORDPRESS_REST_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '') || 'https://cms.edrishusein.com';
     
+    // Test WordPress API connection first
+    const apiTest = await testWordPressAPI(WORDPRESS_REST_URL);
+    if (!apiTest.success) {
+      console.error(`❌ WordPress API test failed: ${apiTest.issue}`);
+      throw new Error(`WordPress API is not accessible: ${apiTest.issue}`);
+    }
+    
     // Fetch about page, skills, and hobbies in parallel
+    const headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    };
+    
     const [aboutResponse, skillsResponse, hobbiesResponse] = await Promise.all([
-      fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/pages?slug=about-me&acf_format=standard`, { cache: 'no-store' }),
-      fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/skill?per_page=50`, { cache: 'no-store' }),
-      fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/hobby?per_page=50`, { cache: 'no-store' })
+      fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/pages?slug=about-me&acf_format=standard`, { 
+        cache: 'no-store', 
+        headers 
+      }),
+      fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/skill?per_page=50`, { 
+        cache: 'no-store', 
+        headers 
+      }),
+      fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/hobby?per_page=50`, { 
+        cache: 'no-store', 
+        headers 
+      })
     ]);
     
     if (!aboutResponse.ok) {
+      console.error(`❌ WordPress REST API failed: ${aboutResponse.status} ${aboutResponse.statusText}`);
+      const errorText = await aboutResponse.text();
+      console.error('Error response body:', errorText.substring(0, 200));
       throw new Error(`WordPress REST API failed: ${aboutResponse.status}`);
+    }
+    
+    // Check if response is actually JSON
+    const contentType = aboutResponse.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      console.error(`❌ WordPress returned non-JSON response. Content-Type: ${contentType}`);
+      const responseText = await aboutResponse.text();
+      console.error('Response preview:', responseText.substring(0, 300));
+      throw new Error('WordPress returned HTML instead of JSON - likely a PHP error or wrong endpoint');
     }
     
     const aboutPages = await aboutResponse.json();
@@ -164,26 +315,50 @@ async function getAboutPageData(): Promise<AboutPageData> {
       throw new Error('About page not found in WordPress');
     }
     
-    // Get skills and hobbies data
+    // Get skills and hobbies data with better error handling
     let skillsData: any[] = [];
     let hobbiesData: any[] = [];
     
+    // Handle skills response
     if (skillsResponse.ok) {
-      skillsData = await skillsResponse.json();
-      console.log(`✅ Found ${skillsData.length} skills from WordPress`);
+      try {
+        const skillsContentType = skillsResponse.headers.get('content-type');
+        if (skillsContentType && skillsContentType.includes('application/json')) {
+          skillsData = await skillsResponse.json();
+          console.log(`✅ Found ${skillsData.length} skills from WordPress`);
+        } else {
+          console.warn('⚠️ Skills endpoint returned non-JSON response');
+          const skillsText = await skillsResponse.text();
+          console.warn('Skills response preview:', skillsText.substring(0, 200));
+        }
+      } catch (error) {
+        console.warn('⚠️ Error parsing skills JSON:', error);
+      }
     } else {
-      console.warn('⚠️ Skills data not available from WordPress');
+      console.warn(`⚠️ Skills API failed: ${skillsResponse.status} ${skillsResponse.statusText}`);
     }
     
+    // Handle hobbies response
     if (hobbiesResponse.ok) {
-      hobbiesData = await hobbiesResponse.json();
-      console.log(`✅ Found ${hobbiesData.length} hobbies from WordPress`);
+      try {
+        const hobbiesContentType = hobbiesResponse.headers.get('content-type');
+        if (hobbiesContentType && hobbiesContentType.includes('application/json')) {
+          hobbiesData = await hobbiesResponse.json();
+          console.log(`✅ Found ${hobbiesData.length} hobbies from WordPress`);
+        } else {
+          console.warn('⚠️ Hobbies endpoint returned non-JSON response');
+          const hobbiesText = await hobbiesResponse.text();
+          console.warn('Hobbies response preview:', hobbiesText.substring(0, 200));
+        }
+      } catch (error) {
+        console.warn('⚠️ Error parsing hobbies JSON:', error);
+      }
     } else {
-      console.warn('⚠️ Hobbies data not available from WordPress');
+      console.warn(`⚠️ Hobbies API failed: ${hobbiesResponse.status} ${hobbiesResponse.statusText}`);
     }
     
     const aboutPage = aboutPages[0];
-    console.log('✅ About page: WordPress data loaded');
+    console.log('✅ About page: WordPress REST API data loaded');
     
     // Transform WordPress REST data to expected format
     const transformedData = {
@@ -219,7 +394,42 @@ async function getAboutPageData(): Promise<AboutPageData> {
           // Experience Section
           experienceSection: {
             sectionTitle: aboutPage.acf?.experience_section_title || "Experience",
-            experienceItems: aboutPage.acf?.experience_items || FALLBACK_ABOUT_DATA.page.aboutPageFields?.experienceSection?.experienceItems || []
+            experienceItems: (() => {
+              const experienceItems = aboutPage.acf?.experience_items;
+              
+              // Check if experience items exist and have proper structure
+              if (!experienceItems || !Array.isArray(experienceItems)) {
+                console.warn('⚠️ No experience_items found or not an array');
+                return FALLBACK_ABOUT_DATA.page.aboutPageFields?.experienceSection?.experienceItems || [];
+              }
+              
+              // Filter and transform valid experience items
+              const validItems = experienceItems
+                .filter((item: any) => {
+                  // Check if item has the expected field structure
+                  const hasValidFields = item.company_name || item.position || item.duration || item.description;
+                  if (!hasValidFields) {
+                    console.warn('⚠️ Experience item missing required fields:', item);
+                    return false;
+                  }
+                  return true;
+                })
+                .map((item: any) => ({
+                  company_name: item.company_name || '',
+                  position: item.position || '',
+                  duration: item.duration || '',
+                  description: item.description || '',
+                  technologies: item.technologies // Keep raw technologies data for proper handling
+                }));
+              
+              if (validItems.length === 0) {
+                console.warn('⚠️ No valid experience items found, using fallback data');
+                return FALLBACK_ABOUT_DATA.page.aboutPageFields?.experienceSection?.experienceItems || [];
+              }
+              
+              console.log(`✅ Found ${validItems.length} valid experience items`);
+              return validItems;
+            })()
           },
           
           // Skills Section
@@ -363,7 +573,20 @@ export default async function AboutPage() {
                     {item.technologies && (
                       <div className="technologies">
                         <span className="tech-label">Technologies:</span>
-                        <span className="tech-list">{item.technologies}</span>
+                        <span className="tech-list">
+                          {Array.isArray(item.technologies)
+                            ? item.technologies
+                                .map((tech: any) => 
+                                  typeof tech === 'string' 
+                                    ? tech 
+                                    : tech.post_title || tech.title?.rendered || tech.title || 'Tech'
+                                )
+                                .join(', ')
+                            : typeof item.technologies === 'string'
+                            ? item.technologies
+                            : item.technologies.post_title || item.technologies.title?.rendered || item.technologies.title || 'Technologies'
+                          }
+                        </span>
                       </div>
                     )}
                   </div>
@@ -381,9 +604,17 @@ export default async function AboutPage() {
               <div className="skills-grid">
                 {fields.skillsSection.selectedSkills.map((skill, index) => (
                   <div key={skill.ID || index} className="skill-item">
-                    <h3 className="skill-name">{skill.post_title}</h3>
+                    <h3 className="skill-name">
+                      {typeof skill.post_title === 'string' 
+                        ? skill.post_title 
+                        : skill.post_title?.rendered || skill.title?.rendered || skill.title || 'Skill'}
+                    </h3>
                     {skill.post_excerpt && (
-                      <p className="skill-description">{skill.post_excerpt}</p>
+                      <p className="skill-description">
+                        {typeof skill.post_excerpt === 'string' 
+                          ? skill.post_excerpt 
+                          : skill.post_excerpt?.rendered || skill.excerpt?.rendered || ''}
+                      </p>
                     )}
                   </div>
                 ))}
@@ -411,7 +642,11 @@ export default async function AboutPage() {
                       <div className="hobbies-list">
                         {fields.personalSection.selectedHobbies.map((hobby, index) => (
                           <div key={hobby.ID || index} className="hobby-item">
-                            <span className="hobby-name">{hobby.post_title}</span>
+                            <span className="hobby-name">
+                              {typeof hobby.post_title === 'string' 
+                                ? hobby.post_title 
+                                : hobby.post_title?.rendered || hobby.title?.rendered || hobby.title || 'Hobby'}
+                            </span>
                           </div>
                         ))}
                       </div>

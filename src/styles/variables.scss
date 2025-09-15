@@ -12,7 +12,8 @@ $primary-light: #ffffff;
 
 // Secondary Colors
 $secondary-color: #666666;
-$text-light-gray: #808080;
+$text-light-gray: #b3b3b3;  // Made lighter/whiter (was #808080)
+$text-lighter-gray: #c0c0c0; // Even lighter for body text
 $text-dark-gray: #404040;
 $color-beige: #B2A59B;
 
@@ -94,7 +95,7 @@ $spacing-5xl: calc($spacing-unit * 16);    // 128px
 
 // Container & Layout
 $container-padding: 6rem;
-$container-padding-mobile: calc($spacing-unit * 2);
+$container-padding-mobile: calc($spacing-unit * 4); // Increased from 2 to 4 (16px to 32px)
 $section-padding-y: $spacing-3xl;
 $section-padding-y-mobile: $spacing-2xl;
 

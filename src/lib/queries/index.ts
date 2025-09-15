@@ -1,4 +1,5 @@
 // src/lib/queries/index.ts
+export * from './about';
 export const GET_HOMEPAGE_DATA = `
   query GetHomepage {
     page(id: "home", idType: URI) {
