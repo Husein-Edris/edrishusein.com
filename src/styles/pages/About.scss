@@ -60,7 +60,7 @@
         font-family: $font-family-base;
         font-size: calc($font-size-lg * 1.1);
         line-height: $line-height-relaxed;
-        color: $text-light-gray;
+        color: $text-lighter-gray;
         margin: 0;
 
         @include mobile {
@@ -111,7 +111,7 @@
       font-family: $font-family-base;
       font-size: $font-size-lg;
       line-height: $line-height-relaxed;
-      color: $text-light-gray;
+      color: $text-lighter-gray;
 
       @include mobile {
         font-size: $font-size-base;
@@ -256,7 +256,7 @@
         font-family: $font-family-base;
         font-size: $font-size-base;
         line-height: $line-height-relaxed;
-        color: $text-light-gray;
+        color: $text-lighter-gray;
         margin: 0 0 calc($spacing-unit * 2) 0;
 
         @include mobile {
@@ -312,11 +312,15 @@
         padding: calc($spacing-unit * 2);
         border-radius: 8px;
         text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
         
         .skill-name {
           font-weight: $font-weight-medium;
           display: block;
-          margin-bottom: calc($spacing-unit);
+          margin: 0;
         }
         
         .skill-description {
@@ -511,7 +515,7 @@
         font-family: $font-family-base;
         font-size: $font-size-lg;
         line-height: $line-height-relaxed;
-        color: $text-light-gray;
+        color: $text-lighter-gray;
 
         @include mobile {
           font-size: $font-size-base;

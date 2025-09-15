@@ -52,7 +52,7 @@ const FALLBACK_HOMEPAGE_DATA: HomepageSections = {
   contactSection: {
     subTitle: "Get in touch",
     title: "Let's work together",
-    email: "hello@edrishusein.com"
+    email: "kontakt@edrishusein.com"
   }
 };
 
