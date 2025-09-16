@@ -22,6 +22,25 @@ export const GET_PROJECTS_FOR_GRID = `
             liveSite
           }
         }
+        seo {
+          title
+          metaDesc
+          canonical
+          robots
+          focusKeywords
+          opengraphImage {
+            sourceUrl
+            altText
+          }
+          twitterImage {
+            sourceUrl
+            altText
+          }
+          schema {
+            pageType
+            articleType
+          }
+        }
       }
     }
   }
@@ -49,6 +68,25 @@ export const GET_ALL_PROJECTS = `
           projectLinks {
             liveSite
             github
+          }
+        }
+        seo {
+          title
+          metaDesc
+          canonical
+          robots
+          focusKeywords
+          opengraphImage {
+            sourceUrl
+            altText
+          }
+          twitterImage {
+            sourceUrl
+            altText
+          }
+          schema {
+            pageType
+            articleType
           }
         }
       }
@@ -103,6 +141,42 @@ export const GET_CASE_STUDY = `
         projectLinks {
           liveSite
           github
+        }
+      }
+      seo {
+        title
+        metaDesc
+        canonical
+        robots
+        focusKeywords
+        opengraphImage {
+          sourceUrl
+          altText
+        }
+        twitterImage {
+          sourceUrl
+          altText
+        }
+        breadcrumbs {
+          text
+          url
+        }
+        schema {
+          pageType
+          articleType
+        }
+        social {
+          facebook {
+            title
+            description
+            image
+          }
+          twitter {
+            title
+            description
+            image
+            cardType
+          }
         }
       }
     }

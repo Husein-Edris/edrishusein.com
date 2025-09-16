@@ -142,11 +142,9 @@ export async function GET(request: NextRequest) {
     console.log('📡 WordPress response:', response);
 
     if (!response?.post) {
-      console.log('⚠️ No post found for slug:', slug);
-      return NextResponse.json(
-        { error: 'Post not found' },
-        { status: 404 }
-      );
+      console.log('⚠️ No post found in WordPress for slug:', slug, 'using fallback');
+      // Don't return 404, instead fall through to fallback content below
+      throw new Error('Post not found in WordPress, using fallback');
     }
 
     const post = response.post;
@@ -180,39 +178,129 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('❌ Error fetching post:', error);
 
-    // Return fallback post data
+    // Create dynamic fallback content based on slug
+    const fallbackPosts: { [key: string]: any } = {
+      'sample-blog-post': {
+        title: "Welcome to My Blog",
+        excerpt: "This is a sample blog post showcasing the blog functionality.",
+        content: `
+          <p>Welcome to my development blog! This is a sample post that demonstrates the blog functionality of this Next.js application.</p>
+          
+          <h2>About This Blog</h2>
+          <p>Here I share insights about:</p>
+          
+          <ul>
+            <li>Full-stack development with Next.js and WordPress</li>
+            <li>Modern web technologies and best practices</li>
+            <li>Project case studies and lessons learned</li>
+            <li>Technical tutorials and guides</li>
+          </ul>
+          
+          <h3>Technical Stack</h3>
+          <p>This blog is built with cutting-edge technologies:</p>
+          
+          <ul>
+            <li><strong>Frontend:</strong> Next.js 15 with TypeScript</li>
+            <li><strong>CMS:</strong> Headless WordPress with WPGraphQL</li>
+            <li><strong>Styling:</strong> SCSS with design system</li>
+            <li><strong>SEO:</strong> RankMath integration with structured data</li>
+          </ul>
+          
+          <blockquote>
+            <p>This post demonstrates the fallback system that ensures content is always available, even when the CMS is offline.</p>
+          </blockquote>
+        `
+      },
+      'getting-started-with-nextjs': {
+        title: "Getting Started with Next.js 15",
+        excerpt: "A comprehensive guide to building modern web applications with Next.js 15.",
+        content: `
+          <p>Next.js 15 brings exciting new features that make building modern web applications easier than ever. In this guide, we'll explore the key features and how to get started.</p>
+          
+          <h2>What's New in Next.js 15</h2>
+          <p>The latest version introduces several game-changing features:</p>
+          
+          <ul>
+            <li><strong>App Router:</strong> Enhanced routing with layouts and server components</li>
+            <li><strong>Turbopack:</strong> Faster development builds</li>
+            <li><strong>Server Actions:</strong> Simplified server-side operations</li>
+            <li><strong>Improved TypeScript Support:</strong> Better type safety</li>
+          </ul>
+          
+          <h3>Setting Up Your Project</h3>
+          <p>Creating a new Next.js project is straightforward:</p>
+          
+          <pre><code>npx create-next-app@latest my-app --typescript --tailwind --eslint</code></pre>
+          
+          <p>This command sets up a complete development environment with TypeScript, Tailwind CSS, and ESLint configured out of the box.</p>
+          
+          <h3>Key Benefits</h3>
+          <ul>
+            <li>Server-side rendering for better SEO</li>
+            <li>Static site generation for performance</li>
+            <li>Built-in optimization for images and fonts</li>
+            <li>Seamless API routes</li>
+          </ul>
+        `
+      },
+      'modern-web-development': {
+        title: "Modern Web Development Best Practices",
+        excerpt: "Essential practices for building maintainable, scalable web applications.",
+        content: `
+          <p>Modern web development has evolved rapidly. Here are the essential practices every developer should follow to build maintainable, scalable applications.</p>
+          
+          <h2>Architecture Principles</h2>
+          <p>Good architecture forms the foundation of any successful project:</p>
+          
+          <ul>
+            <li><strong>Component-Based Design:</strong> Build reusable, modular components</li>
+            <li><strong>Separation of Concerns:</strong> Keep logic, styling, and data separate</li>
+            <li><strong>Progressive Enhancement:</strong> Start with basic functionality, then enhance</li>
+            <li><strong>Performance First:</strong> Optimize from the beginning</li>
+          </ul>
+          
+          <h3>Development Workflow</h3>
+          <p>A solid development workflow ensures consistency and quality:</p>
+          
+          <ol>
+            <li><strong>Version Control:</strong> Use Git with meaningful commit messages</li>
+            <li><strong>Code Quality:</strong> ESLint, Prettier, and TypeScript</li>
+            <li><strong>Testing:</strong> Unit tests, integration tests, and E2E testing</li>
+            <li><strong>CI/CD:</strong> Automated testing and deployment</li>
+          </ol>
+          
+          <h3>Performance Optimization</h3>
+          <p>Performance directly impacts user experience and SEO:</p>
+          
+          <ul>
+            <li>Image optimization and lazy loading</li>
+            <li>Code splitting and dynamic imports</li>
+            <li>Proper caching strategies</li>
+            <li>Bundle analysis and optimization</li>
+          </ul>
+          
+          <blockquote>
+            <p>Remember: the best code is not just functional, but also maintainable, scalable, and performant.</p>
+          </blockquote>
+        `
+      }
+    };
+
+    // Get fallback post or use default
+    const fallbackData = fallbackPosts[slug] || fallbackPosts['sample-blog-post'];
+    
     const fallbackPost = {
-      title: "Sample Blog Post",
-      excerpt: "This is a sample blog post with fallback content for development purposes.",
-      content: `
-        <p>This is a sample blog post created for development and testing purposes. In a production environment, this content would be fetched from your WordPress CMS.</p>
-        
-        <h2>Getting Started</h2>
-        <p>To see real content here, make sure your WordPress installation is properly configured with:</p>
-        
-        <ul>
-          <li>WPGraphQL plugin installed and activated</li>
-          <li>Blog posts created in WordPress admin</li>
-          <li>Proper GraphQL endpoint configuration</li>
-        </ul>
-        
-        <h3>Content Management</h3>
-        <p>Once your WordPress setup is complete, this page will automatically display your blog content with rich formatting, images, and metadata.</p>
-        
-        <blockquote>
-          <p>This fallback system ensures your site remains functional even when the CMS is unavailable.</p>
-        </blockquote>
-      `,
+      ...fallbackData,
       featuredImage: {
         node: {
-          sourceUrl: "/images/Blog-sample-img.png",
-          altText: "Sample Blog Post",
+          sourceUrl: "/images/Blog-sample-img-optimized.webp",
+          altText: fallbackData.title,
           mediaDetails: { width: 1200, height: 600 }
         }
       },
       date: new Date().toISOString(),
       slug: slug,
-      readingTime: "3 min read",
+      readingTime: "5 min read",
       author: {
         name: "Edris Husein",
         avatar: {
@@ -225,9 +313,9 @@ export async function GET(request: NextRequest) {
         { name: "Tutorial", slug: "tutorial" }
       ],
       tags: [
-        { name: "WordPress", slug: "wordpress" },
         { name: "Next.js", slug: "nextjs" },
-        { name: "Web Development", slug: "web-development" }
+        { name: "Web Development", slug: "web-development" },
+        { name: "TypeScript", slug: "typescript" }
       ]
     };
 

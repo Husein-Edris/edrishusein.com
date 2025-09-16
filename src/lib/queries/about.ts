@@ -73,8 +73,37 @@ export const GET_ABOUT_PAGE_DATA = gql`
       seo {
         title
         metaDesc
+        canonical
+        robots
+        focusKeywords
         opengraphImage {
           sourceUrl
+          altText
+        }
+        twitterImage {
+          sourceUrl
+          altText
+        }
+        breadcrumbs {
+          text
+          url
+        }
+        schema {
+          pageType
+          articleType
+        }
+        social {
+          facebook {
+            title
+            description
+            image
+          }
+          twitter {
+            title
+            description
+            image
+            cardType
+          }
         }
       }
     }
