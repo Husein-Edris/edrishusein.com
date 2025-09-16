@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
 import { Metadata } from 'next';
+import { generateEnhancedMetadata, generateStructuredData } from '@/src/lib/seo-utils';
 import '@/src/styles/pages/About.scss';
 
 export const dynamic = 'force-dynamic'; // Always fetch fresh data from WordPress
@@ -494,21 +495,28 @@ export async function generateMetadata(): Promise<Metadata> {
   const data = await getAboutPageData();
   const page = data.page;
 
-  return {
-    title: page.seo?.title || page.title || 'About - Edris Husein',
-    description: page.seo?.metaDesc || 'Learn more about Edris Husein, full-stack developer passionate about creating exceptional digital experiences.',
-    openGraph: {
-      title: page.seo?.title || page.title || 'About - Edris Husein',
-      description: page.seo?.metaDesc || 'Learn more about Edris Husein, full-stack developer passionate about creating exceptional digital experiences.',
-      images: page.seo?.opengraphImage?.sourceUrl ? [page.seo.opengraphImage.sourceUrl] : [],
-    },
-  };
+  return generateEnhancedMetadata(
+    page.seo,
+    {
+      title: 'About - Edris Husein',
+      description: 'Learn more about Edris Husein, full-stack developer passionate about creating exceptional digital experiences.',
+      path: '/about',
+      type: 'website'
+    }
+  );
 }
 
 export default async function AboutPage() {
   const data = await getAboutPageData();
   const page = data.page;
   const fields = page.aboutPageFields;
+
+  // Generate structured data
+  const structuredData = generateStructuredData('WebPage', {
+    title: page.title,
+    description: page.seo?.metaDesc || 'Learn more about Edris Husein',
+    canonical: page.seo?.canonical || 'https://edrishusein.com/about'
+  });
 
   return (
     <>
@@ -671,6 +679,14 @@ export default async function AboutPage() {
         )}
       </main>
       <Footer />
+      
+      {/* Structured Data for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData),
+        }}
+      />
     </>
   );
 }

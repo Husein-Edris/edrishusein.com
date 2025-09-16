@@ -50,3 +50,4 @@ docs/
 *.tar.gz
 claude.json
 TODO.md
+server.log

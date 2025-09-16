@@ -167,8 +167,37 @@ export const GET_CASE_STUDY = `
       seo {
         title
         metaDesc
+        canonical
+        robots
+        focusKeywords
         opengraphImage {
           sourceUrl
+          altText
+        }
+        twitterImage {
+          sourceUrl
+          altText
+        }
+        breadcrumbs {
+          text
+          url
+        }
+        schema {
+          pageType
+          articleType
+        }
+        social {
+          facebook {
+            title
+            description
+            image
+          }
+          twitter {
+            title
+            description
+            image
+            cardType
+          }
         }
       }
       caseStudy {
@@ -269,8 +298,37 @@ export const GET_POST_BY_SLUG = `
       seo {
         title
         metaDesc
+        canonical
+        robots
+        focusKeywords
         opengraphImage {
           sourceUrl
+          altText
+        }
+        twitterImage {
+          sourceUrl
+          altText
+        }
+        breadcrumbs {
+          text
+          url
+        }
+        schema {
+          pageType
+          articleType
+        }
+        social {
+          facebook {
+            title
+            description
+            image
+          }
+          twitter {
+            title
+            description
+            image
+            cardType
+          }
         }
       }
     }
@@ -361,8 +419,37 @@ export const GET_ABOUT_PAGE = `
       seo {
         title
         metaDesc
+        canonical
+        robots
+        focusKeywords
         opengraphImage {
           sourceUrl
+          altText
+        }
+        twitterImage {
+          sourceUrl
+          altText
+        }
+        breadcrumbs {
+          text
+          url
+        }
+        schema {
+          pageType
+          articleType
+        }
+        social {
+          facebook {
+            title
+            description
+            image
+          }
+          twitter {
+            title
+            description
+            image
+            cardType
+          }
         }
       }
     }
