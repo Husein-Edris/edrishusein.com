@@ -68,6 +68,7 @@ const Header: FC = () => {
             width={80}
             height={40}
             priority
+            style={{ width: 'auto', height: '90px' }}
           />
         </Link>
 

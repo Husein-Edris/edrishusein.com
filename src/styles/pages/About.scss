@@ -78,7 +78,6 @@
 
       .profile-image {
         border-radius: 50%;
-        width: 100%;
         height: auto;
         max-width: 400px;
         
@@ -330,33 +329,55 @@
     }
   }
 
-  // Personal Section
-  .about-personal {
-    .hobbies-section {
-      margin-top: calc($spacing-unit * 4);
-      
-      .hobbies-title {
-        font-size: $font-size-lg;
-        margin-bottom: calc($spacing-unit * 2);
-        color: $color-beige;
+  // Interests & Hobbies Section (standalone)
+  .about-hobbies {
+    padding: calc($spacing-unit * 8) 0;
+    border-top: 1px solid rgba($white, 0.1);
+
+    @include mobile {
+      padding: calc($spacing-unit * 6) 0;
+    }
+
+    .section-title {
+      font-family: $font-family-syncopate;
+      font-size: $font-size-h2;
+      font-weight: $font-weight-normal;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: calc($spacing-unit * 6);
+      color: $white;
+      text-align: center;
+
+      @include mobile {
+        font-size: calc($font-size-h2 * 0.9);
+        margin-bottom: calc($spacing-unit * 4);
       }
+    }
       
-      .hobbies-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: calc($spacing-unit * 1.5);
+    .hobbies-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: calc($spacing-unit * 1.5);
+      justify-content: center;
+      max-width: 800px;
+      margin: 0 auto;
+      
+      .hobby-item {
+        background: rgba($color-beige, 0.2);
+        padding: calc($spacing-unit * 0.75) calc($spacing-unit * 1.5);
+        border-radius: 20px;
+        border: 1px solid rgba($color-beige, 0.3);
+        transition: all 0.3s ease;
         
-        .hobby-item {
-          background: rgba($color-beige, 0.2);
-          padding: calc($spacing-unit * 0.75) calc($spacing-unit * 1.5);
-          border-radius: 20px;
-          border: 1px solid rgba($color-beige, 0.3);
-          
-          .hobby-name {
-            font-size: $font-size-sm;
-            color: $color-beige;
-            font-weight: $font-weight-medium;
-          }
+        &:hover {
+          background: rgba($color-beige, 0.3);
+          transform: translateY(-2px);
+        }
+        
+        .hobby-name {
+          font-size: $font-size-sm;
+          color: $color-beige;
+          font-weight: $font-weight-medium;
         }
       }
     }
@@ -468,85 +489,5 @@
     }
   }
 
-  // Personal Section
-  .about-personal {
-    padding: calc($spacing-unit * 8) 0;
-    border-top: 1px solid rgba($white, 0.1);
-
-    @include mobile {
-      padding: calc($spacing-unit * 6) 0;
-    }
-
-    .personal-content {
-      display: grid;
-      grid-template-columns: 1fr 300px;
-      gap: calc($spacing-unit * 6);
-      align-items: center;
-
-      @include tablet {
-        grid-template-columns: 1fr;
-        gap: calc($spacing-unit * 4);
-        text-align: center;
-      }
-    }
-
-    .personal-text {
-      .section-title {
-        font-family: $font-family-syncopate;
-        font-size: $font-size-h2;
-        font-weight: $font-weight-normal;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        margin-bottom: calc($spacing-unit * 3);
-        color: $white;
-
-        @include tablet {
-          text-align: center;
-        }
-
-        @include mobile {
-          font-size: calc($font-size-h2 * 0.9);
-          margin-bottom: calc($spacing-unit * 2);
-        }
-      }
-
-      .personal-description {
-        font-family: $font-family-base;
-        font-size: $font-size-lg;
-        line-height: $line-height-relaxed;
-        color: $text-lighter-gray;
-
-        @include mobile {
-          font-size: $font-size-base;
-        }
-
-        p {
-          margin-bottom: calc($spacing-unit * 2);
-
-          &:last-child {
-            margin-bottom: 0;
-          }
-        }
-      }
-    }
-
-    .personal-image {
-      justify-self: end;
-
-      @include tablet {
-        justify-self: center;
-      }
-
-      .image {
-        border-radius: 12px;
-        width: 100%;
-        height: auto;
-        max-width: 300px;
-
-        @include mobile {
-          max-width: 250px;
-        }
-      }
-    }
-  }
+  // Remove old personal section - now handled by about-hobbies
 }
