@@ -15,10 +15,47 @@ const CookieBanner = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Check if user has already given consent
-    const existingConsent = localStorage.getItem('cookieConsent');
-    if (!existingConsent) {
-      // Small delay to avoid flash on page load
+    const checkConsent = () => {
+      try {
+        // Check if user has already given consent
+        let existingConsent = null;
+        
+        // Try localStorage first
+        if (typeof Storage !== 'undefined') {
+          existingConsent = localStorage.getItem('cookieConsent');
+        }
+        
+        // Fallback to sessionStorage
+        if (!existingConsent && typeof sessionStorage !== 'undefined') {
+          existingConsent = sessionStorage.getItem('cookieConsent');
+        }
+        
+        // Only hide banner if we found valid consent
+        if (!existingConsent || existingConsent === null || existingConsent === 'null') {
+          // Small delay to avoid flash on page load
+          setTimeout(() => setIsVisible(true), 1000);
+        } else {
+          // Validate the consent data
+          try {
+            JSON.parse(existingConsent);
+            // Valid consent found, don't show banner
+          } catch (parseError) {
+            // Invalid consent data, show banner
+            setTimeout(() => setIsVisible(true), 1000);
+          }
+        }
+      } catch (error) {
+        console.error('Error accessing storage:', error);
+        // If storage fails, show banner anyway for consent
+        setTimeout(() => setIsVisible(true), 1000);
+      }
+    };
+
+    // Check if we're in browser environment
+    if (typeof window !== 'undefined' && typeof Storage !== 'undefined') {
+      checkConsent();
+    } else {
+      // Fallback for browsers without localStorage or in SSR
       setTimeout(() => setIsVisible(true), 1000);
     }
   }, []);
@@ -45,16 +82,35 @@ const CookieBanner = () => {
   };
 
   const saveConsent = (consentData: CookieConsent) => {
-    localStorage.setItem('cookieConsent', JSON.stringify({
-      ...consentData,
-      timestamp: new Date().toISOString(),
-    }));
-    setIsVisible(false);
+    try {
+      localStorage.setItem('cookieConsent', JSON.stringify({
+        ...consentData,
+        timestamp: new Date().toISOString(),
+      }));
+      setIsVisible(false);
 
-    // Trigger analytics initialization if consented
-    if (consentData.analytics) {
-      // Initialize Google Analytics or other analytics here
-      console.log('Analytics consent given - initialize tracking');
+      // Trigger analytics initialization if consented
+      if (consentData.analytics) {
+        // Initialize Google Analytics or other analytics here
+        console.log('Analytics consent given - initialize tracking');
+      }
+    } catch (error) {
+      console.error('Error saving consent to localStorage:', error);
+      // Even if saving fails, hide the banner to prevent it from being stuck
+      setIsVisible(false);
+      
+      // Try alternative storage methods
+      try {
+        // Fallback to sessionStorage
+        sessionStorage.setItem('cookieConsent', JSON.stringify({
+          ...consentData,
+          timestamp: new Date().toISOString(),
+        }));
+        console.log('Consent saved to sessionStorage as fallback');
+      } catch (sessionError) {
+        console.error('SessionStorage also failed:', sessionError);
+        // Could implement cookie-based fallback here if needed
+      }
     }
   };
 
