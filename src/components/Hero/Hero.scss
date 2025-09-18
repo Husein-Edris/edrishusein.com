@@ -72,11 +72,12 @@
   .title {
     color: $white;
     font-family: $font-family-syncopate;
-    font-size: $font-size-5xl;
+    font-size: $font-size-h1;
     font-weight: $font-weight-bold;
     margin-bottom: $spacing-lg;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     gap: $spacing-sm;
 
     @include tablet {
@@ -91,9 +92,9 @@
       gap: $spacing-xs;
     }
 
-    // First line: "Hi" + wave (mobile only)
+    // First line: "Hi" + wave
     .first-line {
-      display: inline;
+      display: block;
 
       @include mobile {
         display: flex;
@@ -103,9 +104,9 @@
       }
     }
 
-    // Second line: "I'm EDRIS" (mobile only)
+    // Second line: "I'm EDRIS"
     .second-line {
-      display: inline;
+      display: block;
 
       @include mobile {
         display: flex;
@@ -124,6 +125,7 @@
       display: inline-block;
       transform-origin: 70% 70%;
       font-size: inherit;
+      margin-right: 7px;
 
       @include mobile {
         font-size: inherit;
