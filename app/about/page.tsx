@@ -144,7 +144,7 @@ const FALLBACK_ABOUT_DATA = {
 // Helper function to test WordPress API endpoint
 async function testWordPressAPI(baseUrl: string): Promise<{success: boolean, issue?: string}> {
   try {
-    console.log(`🔍 Testing WordPress API at: ${baseUrl}`);
+    // console.log(`🔍 Testing WordPress API at: ${baseUrl}`);
     
     // Test basic WordPress API
     const testResponse = await fetch(`${baseUrl}/wp-json/wp/v2/`, { 
@@ -168,7 +168,7 @@ async function testWordPressAPI(baseUrl: string): Promise<{success: boolean, iss
     }
     
     const apiData = await testResponse.json();
-    console.log(`✅ WordPress API is accessible. Routes available:`, Object.keys(apiData.routes || {}).length);
+    // console.log(`✅ WordPress API is accessible. Routes available:`, Object.keys(apiData.routes || {}).length);
     return { success: true };
     
   } catch (error) {
@@ -181,7 +181,7 @@ async function testWordPressAPI(baseUrl: string): Promise<{success: boolean, iss
 
 async function getAboutPageData(): Promise<AboutPageData> {
   try {
-    console.log('🔍 About page: Trying GraphQL first, then REST API fallback');
+    // console.log('🔍 About page: Trying GraphQL first, then REST API fallback');
     
     // Try GraphQL first
     try {
@@ -201,17 +201,17 @@ async function getAboutPageData(): Promise<AboutPageData> {
       
       if (aboutResponse.status === 'fulfilled' && aboutResponse.value?.page) {
         aboutData = aboutResponse.value.page;
-        console.log('✅ About page: GraphQL data loaded successfully');
+        // console.log('✅ About page: GraphQL data loaded successfully');
       }
       
       if (skillsResponse.status === 'fulfilled' && skillsResponse.value?.skills?.nodes) {
         skillsData = skillsResponse.value.skills.nodes;
-        console.log(`✅ Found ${skillsData.length} skills via GraphQL`);
+        // console.log(`✅ Found ${skillsData.length} skills via GraphQL`);
       }
       
       if (hobbiesResponse.status === 'fulfilled' && hobbiesResponse.value?.hobbies?.nodes) {
         hobbiesData = hobbiesResponse.value.hobbies.nodes;
-        console.log(`✅ Found ${hobbiesData.length} hobbies via GraphQL`);
+        // console.log(`✅ Found ${hobbiesData.length} hobbies via GraphQL`);
       }
       
       if (aboutData) {
@@ -259,17 +259,17 @@ async function getAboutPageData(): Promise<AboutPageData> {
         return transformedData;
       }
     } catch (graphqlError) {
-      console.warn('⚠️ GraphQL failed, falling back to REST API:', graphqlError);
+      // console.warn('⚠️ GraphQL failed, falling back to REST API:', graphqlError);
     }
     
     // Fallback to REST API
-    console.log('🔍 About page: Using REST API fallback');
+    // console.log('🔍 About page: Using REST API fallback');
     const WORDPRESS_REST_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '') || 'https://cms.edrishusein.com';
     
     // Test WordPress API connection first
     const apiTest = await testWordPressAPI(WORDPRESS_REST_URL);
     if (!apiTest.success) {
-      console.error(`❌ WordPress API test failed: ${apiTest.issue}`);
+      // console.error(`❌ WordPress API test failed: ${apiTest.issue}`);
       throw new Error(`WordPress API is not accessible: ${apiTest.issue}`);
     }
     
@@ -295,18 +295,18 @@ async function getAboutPageData(): Promise<AboutPageData> {
     ]);
     
     if (!aboutResponse.ok) {
-      console.error(`❌ WordPress REST API failed: ${aboutResponse.status} ${aboutResponse.statusText}`);
+      // console.error(`❌ WordPress REST API failed: ${aboutResponse.status} ${aboutResponse.statusText}`);
       const errorText = await aboutResponse.text();
-      console.error('Error response body:', errorText.substring(0, 200));
+      // console.error('Error response body:', errorText.substring(0, 200));
       throw new Error(`WordPress REST API failed: ${aboutResponse.status}`);
     }
     
     // Check if response is actually JSON
     const contentType = aboutResponse.headers.get('content-type');
     if (!contentType || !contentType.includes('application/json')) {
-      console.error(`❌ WordPress returned non-JSON response. Content-Type: ${contentType}`);
+      // console.error(`❌ WordPress returned non-JSON response. Content-Type: ${contentType}`);
       const responseText = await aboutResponse.text();
-      console.error('Response preview:', responseText.substring(0, 300));
+      // console.error('Response preview:', responseText.substring(0, 300));
       throw new Error('WordPress returned HTML instead of JSON - likely a PHP error or wrong endpoint');
     }
     
@@ -326,17 +326,17 @@ async function getAboutPageData(): Promise<AboutPageData> {
         const skillsContentType = skillsResponse.headers.get('content-type');
         if (skillsContentType && skillsContentType.includes('application/json')) {
           skillsData = await skillsResponse.json();
-          console.log(`✅ Found ${skillsData.length} skills from WordPress`);
+          // console.log(`✅ Found ${skillsData.length} skills from WordPress`);
         } else {
-          console.warn('⚠️ Skills endpoint returned non-JSON response');
+          // console.warn('⚠️ Skills endpoint returned non-JSON response');
           const skillsText = await skillsResponse.text();
-          console.warn('Skills response preview:', skillsText.substring(0, 200));
+          // console.warn('Skills response preview:', skillsText.substring(0, 200));
         }
       } catch (error) {
-        console.warn('⚠️ Error parsing skills JSON:', error);
+        // console.warn('⚠️ Error parsing skills JSON:', error);
       }
     } else {
-      console.warn(`⚠️ Skills API failed: ${skillsResponse.status} ${skillsResponse.statusText}`);
+      // console.warn(`⚠️ Skills API failed: ${skillsResponse.status} ${skillsResponse.statusText}`);
     }
     
     // Handle hobbies response
@@ -345,21 +345,21 @@ async function getAboutPageData(): Promise<AboutPageData> {
         const hobbiesContentType = hobbiesResponse.headers.get('content-type');
         if (hobbiesContentType && hobbiesContentType.includes('application/json')) {
           hobbiesData = await hobbiesResponse.json();
-          console.log(`✅ Found ${hobbiesData.length} hobbies from WordPress`);
+          // console.log(`✅ Found ${hobbiesData.length} hobbies from WordPress`);
         } else {
-          console.warn('⚠️ Hobbies endpoint returned non-JSON response');
+          // console.warn('⚠️ Hobbies endpoint returned non-JSON response');
           const hobbiesText = await hobbiesResponse.text();
-          console.warn('Hobbies response preview:', hobbiesText.substring(0, 200));
+          // console.warn('Hobbies response preview:', hobbiesText.substring(0, 200));
         }
       } catch (error) {
-        console.warn('⚠️ Error parsing hobbies JSON:', error);
+        // console.warn('⚠️ Error parsing hobbies JSON:', error);
       }
     } else {
-      console.warn(`⚠️ Hobbies API failed: ${hobbiesResponse.status} ${hobbiesResponse.statusText}`);
+      // console.warn(`⚠️ Hobbies API failed: ${hobbiesResponse.status} ${hobbiesResponse.statusText}`);
     }
     
     const aboutPage = aboutPages[0];
-    console.log('✅ About page: WordPress REST API data loaded');
+    // console.log('✅ About page: WordPress REST API data loaded');
     
     // Transform WordPress REST data to expected format
     const transformedData = {
@@ -400,7 +400,7 @@ async function getAboutPageData(): Promise<AboutPageData> {
               
               // Check if experience items exist and have proper structure
               if (!experienceItems || !Array.isArray(experienceItems)) {
-                console.warn('⚠️ No experience_items found or not an array');
+                // console.warn('⚠️ No experience_items found or not an array');
                 return FALLBACK_ABOUT_DATA.page.aboutPageFields?.experienceSection?.experienceItems || [];
               }
               
@@ -410,7 +410,7 @@ async function getAboutPageData(): Promise<AboutPageData> {
                   // Check if item has the expected field structure
                   const hasValidFields = item.company_name || item.position || item.duration || item.description;
                   if (!hasValidFields) {
-                    console.warn('⚠️ Experience item missing required fields:', item);
+                    // console.warn('⚠️ Experience item missing required fields:', item);
                     return false;
                   }
                   return true;
@@ -424,11 +424,11 @@ async function getAboutPageData(): Promise<AboutPageData> {
                 }));
               
               if (validItems.length === 0) {
-                console.warn('⚠️ No valid experience items found, using fallback data');
+                // console.warn('⚠️ No valid experience items found, using fallback data');
                 return FALLBACK_ABOUT_DATA.page.aboutPageFields?.experienceSection?.experienceItems || [];
               }
               
-              console.log(`✅ Found ${validItems.length} valid experience items`);
+              // console.log(`✅ Found ${validItems.length} valid experience items`);
               return validItems;
             })()
           },
@@ -486,7 +486,7 @@ async function getAboutPageData(): Promise<AboutPageData> {
     return transformedData;
     
   } catch (error) {
-    console.error('❌ About page: WordPress API error, using fallback:', error);
+    // console.error('❌ About page: WordPress API error, using fallback:', error);
     return FALLBACK_ABOUT_DATA;
   }
 }
@@ -634,48 +634,21 @@ export default async function AboutPage() {
           </section>
         )}
 
-        {/* Personal Section */}
-        {fields?.personalSection && (
-          <section className="about-personal">
+        {/* Interests & Hobbies Section */}
+        {fields?.personalSection?.selectedHobbies && fields.personalSection.selectedHobbies.length > 0 && (
+          <section className="about-hobbies">
             <div className="container">
-              <div className="personal-content">
-                <div className="personal-text">
-                  <h2 className="section-title">{fields.personalSection.sectionTitle}</h2>
-                  <div 
-                    className="personal-description"
-                    dangerouslySetInnerHTML={{ __html: fields.personalSection.personalContent }}
-                  />
-                  
-                  {/* Hobbies */}
-                  {fields.personalSection.selectedHobbies && fields.personalSection.selectedHobbies.length > 0 && (
-                    <div className="hobbies-section">
-                      <h3 className="hobbies-title">Interests & Hobbies</h3>
-                      <div className="hobbies-list">
-                        {fields.personalSection.selectedHobbies.map((hobby, index) => (
-                          <div key={hobby.ID || index} className="hobby-item">
-                            <span className="hobby-name">
-                              {typeof hobby.post_title === 'string' 
-                                ? hobby.post_title 
-                                : hobby.post_title?.rendered || hobby.title?.rendered || hobby.title || 'Hobby'}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-                
-                {fields.personalSection.personalImage && (
-                  <div className="personal-image">
-                    <Image
-                      src={fields.personalSection.personalImage.node.sourceUrl}
-                      alt={fields.personalSection.personalImage.node.altText}
-                      width={fields.personalSection.personalImage.node.mediaDetails.width}
-                      height={fields.personalSection.personalImage.node.mediaDetails.height}
-                      className="image"
-                    />
+              <h2 className="section-title">Interests & Hobbies</h2>
+              <div className="hobbies-list">
+                {fields.personalSection.selectedHobbies.map((hobby, index) => (
+                  <div key={hobby.ID || index} className="hobby-item">
+                    <span className="hobby-name">
+                      {typeof hobby.post_title === 'string' 
+                        ? hobby.post_title 
+                        : hobby.post_title?.rendered || hobby.title?.rendered || hobby.title || 'Hobby'}
+                    </span>
                   </div>
-                )}
+                ))}
               </div>
             </div>
           </section>
