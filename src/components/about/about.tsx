@@ -1,5 +1,6 @@
 import './about.scss';
 import SectionHeader from '../SectionHeader/SectionHeader';
+import Link from 'next/link';
 
 interface AboutProps {
   data?: {
@@ -42,6 +43,12 @@ const About = ({ data }: AboutProps) => {
             <p>I'm currently expanding my expertise in React, Next.js, and headless WordPress to push the boundaries of modern web development.</p>
           </div>
         )}
+        
+        <div className="about-cta">
+          <Link href="/about" className="learn-more-btn">
+            Learn more about me
+          </Link>
+        </div>
       </div>
     </section>
   );
