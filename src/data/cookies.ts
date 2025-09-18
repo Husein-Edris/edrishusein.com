@@ -100,33 +100,43 @@ export const addCookieToCategory = (categoryId: CookieCategory['id'], cookie: Co
 
 // Function to detect cookies currently set in the browser
 export const detectBrowserCookies = (): string[] => {
-  if (typeof document === 'undefined') return [];
+  if (typeof window === 'undefined' || typeof document === 'undefined') return [];
   
-  return document.cookie
-    .split(';')
-    .map(cookie => cookie.trim().split('=')[0])
-    .filter(name => name.length > 0);
+  try {
+    return document.cookie
+      .split(';')
+      .map(cookie => cookie.trim().split('=')[0])
+      .filter(name => name.length > 0);
+  } catch (error) {
+    console.error('Error reading browser cookies:', error);
+    return [];
+  }
 };
 
 // Function to match detected cookies with our database
 export const getActiveCookies = (): { [key: string]: CookieInfo[] } => {
-  const detectedCookies = detectBrowserCookies();
-  const result: { [key: string]: CookieInfo[] } = {};
-  
-  cookieDatabase.forEach(category => {
-    const activeCookies = category.cookies.filter(cookie => {
-      // Handle wildcard cookies (like _ga_*)
-      if (cookie.name.includes('*')) {
-        const pattern = cookie.name.replace('*', '');
-        return detectedCookies.some(detected => detected.startsWith(pattern));
+  try {
+    const detectedCookies = detectBrowserCookies();
+    const result: { [key: string]: CookieInfo[] } = {};
+    
+    cookieDatabase.forEach(category => {
+      const activeCookies = category.cookies.filter(cookie => {
+        // Handle wildcard cookies (like _ga_*)
+        if (cookie.name.includes('*')) {
+          const pattern = cookie.name.replace('*', '');
+          return detectedCookies.some(detected => detected.startsWith(pattern));
+        }
+        return detectedCookies.includes(cookie.name);
+      });
+      
+      if (activeCookies.length > 0) {
+        result[category.id] = activeCookies;
       }
-      return detectedCookies.includes(cookie.name);
     });
     
-    if (activeCookies.length > 0) {
-      result[category.id] = activeCookies;
-    }
-  });
-  
-  return result;
+    return result;
+  } catch (error) {
+    console.error('Error matching detected cookies:', error);
+    return {};
+  }
 };

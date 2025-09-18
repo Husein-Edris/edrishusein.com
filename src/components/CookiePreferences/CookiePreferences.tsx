@@ -33,28 +33,52 @@ const CookiePreferences: React.FC<CookiePreferencesProps> = ({
   });
   
   const [isLoaded, setIsLoaded] = useState(false);
-  const [activeCookies, setActiveCookies] = useState<{ [key: string]: CookieInfo[] }>({});
-  const [showOnlyActive, setShowOnlyActive] = useState(false);
+  // const [activeCookies, setActiveCookies] = useState<{ [key: string]: CookieInfo[] }>({});
+  // const [showOnlyActive, setShowOnlyActive] = useState(false);
 
   useEffect(() => {
-    // Load existing consent preferences
-    const existingConsent = localStorage.getItem('cookieConsent');
-    if (existingConsent) {
+    // Load existing consent preferences with browser compatibility
+    const loadConsent = () => {
       try {
-        const parsed = JSON.parse(existingConsent);
-        setConsent({
-          essential: true, // Always true
-          analytics: parsed.analytics || false,
-          marketing: parsed.marketing || false,
-          functional: parsed.functional || false,
-        });
+        // Try localStorage first
+        let existingConsent = null;
+        if (typeof Storage !== 'undefined') {
+          existingConsent = localStorage.getItem('cookieConsent');
+          
+          // Fallback to sessionStorage if localStorage fails
+          if (!existingConsent && typeof sessionStorage !== 'undefined') {
+            existingConsent = sessionStorage.getItem('cookieConsent');
+          }
+        }
+        
+        if (existingConsent) {
+          const parsed = JSON.parse(existingConsent);
+          setConsent({
+            essential: true, // Always true
+            analytics: parsed.analytics || false,
+            marketing: parsed.marketing || false,
+            functional: parsed.functional || false,
+          });
+        }
       } catch (error) {
-        console.error('Error parsing existing consent:', error);
+        console.error('Error loading existing consent:', error);
+        // Continue with default consent values
       }
+    };
+
+    // Only run in browser environment
+    if (typeof window !== 'undefined') {
+      loadConsent();
     }
     
-    // Detect active cookies
-    setActiveCookies(getActiveCookies());
+    // Cookie detection temporarily disabled
+    // try {
+    //   setActiveCookies(getActiveCookies());
+    // } catch (error) {
+    //   console.error('Error detecting cookies:', error);
+    //   setActiveCookies({});
+    // }
+    
     setIsLoaded(true);
   }, []);
 
@@ -83,23 +107,44 @@ const CookiePreferences: React.FC<CookiePreferencesProps> = ({
   };
 
   const saveConsent = (consentData: CookieConsent) => {
-    localStorage.setItem('cookieConsent', JSON.stringify({
-      ...consentData,
-      timestamp: new Date().toISOString(),
-    }));
+    try {
+      // Try localStorage first
+      if (typeof Storage !== 'undefined') {
+        localStorage.setItem('cookieConsent', JSON.stringify({
+          ...consentData,
+          timestamp: new Date().toISOString(),
+        }));
+      } else if (typeof sessionStorage !== 'undefined') {
+        // Fallback to sessionStorage
+        sessionStorage.setItem('cookieConsent', JSON.stringify({
+          ...consentData,
+          timestamp: new Date().toISOString(),
+        }));
+      }
 
-    // Trigger analytics initialization if consented
-    if (consentData.analytics) {
-      // Initialize Google Analytics or other analytics here
-      console.log('Analytics consent given - initialize tracking');
-    }
+      // Trigger analytics initialization if consented
+      if (consentData.analytics) {
+        // Initialize Google Analytics or other analytics here
+        console.log('Analytics consent given - initialize tracking');
+      }
 
-    if (onSave) {
-      onSave();
-    } else if (isStandalone) {
-      // Show success message and redirect or stay on page
-      alert('Your cookie preferences have been saved.');
-      router.push('/');
+      if (onSave) {
+        onSave();
+      } else if (isStandalone) {
+        // Show success message and redirect or stay on page
+        alert('Your cookie preferences have been saved.');
+        router.push('/');
+      }
+    } catch (error) {
+      console.error('Error saving consent:', error);
+      
+      // Show error but still allow navigation
+      if (isStandalone) {
+        alert('There was an issue saving your preferences, but they have been applied for this session.');
+        router.push('/');
+      } else if (onSave) {
+        onSave();
+      }
     }
   };
 
@@ -143,8 +188,8 @@ const CookiePreferences: React.FC<CookiePreferencesProps> = ({
         <div className="cookie-categories">
           {cookieDatabase.map((category) => {
             const categoryConsent = consent[category.id as keyof CookieConsent];
-            const categoryCookies = getCookiesByCategory(category.id);
-            const categoryActiveCookies = activeCookies[category.id] || [];
+            // const categoryCookies = getCookiesByCategory(category.id);
+            // const categoryActiveCookies = activeCookies[category.id] || [];
             
             return (
               <div key={category.id} className="cookie-category">
