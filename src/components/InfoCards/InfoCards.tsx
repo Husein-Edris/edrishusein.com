@@ -90,60 +90,92 @@ function InfoCards({
         )}
         <div className={`cards-grid columns-${columns}`}>
           {displayCards?.map((card, index) => {
-            // For project cards, wrap entire card in Link to case study
-            const CardWrapper = skin === 'projects' ? Link : Link;
-            const cardProps = skin === 'projects' 
-              ? { href: card.caseStudyLink || '#', className: `card ${card.variant || variant}` }
-              : { href: card.link || '#', className: `card ${card.variant || variant}` };
-
             if (skin !== 'projects' && !card.link) {
               return null; // Skip cards without links for non-project skins
             }
 
+            // For non-project cards, wrap entire card in Link
+            if (skin !== 'projects') {
+              return (
+                <Link key={index} href={card.link || '#'} className={`card ${card.variant || variant}`}>
+                  <div className="card-content">
+                    {card.image && (
+                      <div className="card-image">
+                        <Image
+                          src={card.image}
+                          alt={card.title}
+                          width={400}
+                          height={300}
+                          quality={85}
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          placeholder="blur"
+                          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkbHB0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8A2A="
+                          style={{ height: 'auto' }}
+                        />
+                      </div>
+                    )}
+                    <div className="card-info">
+                      <h3 className="card-title">{card.title}</h3>
+                      {skin === 'default' && (
+                        <div className="card-arrow">
+                          <Image
+                            src="/icons/arrow-active.svg"
+                            alt="Arrow"
+                            width={40}
+                            height={40}
+                            className="arrow-simple"
+                          />
+                        </div>
+                      )}
+                      <div
+                        className="card-description"
+                        dangerouslySetInnerHTML={{ __html: card.description }}
+                      />
+                    </div>
+                  </div>
+                </Link>
+              );
+            }
+
+            // For project cards, don't wrap entire card - only specific elements link to case study
             return (
-              <CardWrapper key={index} {...(cardProps as any)}>
+              <div key={index} className={`card ${card.variant || variant}`}>
                 <div className="card-content">
                   {card.image && (
-                    <div className="card-image">
+                    <Link href={card.caseStudyLink || '#'} className="card-image">
                       <Image
                         src={card.image}
                         alt={card.title}
                         width={400}
                         height={300}
-                        priority={index === 0 && skin === 'projects'}
-                        loading={index === 0 && skin === 'projects' ? "eager" : "lazy"}
+                        priority={index === 0}
+                        loading={index === 0 ? "eager" : "lazy"}
                         quality={85}
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         placeholder="blur"
-                        blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkbHB0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8A2A="
+                        blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkbHB0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8A2A="
                         style={{ height: 'auto' }}
                       />
-                    </div>
+                    </Link>
                   )}
                   <div className="card-info">
-                    <h3 className="card-title">{card.title}</h3>
-                    {skin === 'default' && (
-                      <div className="card-arrow">
-                        <Image
-                          src="/icons/arrow-active.svg"
-                          alt="Arrow"
-                          width={40}
-                          height={40}
-                          className="arrow-simple"
-                        />
-                      </div>
-                    )}
+                    <Link href={card.caseStudyLink || '#'}>
+                      <h3 className="card-title">{card.title}</h3>
+                    </Link>
                     <div
                       className="card-description"
                       dangerouslySetInnerHTML={{ __html: card.description }}
                     />
-                    {skin === 'projects' && (card.caseStudyLink || card.visitLink) && (
-                      <div className="project-links" onClick={(e) => e.stopPropagation()}>
+                    {(card.caseStudyLink || card.visitLink) && (
+                      <div className="project-links">
                         {card.visitLink && card.visitLink !== '#' && (
                           <button 
+                            type="button"
                             className="project-link visit-site-link"
                             onClick={(e) => {
+                              e.preventDefault();
                               e.stopPropagation();
+                              console.log('Visit button clicked, URL:', card.visitLink);
                               window.open(card.visitLink, '_blank', 'noopener,noreferrer');
                             }}
                           >
@@ -151,21 +183,18 @@ function InfoCards({
                           </button>
                         )}
                         {card.caseStudyLink && (
-                          <button 
+                          <Link 
+                            href={card.caseStudyLink}
                             className="project-link case-study-link"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              window.location.href = card.caseStudyLink;
-                            }}
                           >
                             CASE STUDY
-                          </button>
+                          </Link>
                         )}
                       </div>
                     )}
                   </div>
                 </div>
-              </CardWrapper>
+              </div>
             );
           })}
         </div>
