@@ -577,7 +577,10 @@ export default async function AboutPage() {
                       <span className="duration">{item.duration}</span>
                     </div>
                     <h4 className="company">{item.company_name}</h4>
-                    <p className="description">{item.description}</p>
+                    <div 
+                      className="description"
+                      dangerouslySetInnerHTML={{ __html: item.description }}
+                    />
                     {item.technologies && (
                       <div className="technologies">
                         <span className="tech-label">Technologies:</span>
