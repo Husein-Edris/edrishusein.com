@@ -1,0 +1,157 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.cookie-list {
+  margin-top: $spacing-md;
+  padding: $spacing-md;
+  background: rgba($white, 0.02);
+  border: 1px solid rgba($white, 0.05);
+  border-radius: $border-radius-sm;
+
+  &.empty {
+    .no-cookies {
+      font-size: $font-size-xs;
+      color: rgba($white, 0.5);
+      font-style: italic;
+      margin: 0;
+      text-align: center;
+      padding: $spacing-sm 0;
+    }
+  }
+
+  .cookie-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-md;
+    
+    @include mobile {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: $spacing-xs;
+    }
+  }
+
+  .cookie-list-title {
+    font-family: $font-family-syncopate;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    color: $color-beige;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+  }
+
+  .active-count {
+    font-size: $font-size-xs;
+    color: rgba(34, 197, 94, 0.8);
+    background: rgba(34, 197, 94, 0.1);
+    padding: $spacing-xs $spacing-sm;
+    border-radius: $border-radius-full;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+  }
+
+  .cookie-items {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  .cookie-item {
+    padding: $spacing-sm $spacing-md;
+    background: rgba($white, 0.01);
+    border: 1px solid rgba($white, 0.03);
+    border-radius: $border-radius-sm;
+    transition: all $transition-base;
+
+    &:hover {
+      background: rgba($white, 0.03);
+      border-color: rgba($white, 0.08);
+    }
+
+    &.active {
+      border-color: rgba(34, 197, 94, 0.3);
+      background: rgba(34, 197, 94, 0.05);
+
+      &:hover {
+        background: rgba(34, 197, 94, 0.08);
+      }
+    }
+  }
+
+  .cookie-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: $spacing-xs;
+    gap: $spacing-sm;
+
+    @include mobile {
+      flex-direction: column;
+      gap: $spacing-xs;
+    }
+  }
+
+  .cookie-name {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+
+    strong {
+      color: $white;
+      font-weight: $font-weight-semibold;
+      font-size: $font-size-xs;
+      font-family: 'Monaco', 'Menlo', monospace;
+    }
+
+    .active-indicator {
+      color: #22c55e;
+      font-size: $font-size-xs;
+      animation: pulse 2s infinite;
+    }
+  }
+
+  .cookie-expiry {
+    font-size: $font-size-xs;
+    color: rgba($white, 0.6);
+    font-style: italic;
+    white-space: nowrap;
+  }
+
+  .cookie-description {
+    font-size: $font-size-xs;
+    line-height: $line-height-relaxed;
+    color: rgba($white, 0.7);
+    margin: 0 0 $spacing-xs 0;
+  }
+
+  .cookie-purpose {
+    font-size: $font-size-xs;
+    line-height: $line-height-relaxed;
+    color: rgba($white, 0.6);
+    margin: 0 0 $spacing-xs 0;
+
+    em {
+      font-style: italic;
+    }
+  }
+
+  .cookie-domain {
+    font-size: $font-size-xs;
+    color: rgba($white, 0.5);
+    margin: 0;
+
+    small {
+      font-size: inherit;
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+}

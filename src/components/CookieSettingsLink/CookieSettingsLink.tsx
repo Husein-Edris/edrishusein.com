@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import './CookieSettingsLink.scss';
 
 interface CookieSettingsLinkProps {
@@ -8,21 +9,13 @@ interface CookieSettingsLinkProps {
 }
 
 const CookieSettingsLink = ({ children, className }: CookieSettingsLinkProps) => {
-  const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    
-    // Dispatch custom event to show cookie settings
-    const event = new CustomEvent('showCookieSettings');
-    window.dispatchEvent(event);
-  };
-
   return (
-    <button
-      onClick={handleClick}
+    <Link
+      href="/cookie-settings"
       className={`cookie-settings-link ${className || ''}`}
     >
       {children}
-    </button>
+    </Link>
   );
 };
 

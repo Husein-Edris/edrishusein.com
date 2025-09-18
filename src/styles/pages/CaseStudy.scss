@@ -599,9 +599,7 @@
 
   // Breadcrumbs styling for notebook template
   .breadcrumbs {
-    display: flex;
-    align-items: center;
-    gap: calc($spacing-unit * 0.75);
+    text-align: center;
     margin-bottom: calc($spacing-unit * 2);
     font-size: calc($font-size-base * 0.9);
     color: $text-light-gray;
