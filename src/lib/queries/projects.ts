@@ -137,6 +137,10 @@ export const GET_CASE_STUDY = `
         projectGallery {
           sourceUrl
           altText
+          mediaDetails {
+            width
+            height
+          }
         }
         projectLinks {
           liveSite
