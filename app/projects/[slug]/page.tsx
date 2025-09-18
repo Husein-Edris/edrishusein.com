@@ -338,13 +338,15 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
             <section className="project-gallery">
               <h2>Project Gallery</h2>
               <div className="gallery-grid">
-                {project.caseStudy.projectGallery.map((image: any, index: number) => (
+                {project.caseStudy.projectGallery
+                  .filter((image: any) => image.url && image.url.trim() !== '')
+                  .map((image: any, index: number) => (
                   <div key={index} className="gallery-item">
                     <Image
-                      src={image.sourceUrl}
-                      alt={image.altText || `${project.title} gallery image ${index + 1}`}
-                      width={image.mediaDetails?.width || 400}
-                      height={image.mediaDetails?.height || 300}
+                      src={image.url}
+                      alt={image.alt || `${project.title} gallery image ${index + 1}`}
+                      width={image.width || 400}
+                      height={image.height || 300}
                       className="gallery-image"
                     />
                   </div>

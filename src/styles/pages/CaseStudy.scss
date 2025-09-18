@@ -344,7 +344,7 @@
         .gallery-image {
           width: 100%;
           height: 300px;
-          object-fit: cover;
+          object-fit: contain;
           transition: transform 0.3s ease;
         }
       }
@@ -432,7 +432,12 @@
         font-size: calc($font-size-base * 1.1);
       }
 
-      h1, h2, h3, h4, h5, h6 {
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
         color: $white;
         font-family: $font-family-syncopate;
         margin-top: calc($spacing-unit * 3);
@@ -459,7 +464,8 @@
         font-size: calc($font-size-base * 1.4);
       }
 
-      ul, ol {
+      ul,
+      ol {
         color: $text-light-gray;
         margin-left: calc($spacing-unit * 3);
         margin-bottom: calc($spacing-unit * 2);
@@ -509,7 +515,7 @@
       a {
         color: $color-beige;
         text-decoration: underline;
-        
+
         &:hover {
           color: $white;
         }
