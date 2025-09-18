@@ -36,7 +36,7 @@ const Footer = () => {
                                 priority
                             />
                         </Link>
-                        <p className="copyright">©{currentYear} TEST DEPLOY Edris Husein</p>
+                        <p className="copyright">©{currentYear}Edris Husein</p>
                     </div>
 
                     <nav className="footer-nav">

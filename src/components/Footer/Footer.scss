@@ -20,7 +20,7 @@
         display: flex;
         flex-direction: row;
         align-items: center;
-        justify-content: space-around;
+        justify-content: space-between;
         text-align: center;
         gap: $spacing-2xl;
 
@@ -33,7 +33,7 @@
     .footer-left {
         display: flex;
         flex-direction: column;
-        align-items: center;
+        align-items: flex-start;
         gap: $spacing-lg;
 
         .logo {
@@ -85,7 +85,7 @@
             list-style: none;
             margin: 0;
             padding: 0;
-            align-items: center;
+            align-items: flex-start;
 
             @include mobile {
                 gap: $spacing-sm;
