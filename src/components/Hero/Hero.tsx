@@ -72,7 +72,7 @@ const Hero = ({ data }: HeroProps) => {
               Hi<span className="wave">👋🏻</span>
             </div>
             <div className="second-line">
-              <span className="subTitle">I'm</span>EDRIS
+              <span className="subTitle">I'm </span><span className="name">EDRIS</span>
             </div>
           </h1>
           <p className="description">
