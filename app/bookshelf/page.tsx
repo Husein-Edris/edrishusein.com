@@ -2,7 +2,7 @@ import { GraphQLClient } from 'graphql-request';
 import Image from 'next/image';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
-import '@/src/styles/pages/CaseStudy.scss';
+import '@/src/styles/pages/Bookshelf.scss';
 
 export const dynamic = 'force-dynamic'; // Always fetch fresh data from WordPress
 
@@ -90,7 +90,7 @@ export default async function BookshelfPage() {
   return (
     <>
       <Header />
-      <main className="case-study">
+      <main className="bookshelf-page">
         {/* Hero Section */}
         <div className="hero-section">
           <div className="container">
@@ -109,25 +109,23 @@ export default async function BookshelfPage() {
                 books.map((book: any) => (
                   <div key={book.id} className="book-card">
                     {book.featuredImage?.node && (
-                      <div className="book-image">
+                      <div className="book-cover">
                         <Image
                           src={book.featuredImage.node.sourceUrl}
                           alt={book.featuredImage.node.altText || book.title}
                           width={book.featuredImage.node.mediaDetails?.width || 300}
                           height={book.featuredImage.node.mediaDetails?.height || 400}
-                          className="featured-image"
+                          className="book-image"
                         />
                       </div>
                     )}
-                    <div className="book-content">
-                      <h3 className="book-title">{book.title}</h3>
-                      {book.excerpt && (
-                        <div 
-                          className="book-description"
-                          dangerouslySetInnerHTML={{ __html: book.excerpt }}
-                        />
-                      )}
-                    </div>
+                    <div className="book-title">{book.title}</div>
+                    {book.excerpt && (
+                      <div 
+                        className="book-description"
+                        dangerouslySetInnerHTML={{ __html: book.excerpt }}
+                      />
+                    )}
                   </div>
                 ))
               ) : (
