@@ -38,8 +38,8 @@
     position: relative;
 
     @include tablet {
-      width: 350px;
-      height: 350px;
+      width: 450px;
+      height: 450px;
     }
 
     @include mobile {
@@ -81,7 +81,7 @@
     gap: $spacing-sm;
 
     @include tablet {
-      font-size: $font-size-4xl;
+      font-size: $font-size-5xl;
     }
 
     @include mobile {
