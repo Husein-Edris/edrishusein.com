@@ -145,7 +145,7 @@ function InfoCards({
                       className="card-image"
                       style={{
                         backgroundImage: `url(${card.image})`,
-                        backgroundSize: 'contain',
+                        backgroundSize: 'cover',
                         backgroundPosition: '50% 50%',
                         backgroundRepeat: 'no-repeat',
                         color: 'transparent',
