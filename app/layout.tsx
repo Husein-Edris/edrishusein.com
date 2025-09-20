@@ -39,6 +39,20 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="theme-color" content="#ffffff" />
         <meta name="description" content="Full-stack developer and digital creative specializing in modern web applications, UI/UX design, and WordPress development." />
+        
+        {/* Tech Stack Showcase - Headless Architecture */}
+        <meta name="generator" content="WordPress (Headless CMS), Next.js 15, React 19" />
+        <meta name="framework" content="Next.js" />
+        <meta name="cms" content="WordPress" />
+        <meta name="architecture" content="Headless" />
+        <meta name="frontend" content="React, Next.js, TypeScript, SCSS" />
+        <meta name="backend" content="WordPress, GraphQL, WPGraphQL" />
+        <meta name="deployment" content="PM2, Node.js" />
+        
+        {/* WordPress Headless CMS Indicators */}
+        <link rel="alternate" type="application/json" href="https://cms.edrishusein.com/wp-json/" />
+        <link rel="https://api.w.org/" href="https://cms.edrishusein.com/wp-json/" />
+        
         {/* Recent updates: Footer layout, cookie settings, case-study spacing */}
       </head>
       <body suppressHydrationWarning={true}>
