@@ -32,7 +32,7 @@ const CookiePreferences: React.FC<CookiePreferencesProps> = ({
     functional: false,
   });
   
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(typeof window !== 'undefined');
   // const [activeCookies, setActiveCookies] = useState<{ [key: string]: CookieInfo[] }>({});
   // const [showOnlyActive, setShowOnlyActive] = useState(false);
 
@@ -79,7 +79,15 @@ const CookiePreferences: React.FC<CookiePreferencesProps> = ({
     //   setActiveCookies({});
     // }
     
+    // Set loaded state immediately
     setIsLoaded(true);
+    
+    // Failsafe timeout in case something blocks the component
+    const failsafeTimeout = setTimeout(() => {
+      setIsLoaded(true);
+    }, 2000);
+    
+    return () => clearTimeout(failsafeTimeout);
   }, []);
 
   const handleAcceptAll = () => {
