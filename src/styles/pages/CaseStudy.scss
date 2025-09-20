@@ -56,9 +56,13 @@
         max-width: 900px;
         width: 100%;
         max-height: 500px;
-        height: auto;
-        object-fit: contain;
+        height: auto !important;
+        object-fit: contain !important;
         border-radius: 12px;
+        background-size: unset !important;
+        background-image: unset !important;
+        background-position: unset !important;
+        background-repeat: unset !important;
 
         @include mobile {
           max-width: 100%;
@@ -199,9 +203,13 @@
       max-width: 800px;
       width: 100%;
       max-height: 400px;
-      height: auto;
-      object-fit: contain;
+      height: auto !important;
+      object-fit: contain !important;
       border-radius: 12px;
+      background-size: unset !important;
+      background-image: unset !important;
+      background-position: unset !important;
+      background-repeat: unset !important;
 
       @include mobile {
         max-width: 100%;
