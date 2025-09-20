@@ -45,6 +45,15 @@ const nextConfig: NextConfig = {
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'origin-when-cross-origin' },
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+          
+          // Tech Stack Showcase Headers
+          { key: 'X-Powered-By', value: 'WordPress (Headless CMS) + Next.js 15' },
+          { key: 'X-Framework', value: 'Next.js' },
+          { key: 'X-CMS', value: 'WordPress' },
+          { key: 'X-Architecture', value: 'Headless' },
+          { key: 'X-Frontend-Stack', value: 'React 19, Next.js 15, TypeScript, SCSS' },
+          { key: 'X-Backend-Stack', value: 'WordPress, GraphQL, WPGraphQL, Advanced Custom Fields' },
+          { key: 'X-Deployment', value: 'PM2, Node.js, Custom Server' },
         ],
       },
     ]

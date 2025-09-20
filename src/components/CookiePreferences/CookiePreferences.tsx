@@ -32,11 +32,15 @@ const CookiePreferences: React.FC<CookiePreferencesProps> = ({
     functional: false,
   });
   
-  const [isLoaded, setIsLoaded] = useState(typeof window !== 'undefined');
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   // const [activeCookies, setActiveCookies] = useState<{ [key: string]: CookieInfo[] }>({});
   // const [showOnlyActive, setShowOnlyActive] = useState(false);
 
   useEffect(() => {
+    // Mark component as mounted to prevent hydration mismatch
+    setIsMounted(true);
+    
     // Load existing consent preferences with browser compatibility
     const loadConsent = () => {
       try {
@@ -66,28 +70,9 @@ const CookiePreferences: React.FC<CookiePreferencesProps> = ({
       }
     };
 
-    // Only run in browser environment
-    if (typeof window !== 'undefined') {
-      loadConsent();
-    }
-    
-    // Cookie detection temporarily disabled
-    // try {
-    //   setActiveCookies(getActiveCookies());
-    // } catch (error) {
-    //   console.error('Error detecting cookies:', error);
-    //   setActiveCookies({});
-    // }
-    
-    // Set loaded state immediately
+    // Load consent and mark as loaded
+    loadConsent();
     setIsLoaded(true);
-    
-    // Failsafe timeout in case something blocks the component
-    const failsafeTimeout = setTimeout(() => {
-      setIsLoaded(true);
-    }, 2000);
-    
-    return () => clearTimeout(failsafeTimeout);
   }, []);
 
   const handleAcceptAll = () => {
@@ -165,7 +150,8 @@ const CookiePreferences: React.FC<CookiePreferencesProps> = ({
     }));
   };
 
-  if (!isLoaded) {
+  // Prevent hydration mismatch by showing loading state until mounted
+  if (!isMounted || !isLoaded) {
     return <div className="cookie-preferences-loading">Loading preferences...</div>;
   }
 
