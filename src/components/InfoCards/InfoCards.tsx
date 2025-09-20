@@ -108,8 +108,6 @@ function InfoCards({
                           height={300}
                           quality={85}
                           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                          placeholder="blur"
-                          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkbHB0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8A2A="
                           style={{ height: 'auto' }}
                         />
                       </div>
@@ -142,20 +140,21 @@ function InfoCards({
               <div key={index} className={`card ${card.variant || variant}`}>
                 <div className="card-content">
                   {card.image && (
-                    <Link href={card.caseStudyLink || '#'} className="card-image">
-                      <Image
-                        src={card.image}
-                        alt={card.title}
-                        width={400}
-                        height={300}
-                        priority={index === 0}
-                        loading={index === 0 ? "eager" : "lazy"}
-                        quality={85}
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        placeholder="blur"
-                        blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkbHB0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8A2A="
-                        style={{ height: 'auto' }}
-                      />
+                    <Link 
+                      href={card.caseStudyLink || '#'} 
+                      className="card-image"
+                      style={{
+                        backgroundImage: `url(${card.image})`,
+                        backgroundSize: 'contain',
+                        backgroundPosition: '50% 50%',
+                        backgroundRepeat: 'no-repeat',
+                        color: 'transparent',
+                        height: '300px'
+                      }}
+                      aria-label={card.title}
+                    >
+                      {/* Hidden text for screen readers */}
+                      <span style={{ position: 'absolute', left: '-9999px' }}>{card.title}</span>
                     </Link>
                   )}
                   <div className="card-info">
