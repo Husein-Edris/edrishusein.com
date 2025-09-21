@@ -22,7 +22,7 @@ const FALLBACK_HOMEPAGE_DATA: HomepageSections = {
   },
   aboutSection: {
     title: "About Me",
-    aboutMeText: "Passionate developer with expertise in React, Next.js, and WordPress development."
+    aboutMeText: "I'm a full-stack developer passionate about crafting digital experiences that blend technical excellence with human-centered design. With expertise spanning React, Next.js, WordPress, and modern web technologies, I help businesses transform their ideas into powerful, scalable web solutions. When I'm not coding, you'll find me exploring new technologies, contributing to open source projects, or spending quality time with my family."
   },
   bookshelfSection: {
     title: "BOOKSHELF",

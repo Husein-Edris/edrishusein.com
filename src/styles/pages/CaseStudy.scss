@@ -854,7 +854,7 @@
           display: flex;
           align-items: center;
           justify-content: center;
-          background: rgba($text-light-gray, 0.05);
+          background: $white;
           padding: calc($spacing-unit * 2);
 
           @include mobile {
@@ -862,6 +862,7 @@
           }
 
           .featured-image {
+            margin: 0;
             max-width: 80%;
             max-height: 80%;
             object-fit: contain;
