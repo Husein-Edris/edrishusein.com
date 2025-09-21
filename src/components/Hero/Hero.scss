@@ -11,7 +11,7 @@
 
   @include mobile {
     padding: $spacing-xl $container-padding-mobile;
-    min-height: 60vh;
+    min-height: 90vh;
   }
 
   .container {
@@ -85,7 +85,7 @@
     }
 
     @include mobile {
-      font-size: $font-size-3xl;
+      font-size: $font-size-5xl;
       flex-direction: column;
       align-items: center;
       text-align: center;
