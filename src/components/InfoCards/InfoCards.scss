@@ -54,6 +54,44 @@
     }
   }
 
+  // Desktop view-more button (hide on mobile)
+  .view-more-desktop {
+    @include mobile {
+      display: none;
+    }
+  }
+
+  // Mobile view-more button (show only on mobile)
+  .view-more-mobile {
+    display: none;
+    text-align: center;
+    margin-top: $spacing-2xl;
+
+    @include mobile {
+      display: block;
+    }
+
+    .view-more-link {
+      @include button-secondary;
+      @include button-size('sm');
+      display: inline-flex;
+      align-items: center;
+      gap: $spacing-xs;
+      font-size: $font-size-sm;
+      text-decoration: none;
+
+      &::after {
+        content: '→';
+        font-size: $font-size-base;
+        transition: transform $transition-base;
+      }
+
+      &:hover::after {
+        transform: translateX(4px);
+      }
+    }
+  }
+
   // Light mode styling for blog/notebook sections
   &.blog.blog-light {
     .section-header-wrapper {
@@ -76,6 +114,29 @@
           &:hover::after {
             transform: translateX(4px);
           }
+        }
+      }
+    }
+
+    // Light mode mobile button styling
+    .view-more-mobile {
+      .view-more-link {
+        @include button-outline;
+        @include button-size('sm');
+        display: inline-flex;
+        align-items: center;
+        gap: $spacing-xs;
+        font-size: $font-size-sm;
+        text-decoration: none;
+
+        &::after {
+          content: '→';
+          font-size: $font-size-base;
+          transition: transform $transition-base;
+        }
+
+        &:hover::after {
+          transform: translateX(4px);
         }
       }
     }

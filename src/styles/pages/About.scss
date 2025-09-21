@@ -139,7 +139,7 @@
         font-size: $font-size-h2;
 
         @include mobile {
-          font-size: calc($font-size-h2 * 0.9);
+          font-size: calc($font-size-h2 * 0.7);
         }
       }
 
@@ -147,7 +147,7 @@
         font-size: $font-size-h3;
 
         @include mobile {
-          font-size: calc($font-size-h3 * 0.9);
+          font-size: calc($font-size-h3 * 0.7);
         }
       }
     }

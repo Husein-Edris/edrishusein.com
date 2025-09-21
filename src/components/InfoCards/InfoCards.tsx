@@ -81,7 +81,7 @@ function InfoCards({
               hideNumber={true}
             />
             {viewMoreLink && (
-              <div className="view-more-inline">
+              <div className="view-more-inline view-more-desktop">
                 <Link href={viewMoreLink} className="view-more-link">
                   {viewMoreText || 'VIEW MORE'}
                 </Link>
@@ -198,6 +198,14 @@ function InfoCards({
             );
           })}
         </div>
+        
+        {viewMoreLink && (
+          <div className="view-more-inline view-more-mobile">
+            <Link href={viewMoreLink} className="view-more-link">
+              {viewMoreText || 'VIEW MORE'}
+            </Link>
+          </div>
+        )}
 
       </div>
     </section>
