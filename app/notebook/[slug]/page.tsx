@@ -6,13 +6,14 @@ import Link from 'next/link';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
 import InfoCards from '@/src/components/InfoCards/InfoCards';
+import '@/src/styles/pages/BlogPost.scss';
 import '@/src/styles/pages/CaseStudy.scss';
 import { WordPressPost } from '@/src/types/api';
 
 // Generate static params for all blog posts
 export async function generateStaticParams() {
   try {
-    const response = await fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:3001' : process.env.NEXT_PUBLIC_SITE_URL}/api/post?limit=50`);
+    const response = await fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : process.env.NEXT_PUBLIC_SITE_URL}/api/post?limit=50`);
     if (!response.ok) return [];
     
     const data = await response.json();
@@ -64,7 +65,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 // Server-side data fetching
 async function getPost(slug: string): Promise<WordPressPost> {
   const response = await fetch(
-    `${process.env.NODE_ENV === 'development' ? 'http://localhost:3001' : process.env.NEXT_PUBLIC_SITE_URL}/api/post?slug=${slug}`,
+    `${process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : process.env.NEXT_PUBLIC_SITE_URL}/api/post?slug=${slug}`,
     { cache: 'no-store' } // Always fetch fresh data
   );
   
@@ -83,7 +84,7 @@ async function getPost(slug: string): Promise<WordPressPost> {
 async function getMoreArticles(excludeSlug: string): Promise<WordPressPost[]> {
   try {
     const response = await fetch(
-      `${process.env.NODE_ENV === 'development' ? 'http://localhost:3001' : process.env.NEXT_PUBLIC_SITE_URL}/api/post?limit=4`,
+      `${process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : process.env.NEXT_PUBLIC_SITE_URL}/api/post?limit=4`,
       { cache: 'no-store' }
     );
     
@@ -144,7 +145,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     return (
       <>
         <Header />
-        <main className="case-study">
+        <main className="case-study blog-post">
           {/* Hero Section */}
           <div className="hero-section">
             <div className="container">
