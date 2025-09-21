@@ -85,7 +85,7 @@
   .cards-grid {
     display: grid;
     gap: $spacing-md;
-    margin-bottom: $spacing-5xl;
+    margin: $spacing-3xl 0;
     padding: $spacing-md;
 
     &.columns-1 {
@@ -219,8 +219,9 @@
     overflow-x: hidden;
 
     .cards-grid {
-      gap: $spacing-lg;
-    }
+      column-gap: $spacing-md;
+      row-gap:  $spacing-xl;   
+     }
 
     .card {
       border-radius: $border-radius-lg;

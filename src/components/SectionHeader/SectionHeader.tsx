@@ -1,19 +1,21 @@
 import './SectionHeader.scss';
 
 interface SectionHeaderProps {
-  number: string;
+  number?: string;
   title: string;
   variant?: 'dark' | 'light';
+  hideNumber?: boolean;
 }
 
 const SectionHeader = ({ 
   number, 
   title, 
-  variant = 'dark' 
+  variant = 'dark',
+  hideNumber = false
 }: SectionHeaderProps) => {
   return (
     <div className={`section-header ${variant}`}>
-      <h2 className="section-number">{number}</h2>
+      {!hideNumber && number && <h2 className="section-number">{number}</h2>}
       <h2 className="section-title">{title}</h2>
     </div>
   );

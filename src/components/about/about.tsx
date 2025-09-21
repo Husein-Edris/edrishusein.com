@@ -16,7 +16,7 @@ const About = ({ data }: AboutProps) => {
   return (
     <section className="about">
       <div className="container">
-        <SectionHeader number="02" title={title} variant="light" />
+        <SectionHeader title={title} variant="light" hideNumber={true} />
         {data?.aboutMeText ? (
           <div 
             className="description"

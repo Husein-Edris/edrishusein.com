@@ -2,6 +2,7 @@ import { GraphQLClient } from 'graphql-request';
 import Image from 'next/image';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
+import SectionHeader from '@/src/components/SectionHeader/SectionHeader';
 import '@/src/styles/pages/Bookshelf.scss';
 
 export const dynamic = 'force-dynamic'; // Always fetch fresh data from WordPress

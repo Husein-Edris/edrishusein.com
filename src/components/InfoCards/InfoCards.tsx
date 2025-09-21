@@ -78,6 +78,7 @@ function InfoCards({
               number={sectionNumber || ''}
               title={displayTitle || ''}
               variant={variant}
+              hideNumber={true}
             />
             {viewMoreLink && (
               <div className="view-more-inline">

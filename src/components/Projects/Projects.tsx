@@ -58,7 +58,7 @@ const Projects = ({ data }: ProjectsProps) => {
   return (
     <section className="projects">
       <div className="container">
-        <SectionHeader number="01" title={sectionTitle} />
+        <SectionHeader title={sectionTitle} hideNumber={true} />
         
         <div className="projects-grid">
           {projects.map((project, index) => (
