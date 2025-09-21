@@ -2,7 +2,7 @@
 @use '../mixins' as *;
 
 .wordpress-page {
-  background-color: $primary-color;
+  background: linear-gradient(135deg, $primary-color 0%, darken($primary-color, 8%) 100%);
   color: $white;
   min-height: 100vh;
 
@@ -38,7 +38,7 @@
     .hero-text {
       .hero-title {
         font-family: $font-family-syncopate;
-        font-size: $font-size-h1;
+        font-size: calc($font-size-h1 * 1.2);
         font-weight: $font-weight-normal;
         text-transform: uppercase;
         letter-spacing: 0.05em;
@@ -86,14 +86,24 @@
     .content-wrapper {
       max-width: 900px;
       margin: 0 auto;
+      background: rgba($white, 0.02);
+      border-radius: $border-radius-xl;
+      padding: calc($spacing-unit * 6);
+      border: 1px solid rgba($white, 0.05);
+      
+      @include mobile {
+        padding: calc($spacing-unit * 4);
+        margin: 0 calc($spacing-unit * 2);
+      }
     }
 
-    // Gutenberg Content Styling
+    // Gutenberg Content Styling with enhanced visuals
     .gutenberg-content {
       color: $white;
       line-height: $line-height-relaxed;
+      animation: fadeInUp 0.8s ease-out;
 
-      // Typography
+      // Enhanced Typography
       h1, h2, h3, h4, h5, h6 {
         font-family: $font-family-syncopate;
         text-transform: uppercase;
@@ -101,9 +111,28 @@
         margin-top: calc($spacing-unit * 6);
         margin-bottom: calc($spacing-unit * 3);
         color: $white;
-
+        position: relative;
+        
         &:first-child {
           margin-top: 0;
+        }
+        
+        &::before {
+          content: '';
+          position: absolute;
+          bottom: -8px;
+          left: 0;
+          width: 40px;
+          height: 2px;
+          background: linear-gradient(90deg, $info-color, $success-color);
+          border-radius: 1px;
+          opacity: 0.7;
+        }
+        
+        &:hover::before {
+          width: 80px;
+          opacity: 1;
+          transition: width 0.3s ease, opacity 0.3s ease;
         }
       }
 
@@ -117,6 +146,7 @@
 
       h2 {
         font-size: $font-size-h2;
+        color: rgba($info-color, 0.9);
         
         @include mobile {
           font-size: calc($font-size-h2 * 0.9);
@@ -195,7 +225,6 @@
       }
 
       figure {
-        margin: calc($spacing-unit * 4) 0;
         text-align: center;
 
         img {
@@ -431,7 +460,6 @@
 
       .wp-block-column {
         width: 50%;
-        @include flex-center;
       }
 
       .wp-block-separator {
