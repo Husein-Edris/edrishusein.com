@@ -6,7 +6,6 @@ import './Footer.scss';
 const Footer = () => {
     const currentYear = new Date().getFullYear();
     const mainLinks = [
-        { href: '/', label: 'Home' },
         { href: '/projects', label: 'Projects' },
         { href: '/about', label: 'About' },
     ];

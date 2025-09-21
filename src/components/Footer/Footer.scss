@@ -27,6 +27,8 @@
         @include mobile {
             flex-direction: column;
             gap: $spacing-xl;
+            align-items: flex-start;
+            text-align: left;
         }
     }
 
@@ -75,7 +77,7 @@
         @include mobile {
             flex-direction: column;
             gap: $spacing-lg;
-            align-items: center;
+            align-items: flex-start;
         }
 
         .nav-list {
