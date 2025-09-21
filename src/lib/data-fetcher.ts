@@ -499,8 +499,8 @@ export class DataFetcher {
   }> {
     const [homepage, projects, posts] = await Promise.allSettled([
       this.getHomepageData(),
-      this.getProjectsData(),
-      this.getPostsData()
+      this.getProjectsData(3), // Show only 3 newest projects on homepage
+      this.getPostsData(3)     // Show only 3 newest posts on homepage
     ]);
 
     return {
