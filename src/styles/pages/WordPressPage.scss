@@ -13,21 +13,20 @@
   // Hero Section (similar to About page)
   .page-hero {
     padding: calc($spacing-unit * 12) 0 calc($spacing-unit * 8) 0;
-    
+
     @include mobile {
       padding: calc($spacing-unit * 8) 0 calc($spacing-unit * 6) 0;
     }
 
     .hero-content {
-      display: grid;
-      grid-template-columns: 1fr 500px;
-      gap: calc($spacing-unit * 8);
+      display: flex !important;
+      gap: calc($spacing-unit * 5);
       align-items: center;
 
       @include tablet {
-        grid-template-columns: 1fr;
-        gap: calc($spacing-unit * 6);
+        gap: $spacing-unit;
         text-align: center;
+        flex-direction: column;
       }
 
       @include mobile {
@@ -36,9 +35,15 @@
     }
 
     .hero-text {
+      width: 50%;
+
+      @include tablet {
+        width: 100%;
+      }
+
       .hero-title {
         font-family: $font-family-syncopate;
-        font-size: calc($font-size-h1 * 1.2);
+        font-size: calc($font-size-h1 * 0.9);
         font-weight: $font-weight-normal;
         text-transform: uppercase;
         letter-spacing: 0.05em;
@@ -47,20 +52,27 @@
         color: $white;
 
         @include tablet {
-          font-size: $font-size-h1;
+          width: 100%;
+          font-size: calc($font-size-h1 * 0.8);
         }
 
         @include mobile {
-          font-size: calc($font-size-h1 * 0.8);
+          width: 100%;
+          font-size: calc($font-size-h1 * 0.6);
           margin-bottom: calc($spacing-unit * 2);
         }
       }
     }
 
     .hero-image {
+      width: 50%;
       display: flex;
       justify-content: center;
       align-items: center;
+
+      @include tablet {
+        width: 100%;
+      }
 
       .featured-image {
         border-radius: $border-radius-lg;
@@ -90,10 +102,9 @@
       border-radius: $border-radius-xl;
       padding: calc($spacing-unit * 6);
       border: 1px solid rgba($white, 0.05);
-      
+
       @include mobile {
         padding: calc($spacing-unit * 4);
-        margin: 0 calc($spacing-unit * 2);
       }
     }
 
@@ -104,7 +115,12 @@
       animation: fadeInUp 0.8s ease-out;
 
       // Enhanced Typography
-      h1, h2, h3, h4, h5, h6 {
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
         font-family: $font-family-syncopate;
         text-transform: uppercase;
         letter-spacing: 0.05em;
@@ -112,11 +128,11 @@
         margin-bottom: calc($spacing-unit * 3);
         color: $white;
         position: relative;
-        
+
         &:first-child {
           margin-top: 0;
         }
-        
+
         &::before {
           content: '';
           position: absolute;
@@ -128,7 +144,7 @@
           border-radius: 1px;
           opacity: 0.7;
         }
-        
+
         &:hover::before {
           width: 80px;
           opacity: 1;
@@ -138,7 +154,7 @@
 
       h1 {
         font-size: $font-size-h1;
-        
+
         @include mobile {
           font-size: calc($font-size-h1 * 0.8);
         }
@@ -147,7 +163,7 @@
       h2 {
         font-size: $font-size-h2;
         color: rgba($info-color, 0.9);
-        
+
         @include mobile {
           font-size: calc($font-size-h2 * 0.9);
         }
@@ -155,13 +171,18 @@
 
       h3 {
         font-size: $font-size-h3;
+
+        @include mobile {
+          font-size: calc($font-size-h3-mobile * 0.7 );
+        }
       }
 
       h4 {
         font-size: $font-size-h4;
       }
 
-      h5, h6 {
+      h5,
+      h6 {
         font-size: $font-size-base;
         font-weight: $font-weight-semibold;
       }
@@ -180,7 +201,8 @@
       }
 
       // Lists
-      ul, ol {
+      ul,
+      ol {
         margin-bottom: calc($spacing-unit * 3);
         padding-left: calc($spacing-unit * 4);
 
@@ -297,6 +319,7 @@
 
         // Syntax highlighting styles
         .token {
+
           &.comment,
           &.prolog,
           &.doctype,
@@ -423,7 +446,8 @@
         border-radius: $border-radius-md;
         overflow: hidden;
 
-        th, td {
+        th,
+        td {
           padding: calc($spacing-unit * 2) calc($spacing-unit * 3);
           text-align: left;
           border-bottom: 1px solid rgba($white, 0.1);
@@ -454,7 +478,7 @@
         margin: calc($spacing-unit * 4) 0;
 
         @include mobile {
-          grid-template-columns: 1fr !important;
+          flex-direction: column;
         }
       }
 
