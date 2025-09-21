@@ -134,13 +134,14 @@
           .reading-time {
             background: rgba($primary-dark, 0.1);
             color: $primary-dark;
-            padding: $spacing-xs $spacing-sm;
+            padding: $spacing-xs !important;
+            line-height: 2rem;
             border-radius: $border-radius-full;
             font-size: $font-size-sm;
             border: 1px solid rgba($primary-dark, 0.2);
             display: flex;
             align-items: center;
-            gap: $spacing-xs;
+            gap: $spacing-xs; 
           }
         }
       }
