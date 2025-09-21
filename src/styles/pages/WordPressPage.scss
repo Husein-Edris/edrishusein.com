@@ -1,0 +1,507 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.wordpress-page {
+  background-color: $primary-color;
+  color: $white;
+  min-height: 100vh;
+
+  .container {
+    @include container;
+  }
+
+  // Hero Section (similar to About page)
+  .page-hero {
+    padding: calc($spacing-unit * 12) 0 calc($spacing-unit * 8) 0;
+    
+    @include mobile {
+      padding: calc($spacing-unit * 8) 0 calc($spacing-unit * 6) 0;
+    }
+
+    .hero-content {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: calc($spacing-unit * 8);
+      align-items: center;
+
+      @include tablet {
+        grid-template-columns: 1fr;
+        gap: calc($spacing-unit * 6);
+        text-align: center;
+      }
+
+      @include mobile {
+        gap: calc($spacing-unit * 4);
+      }
+    }
+
+    .hero-text {
+      .hero-title {
+        font-family: $font-family-syncopate;
+        font-size: calc($font-size-h1 * 1.2);
+        font-weight: $font-weight-normal;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: calc($spacing-unit * 3);
+        line-height: 1.1;
+        color: $white;
+
+        @include tablet {
+          font-size: $font-size-h1;
+        }
+
+        @include mobile {
+          font-size: calc($font-size-h1 * 0.8);
+          margin-bottom: calc($spacing-unit * 2);
+        }
+      }
+    }
+
+    .hero-image {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .featured-image {
+        border-radius: $border-radius-lg;
+        max-width: 100%;
+        height: auto;
+        object-fit: cover;
+
+        @include mobile {
+          max-width: 300px;
+        }
+      }
+    }
+  }
+
+  // Main Content Section
+  .page-content {
+    padding: calc($spacing-unit * 6) 0;
+
+    @include mobile {
+      padding: calc($spacing-unit * 4) 0;
+    }
+
+    .content-wrapper {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    // Gutenberg Content Styling
+    .gutenberg-content {
+      color: $white;
+      line-height: $line-height-relaxed;
+
+      // Typography
+      h1, h2, h3, h4, h5, h6 {
+        font-family: $font-family-syncopate;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: calc($spacing-unit * 6);
+        margin-bottom: calc($spacing-unit * 3);
+        color: $white;
+
+        &:first-child {
+          margin-top: 0;
+        }
+      }
+
+      h1 {
+        font-size: $font-size-h1;
+        
+        @include mobile {
+          font-size: calc($font-size-h1 * 0.8);
+        }
+      }
+
+      h2 {
+        font-size: $font-size-h2;
+        
+        @include mobile {
+          font-size: calc($font-size-h2 * 0.9);
+        }
+      }
+
+      h3 {
+        font-size: $font-size-h3;
+      }
+
+      h4 {
+        font-size: $font-size-h4;
+      }
+
+      h5, h6 {
+        font-size: $font-size-base;
+        font-weight: $font-weight-semibold;
+      }
+
+      // Paragraphs and text
+      p {
+        font-family: $font-family-base;
+        font-size: $font-size-lg;
+        line-height: $line-height-relaxed;
+        margin-bottom: calc($spacing-unit * 3);
+        color: rgba($white, 0.9);
+
+        @include mobile {
+          font-size: $font-size-base;
+        }
+      }
+
+      // Lists
+      ul, ol {
+        margin-bottom: calc($spacing-unit * 3);
+        padding-left: calc($spacing-unit * 4);
+
+        li {
+          font-family: $font-family-base;
+          font-size: $font-size-lg;
+          line-height: $line-height-relaxed;
+          margin-bottom: calc($spacing-unit * 1);
+          color: rgba($white, 0.9);
+
+          @include mobile {
+            font-size: $font-size-base;
+          }
+        }
+      }
+
+      ul {
+        list-style-type: disc;
+      }
+
+      ol {
+        list-style-type: decimal;
+      }
+
+      // Links
+      a {
+        color: $info-color;
+        text-decoration: underline;
+        transition: color $transition-base;
+
+        &:hover {
+          color: lighten($info-color, 10%);
+        }
+      }
+
+      // Images and media
+      img {
+        max-width: 100%;
+        height: auto;
+        border-radius: $border-radius-md;
+        margin: calc($spacing-unit * 4) 0;
+      }
+
+      figure {
+        margin: calc($spacing-unit * 4) 0;
+        text-align: center;
+
+        img {
+          margin: 0;
+        }
+
+        figcaption {
+          font-size: $font-size-sm;
+          color: rgba($white, 0.7);
+          margin-top: calc($spacing-unit * 2);
+          font-style: italic;
+        }
+      }
+
+      // Blockquotes
+      blockquote {
+        border-left: 4px solid $info-color;
+        padding-left: calc($spacing-unit * 4);
+        margin: calc($spacing-unit * 4) 0;
+        font-style: italic;
+        color: rgba($white, 0.8);
+        background-color: rgba($white, 0.05);
+        padding: calc($spacing-unit * 3) calc($spacing-unit * 4);
+        border-radius: $border-radius-md;
+
+        p:last-child {
+          margin-bottom: 0;
+        }
+      }
+
+      // Code blocks
+      code {
+        background-color: rgba($white, 0.1);
+        padding: calc($spacing-unit * 0.5) calc($spacing-unit * 1);
+        border-radius: $border-radius-sm;
+        font-family: 'Fira Code', 'Monaco', 'Consolas', 'Ubuntu Mono', monospace;
+        font-size: calc($font-size-base * 0.9);
+        color: $info-color;
+      }
+
+      pre {
+        background-color: #1a1a1a;
+        padding: calc($spacing-unit * 4);
+        border-radius: $border-radius-lg;
+        overflow-x: auto;
+        margin: calc($spacing-unit * 4) 0;
+        border: 1px solid rgba($white, 0.1);
+        position: relative;
+
+        code {
+          background: none;
+          padding: 0;
+          color: #e6e6e6;
+          font-family: 'Fira Code', 'Monaco', 'Consolas', 'Ubuntu Mono', monospace;
+          font-size: 14px;
+          line-height: 1.6;
+        }
+
+        // Language label (if present)
+        &::before {
+          content: attr(data-language);
+          position: absolute;
+          top: calc($spacing-unit * 1);
+          right: calc($spacing-unit * 2);
+          font-size: 12px;
+          color: rgba($white, 0.6);
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+        }
+
+        // Syntax highlighting styles
+        .token {
+          &.comment,
+          &.prolog,
+          &.doctype,
+          &.cdata {
+            color: #6a737d;
+            font-style: italic;
+          }
+
+          &.punctuation {
+            color: #e6e6e6;
+          }
+
+          &.property,
+          &.tag,
+          &.constant,
+          &.symbol,
+          &.deleted {
+            color: #79b8ff; // Blue for properties
+          }
+
+          &.boolean,
+          &.number {
+            color: #ffab70; // Orange for values
+          }
+
+          &.selector,
+          &.attr-name,
+          &.string,
+          &.char,
+          &.builtin,
+          &.inserted {
+            color: #85e89d; // Green for strings/selectors
+          }
+
+          &.operator,
+          &.entity,
+          &.url,
+          .language-css &.string,
+          .style &.string {
+            color: #e6e6e6;
+          }
+
+          &.atrule,
+          &.attr-value,
+          &.function,
+          &.class-name {
+            color: #b392f0; // Purple for functions/classes
+          }
+
+          &.keyword {
+            color: #ff7b72; // Red/pink for keywords
+            font-weight: 500;
+          }
+
+          &.regex,
+          &.important {
+            color: #ffab70;
+          }
+
+          &.important,
+          &.bold {
+            font-weight: bold;
+          }
+
+          &.italic {
+            font-style: italic;
+          }
+
+          &.entity {
+            cursor: help;
+          }
+        }
+
+        // CSS-specific highlighting
+        .language-css {
+          .token.selector {
+            color: #ff7b72; // Red for CSS selectors like .my-container
+          }
+
+          .token.property {
+            color: #79b8ff; // Blue for CSS properties like height, background
+          }
+
+          .token.important {
+            color: #ffab70;
+          }
+
+          .token.string,
+          .token.url {
+            color: #85e89d; // Green for values
+          }
+
+          .token.function {
+            color: #b392f0; // Purple for functions like flex-center
+          }
+
+          .token.number {
+            color: #ffab70; // Orange for numbers like 200px
+          }
+        }
+
+        // SCSS-specific highlighting  
+        .language-scss {
+          .token.variable {
+            color: #79b8ff; // Blue for SCSS variables
+          }
+
+          .token.keyword {
+            color: #ff7b72; // Red for @include, @mixin, etc.
+          }
+
+          .token.atrule {
+            color: #b392f0; // Purple for @include, @extend
+          }
+        }
+      }
+
+      // Tables
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: calc($spacing-unit * 4) 0;
+        background-color: rgba($white, 0.05);
+        border-radius: $border-radius-md;
+        overflow: hidden;
+
+        th, td {
+          padding: calc($spacing-unit * 2) calc($spacing-unit * 3);
+          text-align: left;
+          border-bottom: 1px solid rgba($white, 0.1);
+        }
+
+        th {
+          background-color: rgba($white, 0.1);
+          font-weight: $font-weight-semibold;
+          font-family: $font-family-syncopate;
+          text-transform: uppercase;
+          font-size: $font-size-sm;
+          letter-spacing: 0.05em;
+        }
+
+        tr:last-child td {
+          border-bottom: none;
+        }
+      }
+
+      // Gutenberg specific blocks
+      .wp-block-group {
+        margin: calc($spacing-unit * 4) 0;
+      }
+
+      .wp-block-columns {
+        display: flex;
+        gap: calc($spacing-unit * 4);
+        margin: calc($spacing-unit * 4) 0;
+
+        @include mobile {
+          grid-template-columns: 1fr !important;
+        }
+      }
+
+      .wp-block-column {
+        width: 50%;
+        @include flex-center;
+      }
+
+      .wp-block-separator {
+        border: none;
+        border-top: 2px solid rgba($white, 0.2);
+        margin: calc($spacing-unit * 6) auto;
+        width: 100px;
+      }
+
+      .wp-block-spacer {
+        // Spacer block - height will be set inline
+      }
+
+      // Button blocks
+      .wp-block-button {
+        margin: calc($spacing-unit * 3) 0;
+
+        .wp-block-button__link {
+          @include button-primary;
+          @include button-size('md');
+          text-decoration: none;
+          display: inline-block;
+        }
+      }
+
+      // Cover blocks
+      .wp-block-cover {
+        position: relative;
+        border-radius: $border-radius-lg;
+        overflow: hidden;
+        margin: calc($spacing-unit * 4) 0;
+        min-height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        @include mobile {
+          min-height: 300px;
+        }
+      }
+    }
+  }
+
+  // Error page styling
+  &.error-page {
+    .error-content {
+      text-align: center;
+      padding: calc($spacing-unit * 12) 0;
+
+      h1 {
+        font-family: $font-family-syncopate;
+        font-size: $font-size-h1;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: calc($spacing-unit * 3);
+        color: $white;
+      }
+
+      p {
+        font-size: $font-size-lg;
+        color: rgba($white, 0.8);
+        margin-bottom: calc($spacing-unit * 4);
+      }
+
+      .back-home-link {
+        @include button-primary;
+        @include button-size('md');
+        text-decoration: none;
+        display: inline-block;
+      }
+    }
+  }
+}
