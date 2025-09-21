@@ -98,6 +98,7 @@
         width: 100%;
         height: 300px;
         overflow: hidden;
+        display: none; // Hide images for blog archive cards
 
         @include tablet {
           height: 250px;
@@ -129,12 +130,13 @@
 
       .card-title {
         font-family: $font-family-syncopate;
-        font-size: calc($font-size-base * 1.25);
+        font-size: calc($font-size-base * 1.20);
         margin-bottom: $spacing-unit;
         text-transform: uppercase;
         letter-spacing: 0.05em;
         color: $white;
         width: 100%;
+        height: 120px;
 
         @include tablet {
           font-size: calc($font-size-base * 1.25);

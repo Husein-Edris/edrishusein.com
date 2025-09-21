@@ -279,7 +279,7 @@
 
     .card-image {
       width: 100% !important;
-      height: 300px !important;
+      height: 240px !important; // Fixed consistent height
       color: transparent;
       background-size: cover;
       background-position: 50% 50%;
@@ -290,11 +290,11 @@
       overflow: hidden;
 
       @include tablet {
-        height: 250px !important;
+        height: 240px !important; // Same height on tablet
       }
 
       @include mobile {
-        height: 220px !important;
+        height: 200px !important; // Slightly smaller on mobile
       }
     }
 
@@ -382,6 +382,20 @@
 
   // Blog skin styles
   &.blog {
+    // Hide images for blog cards
+    .card-image {
+      display: none;
+    }
+    
+    // Slightly reduce padding for blog cards
+    .card-info {
+      padding: $spacing-lg !important;
+      
+      @include mobile {
+        padding: $spacing-md !important;
+      }
+    }
+    
     &.blog-light {
       background-color: $white;
       border-radius: $border-radius-xl;
@@ -464,17 +478,17 @@
     .card-image {
       position: relative;
       width: 100%;
-      height: 300px;
+      height: 240px; // Fixed consistent height
       overflow: hidden;
 
       @include tablet {
         padding: 0;
-        height: 250px;
+        height: 240px; // Same height on tablet
       }
 
       @include mobile {
         padding: 0;
-        height: 220px; // Slightly taller for single column
+        height: 200px; // Slightly smaller on mobile
       }
 
       img {
@@ -499,7 +513,7 @@
 
     .card-title {
       font-family: $font-family-syncopate;
-      font-size: $font-size-xxl;
+      font-size: $font-size-xl;
       margin-bottom: $spacing-unit;
       text-transform: uppercase;
       letter-spacing: 0.05em;

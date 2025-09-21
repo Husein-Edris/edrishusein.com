@@ -807,8 +807,12 @@
 
       .article-image {
         overflow: hidden;
-        height: 200px;
+        height: 240px; // Match main blog cards
         position: relative;
+
+        @include mobile {
+          height: 200px; // Match mobile height
+        }
 
         .card-image {
           width: 100%;
