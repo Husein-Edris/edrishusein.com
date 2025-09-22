@@ -10,6 +10,15 @@
     @include container;
   }
 
+  // Breadcrumb Section
+  .breadcrumb-section {
+    padding: calc($spacing-unit * 3) 0 0 0;
+
+    @include mobile {
+      padding: calc($spacing-unit * 2) 0 0 0;
+    }
+  }
+
   // Hero Section (similar to About page)
   .page-hero {
     padding: calc($spacing-unit * 12) 0 calc($spacing-unit * 8) 0;
@@ -43,7 +52,7 @@
 
       .hero-title {
         font-family: $font-family-syncopate;
-        font-size: calc($font-size-h1 * 0.9);
+        font-size: calc($font-size-h1 * 0.75);
         font-weight: $font-weight-normal;
         text-transform: uppercase;
         letter-spacing: 0.05em;
@@ -53,7 +62,7 @@
 
         @include tablet {
           width: 100%;
-          font-size: calc($font-size-h1 * 0.8);
+          font-size: calc($font-size-h1 * 0.7);
         }
 
         @include mobile {
