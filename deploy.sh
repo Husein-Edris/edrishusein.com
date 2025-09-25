@@ -85,10 +85,16 @@ if [ ! -f ".next/standalone/server.js" ]; then
 fi
 echo "✅ Build artifacts verified"
 
-# Copy assets to standalone build
+# Copy assets to standalone build and document root for Apache
 echo "📁 Copying static assets..."
 cp -r .next/static .next/standalone/.next/
 cp -r public .next/standalone/
+
+# Copy static assets to document root for Apache to serve directly
+echo "📁 Setting up static files for Apache..."
+mkdir -p _next
+cp -r .next/static _next/
+echo "✅ Static files copied to document root"
 
 # 5. Safer process restart using PID file
 echo "🔄 Managing server process..."
