@@ -1,0 +1,4 @@
+# Server aliases for edrishusein.com deployment
+# Add this to your server's ~/.bashrc with: cat .bashrc_server >> ~/.bashrc
+
+alias deploy="cd /var/www/vhosts/edrishusein.com/httpdocs && ./deploy.sh"
