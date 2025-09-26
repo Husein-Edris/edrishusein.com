@@ -33,10 +33,10 @@ export async function generateStaticParams() {
 // Generate metadata for SEO
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  
+
   try {
     const project = await getProject(slug);
-    
+
     return {
       title: `${project.title} | Projects - Edris Husein`,
       description: project.excerpt?.replace(/<[^>]*>/g, '').substring(0, 160) || `${project.title} - A project by Edris Husein`,
@@ -67,12 +67,12 @@ async function getAllProjectsForMoreProjects() {
     const response = await fetch(`${process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '')}/wp-json/wp/v2/project?_embed&per_page=10`, {
       cache: 'no-store'
     });
-    
+
     if (!response.ok) return null;
-    
+
     const projects = await response.json();
     if (!Array.isArray(projects)) return null;
-    
+
     // Transform to match GraphQL structure
     return {
       projects: {
@@ -115,14 +115,14 @@ async function getProject(slug: string) {
     const response = await fetch(`${process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '')}/wp-json/wp/v2/project?slug=${slug}&_embed&acf_format=standard`, {
       cache: 'no-store' // Always fetch fresh data
     });
-    
+
     if (!response.ok) return null;
-    
+
     const projects = await response.json();
     if (!Array.isArray(projects) || projects.length === 0) return null;
-    
+
     const project = projects[0];
-    
+
     return {
       id: project.id.toString(),
       title: project.title?.rendered || project.title,
@@ -173,13 +173,13 @@ async function getProject(slug: string) {
 // Server Component
 export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  
+
   // Fetch both current project and all projects for "More Projects" section
   const [project, allProjectsData] = await Promise.all([
     getProject(slug),
     getAllProjectsForMoreProjects()
   ]);
-  
+
   const allProjects = allProjectsData?.projects?.nodes || [];
 
   if (!project) {
@@ -200,7 +200,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                 dangerouslySetInnerHTML={{ __html: project.excerpt }}
               />
             )}
-            
+
             {/* Featured Image in Hero */}
             {project.featuredImage?.node && (
               <div className="featured-image">
@@ -221,12 +221,34 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
         <div className="container">
 
+          {/* The Challenge */}
+          {project.caseStudy?.projectContent?.challenge && (
+            <section className="challenge">
+              <h2>The Challenge</h2>
+              <div
+                className="content"
+                dangerouslySetInnerHTML={{ __html: project.caseStudy.projectContent.challenge }}
+              />
+            </section>
+          )}
+
+          {/* The Solution */}
+          {project.caseStudy?.projectContent?.solution && (
+            <section className="solution">
+              <h2>The Solution</h2>
+              <div
+                className="content"
+                dangerouslySetInnerHTML={{ __html: project.caseStudy.projectContent.solution }}
+              />
+            </section>
+          )}
+
           {/* Technologies */}
           {(() => {
             // Handle both GraphQL structure (technologies.nodes) and fallback structure (technologies array)
-            const technologies = project.caseStudy?.projectOverview?.technologies?.nodes || 
-                                project.caseStudy?.projectOverview?.technologies || [];
-            
+            const technologies = project.caseStudy?.projectOverview?.technologies?.nodes ||
+              project.caseStudy?.projectOverview?.technologies || [];
+
             return technologies.length > 0 ? (
               <section className="tech-stack">
                 <h2>Technologies Used</h2>
@@ -253,28 +275,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
               </section>
             ) : null;
           })()}
-
-          {/* The Challenge */}
-          {project.caseStudy?.projectContent?.challenge && (
-            <section className="challenge">
-              <h2>The Challenge</h2>
-              <div
-                className="content"
-                dangerouslySetInnerHTML={{ __html: project.caseStudy.projectContent.challenge }}
-              />
-            </section>
-          )}
-
-          {/* The Solution */}
-          {project.caseStudy?.projectContent?.solution && (
-            <section className="solution">
-              <h2>The Solution</h2>
-              <div
-                className="content"
-                dangerouslySetInnerHTML={{ __html: project.caseStudy.projectContent.solution }}
-              />
-            </section>
-          )}
 
           {/* Project Links Section */}
           {project.caseStudy?.projectLinks && (
@@ -341,16 +341,16 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                 {project.caseStudy.projectGallery
                   .filter((image: any) => image.url && image.url.trim() !== '')
                   .map((image: any, index: number) => (
-                  <div key={index} className="gallery-item">
-                    <Image
-                      src={image.url}
-                      alt={image.alt || `${project.title} gallery image ${index + 1}`}
-                      width={image.width || 400}
-                      height={image.height || 300}
-                      className="gallery-image"
-                    />
-                  </div>
-                ))}
+                    <div key={index} className="gallery-item">
+                      <Image
+                        src={image.url}
+                        alt={image.alt || `${project.title} gallery image ${index + 1}`}
+                        width={image.width || 400}
+                        height={image.height || 300}
+                        className="gallery-image"
+                      />
+                    </div>
+                  ))}
               </div>
             </section>
           )}
