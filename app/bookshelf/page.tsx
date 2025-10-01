@@ -8,7 +8,6 @@ import '@/src/styles/pages/Bookshelf.scss';
 
 export default function BookshelfPage() {
   const [books, setBooks] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchBooks() {
@@ -40,8 +39,6 @@ export default function BookshelfPage() {
         }
       } catch (error) {
         console.error('❌ Error fetching books:', error);
-      } finally {
-        setLoading(false);
       }
     }
 
@@ -66,11 +63,7 @@ export default function BookshelfPage() {
           {/* Books Grid */}
           <section className="books-section">
             <div className="books-grid">
-              {loading ? (
-                <div style={{ textAlign: 'center', padding: '4rem', color: '#666' }}>
-                  <p>Loading books...</p>
-                </div>
-              ) : books.length > 0 ? (
+              {books.length > 0 ? (
                 books.map((book: any) => (
                   <div key={book.id} className="book-card">
                     {book.featuredImage?.node && (

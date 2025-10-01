@@ -7,7 +7,6 @@ import InfoCards from '@/src/components/InfoCards/InfoCards';
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchProjects() {
@@ -32,8 +31,6 @@ export default function ProjectsPage() {
         }
       } catch (error) {
         console.error('❌ Error fetching projects:', error);
-      } finally {
-        setLoading(false);
       }
     }
 
@@ -44,19 +41,13 @@ export default function ProjectsPage() {
     <>
       <Header />
       <main>
-        {loading ? (
-          <div style={{ textAlign: 'center', padding: '4rem', color: '#666' }}>
-            <p>Loading projects...</p>
-          </div>
-        ) : (
-          <InfoCards
-            skin="projects"
-            variant="dark"
-            sectionTitle="All Projects"
-            columns={3}
-            cards={projects}
-          />
-        )}
+        <InfoCards
+          skin="projects"
+          variant="dark"
+          sectionTitle="All Projects"
+          columns={3}
+          cards={projects}
+        />
       </main>
       <Footer />
     </>

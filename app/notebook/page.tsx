@@ -8,7 +8,6 @@ import '@/src/styles/pages/Blog.scss';
 
 export default function BlogArchivePage() {
     const [posts, setPosts] = useState([]);
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         async function fetchPosts() {
@@ -41,8 +40,6 @@ export default function BlogArchivePage() {
                 }
             } catch (error) {
                 console.error('❌ Error fetching posts:', error);
-            } finally {
-                setLoading(false);
             }
         }
 
@@ -62,11 +59,7 @@ export default function BlogArchivePage() {
 
                 <div className="container">
                     <div className="blog-grid">
-                        {loading ? (
-                            <div style={{ textAlign: 'center', padding: '4rem', color: '#666' }}>
-                                <p>Loading posts...</p>
-                            </div>
-                        ) : posts.length > 0 ? (
+                        {posts.length > 0 ? (
                             posts.map((post) => (
                                 <Link href={`/notebook/${post.slug}`} key={post.id} className="blog-card">
                                     <div className="card-content">

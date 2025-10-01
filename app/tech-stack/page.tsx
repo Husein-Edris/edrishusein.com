@@ -17,7 +17,6 @@ function shuffleArray<T>(array: T[]): T[] {
 
 export default function TechStackPage() {
   const [techItems, setTechItems] = useState([]);
-  const [loading, setLoading] = useState(true);
   
   useEffect(() => {
     async function fetchTechStack() {
@@ -51,8 +50,6 @@ export default function TechStackPage() {
         }
       } catch (error) {
         console.error('❌ Error fetching tech stack:', error);
-      } finally {
-        setLoading(false);
       }
     }
 
@@ -77,11 +74,7 @@ export default function TechStackPage() {
           {/* Tech Grid */}
           <section className="tech-section">
             <div className="tech-grid">
-              {loading ? (
-                <div style={{ textAlign: 'center', padding: '4rem', color: '#666' }}>
-                  <p>Loading tech stack...</p>
-                </div>
-              ) : techItems.length > 0 ? (
+              {techItems.length > 0 ? (
                 techItems.map((tech: any) => (
                   <div key={tech.id} className="tech-card">
                     {tech.featuredImage?.node && (
