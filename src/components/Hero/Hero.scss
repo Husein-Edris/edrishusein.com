@@ -52,10 +52,12 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform $transition-base;
+      transition: transform $transition-smooth;
+      @include hover-glow($color-beige, 30px);
 
       &:hover {
-        transform: scale(1.05);
+        transform: scale(1.05) rotate(2deg);
+        filter: brightness(1.1);
       }
     }
   }

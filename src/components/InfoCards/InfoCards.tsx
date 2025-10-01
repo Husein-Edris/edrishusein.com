@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import './InfoCards.scss';
 import SectionHeader from '../SectionHeader/SectionHeader';
+import { useScrollAnimation, useStaggeredAnimation } from '../../hooks/useScrollAnimation';
 
 // Types
 interface InfoCardProps {
@@ -69,11 +70,18 @@ function InfoCards({
 
   const sectionClass = `info-cards ${skin} ${skin}-${variant} ${className}`;
 
+  // Animation hooks
+  const headerAnimation = useScrollAnimation({ threshold: 0.2 });
+  const gridAnimation = useScrollAnimation({ threshold: 0.1, delay: 200 });
+
   return (
     <section className={sectionClass}>
       <div className="container">
         {(sectionNumber || displayTitle) && (
-          <div className="section-header-wrapper">
+          <div 
+            ref={headerAnimation.ref}
+            className={`section-header-wrapper animated-header ${headerAnimation.className}`}
+          >
             <SectionHeader
               number={sectionNumber || ''}
               title={displayTitle || ''}
@@ -89,8 +97,12 @@ function InfoCards({
             )}
           </div>
         )}
-        <div className={`cards-grid columns-${columns}`}>
+        <div 
+          ref={gridAnimation.ref}
+          className={`cards-grid columns-${columns} animated-cards-grid ${gridAnimation.className}`}
+        >
           {displayCards?.map((card, index) => {
+            const cardAnimation = useStaggeredAnimation(index, 120);
             if (skin !== 'projects' && !card.link) {
               return null; // Skip cards without links for non-project skins
             }
@@ -98,7 +110,12 @@ function InfoCards({
             // For non-project cards, wrap entire card in Link
             if (skin !== 'projects') {
               return (
-                <Link key={index} href={card.link || '#'} className={`card ${card.variant || variant}`}>
+                <Link 
+                  key={index} 
+                  ref={cardAnimation.ref}
+                  href={card.link || '#'} 
+                  className={`card ${card.variant || variant} ${cardAnimation.className}`}
+                >
                   <div className="card-content">
                     {card.image && (
                       <div className="card-image">
@@ -138,7 +155,11 @@ function InfoCards({
 
             // For project cards, don't wrap entire card - only specific elements link to case study
             return (
-              <div key={index} className={`card ${card.variant || variant}`}>
+              <div 
+                key={index} 
+                ref={cardAnimation.ref}
+                className={`card ${card.variant || variant} ${cardAnimation.className}`}
+              >
                 <div className="card-content">
                   {card.image && (
                     <Link 

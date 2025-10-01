@@ -122,6 +122,22 @@ $shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 $transition-fast: 150ms ease-in-out;
 $transition-base: 300ms ease-in-out;
 $transition-slow: 500ms ease-in-out;
+$transition-bounce: 500ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+$transition-smooth: 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+// Animation Durations
+// ----------------------------------------------------------------------------
+$animation-fast: 200ms;
+$animation-base: 400ms;
+$animation-slow: 600ms;
+$animation-slower: 800ms;
+
+// Animation Easings
+// ----------------------------------------------------------------------------
+$ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+$ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+$ease-in-out-back: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+$ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
 // Z-Index Scale
 // ----------------------------------------------------------------------------
