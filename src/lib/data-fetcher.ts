@@ -1,6 +1,6 @@
 // Enhanced data fetching with error handling and fallbacks
 import { client } from './client';
-import { GET_HOMEPAGE_DATA, GET_PROJECTS_FOR_GRID, GET_POSTS_FOR_NOTEBOOK } from './queries';
+import { GET_HOMEPAGE_DATA, GET_PROJECTS_FOR_GRID, GET_POSTS_FOR_NOTEBOOK, GET_ABOUT_PAGE_DATA } from './queries';
 import { discoverWordPressSchema, WORKING_QUERIES } from './schema-discovery';
 import { HomepageResponse, ProjectsResponse, HomepageSections } from '@/src/types/wordpress';
 
@@ -136,6 +136,51 @@ const FALLBACK_POSTS_DATA = {
   }
 };
 
+// Fallback data for About page
+const FALLBACK_ABOUT_DATA = {
+  page: {
+    id: "about-fallback",
+    title: "About Edris Husein",
+    content: "<p>Full-stack developer passionate about creating exceptional digital experiences.</p>",
+    featuredImage: {
+      node: {
+        sourceUrl: "/images/Edris-Husein-Hero.png",
+        altText: "Edris Husein Profile",
+        mediaDetails: { width: 450, height: 450 }
+      }
+    },
+    aboutPageFieldsNew: {
+      aboutHeroTitle: "About Edris Husein",
+      aboutHeroSubtitle: "Full-stack developer passionate about creating exceptional digital experiences",
+      aboutHeroImage: {
+        sourceUrl: "/images/Edris-Husein-Hero.png",
+        altText: "Edris Husein Profile",
+        mediaDetails: { width: 450, height: 450 }
+      },
+      experienceSectionTitle: "Experience",
+      experienceItems: [
+        {
+          companyName: "Baschnegger Ammann Partner",
+          position: "Web Developer",
+          duration: "2023 - 2024",
+          description: "<p>Built custom WordPress themes and plugins using PHP, JavaScript, and modern CSS.</p>",
+          technologies: []
+        }
+      ],
+      skillsSectionTitle: "Skills & Technologies",
+      selectedSkills: [],
+      personalSectionTitle: "Personal",
+      personalContent: "<p>Outside of work, life is never boring. I love spending time with my family and toddler, exploring new tech, and working on personal projects.</p>",
+      personalImage: {
+        sourceUrl: "/images/Edris-Husein-Hero.png",
+        altText: "Edris Husein Personal",
+        mediaDetails: { width: 450, height: 450 }
+      },
+      selectedHobbies: []
+    }
+  }
+};
+
 export interface FetchResult<T> {
   data: T | null;
   error: string | null;
@@ -185,7 +230,12 @@ export class DataFetcher {
             throw new Error('No homepage sections in GraphQL response');
           }
           
-          return response.page.homepageSections;
+          // Combine WordPress About section with fallback data for other sections
+          const wpSections = response.page.homepageSections;
+          return {
+            ...FALLBACK_HOMEPAGE_DATA,
+            aboutSection: wpSections.aboutSection || FALLBACK_HOMEPAGE_DATA.aboutSection
+          };
         } catch (error) {
           if (process.env.NODE_ENV === 'development') {
             console.warn('⚠️ GraphQL homepage query failed, trying REST API...');
@@ -488,6 +538,101 @@ export class DataFetcher {
       },
       FALLBACK_POSTS_DATA,
       'Error fetching posts data'
+    );
+  }
+
+  static async getAboutPageData(): Promise<FetchResult<any>> {
+    return this.fetchWithFallback(
+      async () => {
+        try {
+          const response = await client.request(GET_ABOUT_PAGE_DATA);
+          if (process.env.NODE_ENV === 'development') {
+            console.log('✅ WordPress about page data loaded successfully');
+          }
+          return response;
+        } catch (error) {
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('⚠️ GraphQL about page query failed, trying REST API...');
+          }
+          
+          // Try WordPress REST API as fallback
+          try {
+            const WORDPRESS_REST_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '') || 'https://cms.edrishusein.com';
+            
+            const restResponse = await fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/pages?slug=about-me&acf_format=standard`, {
+              cache: 'no-store'
+            });
+            
+            if (restResponse.ok) {
+              const restPages = await restResponse.json();
+              
+              if (restPages && restPages.length > 0) {
+                const aboutPage = restPages[0];
+                
+                if (process.env.NODE_ENV === 'development') {
+                  console.log('✅ Found about page data via REST API');
+                }
+                
+                // Transform REST API data to match GraphQL structure
+                const transformedData = {
+                  page: {
+                    id: aboutPage.id.toString(),
+                    title: aboutPage.title?.rendered || aboutPage.title,
+                    content: aboutPage.content?.rendered || aboutPage.content,
+                    featuredImage: aboutPage._embedded?.['wp:featuredmedia']?.[0] ? {
+                      node: {
+                        sourceUrl: aboutPage._embedded['wp:featuredmedia'][0].source_url,
+                        altText: aboutPage._embedded['wp:featuredmedia'][0].alt_text || aboutPage.title?.rendered || '',
+                        mediaDetails: {
+                          width: aboutPage._embedded['wp:featuredmedia'][0].media_details?.width || 450,
+                          height: aboutPage._embedded['wp:featuredmedia'][0].media_details?.height || 450
+                        }
+                      }
+                    } : FALLBACK_ABOUT_DATA.page.featuredImage,
+                    aboutPageFieldsNew: {
+                      aboutHeroTitle: aboutPage.acf?.about_hero_title || FALLBACK_ABOUT_DATA.page.aboutPageFieldsNew.aboutHeroTitle,
+                      aboutHeroSubtitle: aboutPage.acf?.about_hero_subtitle || FALLBACK_ABOUT_DATA.page.aboutPageFieldsNew.aboutHeroSubtitle,
+                      aboutHeroImage: aboutPage.acf?.about_hero_image ? {
+                        sourceUrl: aboutPage.acf.about_hero_image.url || aboutPage.acf.about_hero_image.source_url,
+                        altText: aboutPage.acf.about_hero_image.alt || aboutPage.acf.about_hero_image.alt_text || 'About Hero Image',
+                        mediaDetails: {
+                          width: aboutPage.acf.about_hero_image.width || 450,
+                          height: aboutPage.acf.about_hero_image.height || 450
+                        }
+                      } : FALLBACK_ABOUT_DATA.page.aboutPageFieldsNew.aboutHeroImage,
+                      experienceSectionTitle: aboutPage.acf?.experience_section_title || FALLBACK_ABOUT_DATA.page.aboutPageFieldsNew.experienceSectionTitle,
+                      experienceItems: aboutPage.acf?.experience_items || FALLBACK_ABOUT_DATA.page.aboutPageFieldsNew.experienceItems,
+                      skillsSectionTitle: aboutPage.acf?.skills_section_title || FALLBACK_ABOUT_DATA.page.aboutPageFieldsNew.skillsSectionTitle,
+                      selectedSkills: aboutPage.acf?.selected_skills || FALLBACK_ABOUT_DATA.page.aboutPageFieldsNew.selectedSkills,
+                      personalSectionTitle: aboutPage.acf?.personal_section_title || FALLBACK_ABOUT_DATA.page.aboutPageFieldsNew.personalSectionTitle,
+                      personalContent: aboutPage.acf?.personal_content || FALLBACK_ABOUT_DATA.page.aboutPageFieldsNew.personalContent,
+                      personalImage: aboutPage.acf?.personal_image ? {
+                        sourceUrl: aboutPage.acf.personal_image.url || aboutPage.acf.personal_image.source_url,
+                        altText: aboutPage.acf.personal_image.alt || aboutPage.acf.personal_image.alt_text || 'Personal Image',
+                        mediaDetails: {
+                          width: aboutPage.acf.personal_image.width || 450,
+                          height: aboutPage.acf.personal_image.height || 450
+                        }
+                      } : FALLBACK_ABOUT_DATA.page.aboutPageFieldsNew.personalImage,
+                      selectedHobbies: aboutPage.acf?.selected_hobbies || FALLBACK_ABOUT_DATA.page.aboutPageFieldsNew.selectedHobbies
+                    }
+                  }
+                };
+                
+                return transformedData;
+              }
+            }
+          } catch (restError) {
+            if (process.env.NODE_ENV === 'development') {
+              console.warn('⚠️ REST API also failed:', restError instanceof Error ? restError.message : 'Unknown error');
+            }
+          }
+          
+          throw error; // Use fallback data
+        }
+      },
+      FALLBACK_ABOUT_DATA,
+      'Error fetching about page data'
     );
   }
 

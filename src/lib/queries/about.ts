@@ -16,56 +16,72 @@ export const GET_ABOUT_PAGE_DATA = gql`
           }
         }
       }
-      aboutPageFields {
+      aboutPageFieldsNew {
         aboutHeroTitle
         aboutHeroSubtitle
         aboutHeroImage {
-          node {
-            sourceUrl
-            altText
-            mediaDetails {
-              width
-              height
-            }
+          sourceUrl
+          altText
+          mediaDetails {
+            width
+            height
           }
         }
-        experienceSection {
-          experienceItems {
-            companyName
-            position
-            duration
-            description
-            technologies
-          }
-        }
-        skillsSection {
-          selectedSkills {
-            ... on Skill {
+        experienceSectionTitle
+        experienceItems {
+          companyName
+          position
+          duration
+          description
+          technologies {
+            ... on Tech {
               id
               title
-              content
-              excerpt
-            }
-          }
-        }
-        personalSection {
-          personalContent
-          personalImage {
-            node {
-              sourceUrl
-              altText
-              mediaDetails {
-                width
-                height
+              featuredImage {
+                node {
+                  sourceUrl
+                  altText
+                }
               }
             }
           }
-          selectedHobbies {
-            ... on Hobby {
-              id
-              title
-              content
-              excerpt
+        }
+        skillsSectionTitle
+        selectedSkills {
+          ... on Skill {
+            id
+            title
+            content
+            excerpt
+            featuredImage {
+              node {
+                sourceUrl
+                altText
+              }
+            }
+          }
+        }
+        personalSectionTitle
+        personalContent
+        personalImage {
+          sourceUrl
+          altText
+          mediaDetails {
+            width
+            height
+          }
+        }
+        selectedHobbies {
+          ... on Hobby {
+            id
+            title
+            content
+            excerpt
+            featuredImage {
+              node {
+                sourceUrl
+                altText
+              }
             }
           }
         }

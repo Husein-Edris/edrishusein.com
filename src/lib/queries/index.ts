@@ -6,62 +6,9 @@ export const GET_HOMEPAGE_DATA = `
       id
       title
       homepageSections {
-        heroSection {
-          title
-          heroCopy
-          heroImage {
-            node {
-              sourceUrl
-              altText
-              mediaDetails {
-                height
-                width
-              }
-            }
-          }
-        }
-        projectsSection {
-          title
-        }
         aboutSection {
           title
           aboutMeText
-        }
-        bookshelfSection {
-          title
-          description
-          featuredImage {
-            node {
-              sourceUrl
-              altText
-              mediaDetails {
-                height
-                width
-              }
-            }
-          }
-        }
-        techstackSection {
-          title
-          description
-          featuredImage {
-            node {
-              sourceUrl
-              altText
-              mediaDetails {
-                height
-                width
-              }
-            }
-          }
-        }
-        notebookSection {
-          title
-        }
-        contactSection {
-          subTitle
-          title
-          email
         }
       }
     }
