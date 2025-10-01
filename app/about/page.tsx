@@ -6,7 +6,6 @@ import { Metadata } from 'next';
 import { generateEnhancedMetadata, generateStructuredData } from '@/src/lib/seo-utils';
 import '@/src/styles/pages/About.scss';
 
-export const dynamic = 'force-dynamic'; // Always fetch fresh data from WordPress
 
 // Types based on actual ACF field structure
 interface ExperienceItem {

@@ -4,7 +4,6 @@ import Header from '@/src/components/Header/Header';
 import SectionRenderer from '@/src/components/SectionRenderer/SectionRenderer';
 import Footer from '@/src/components/Footer/Footer';
 
-export const dynamic = 'force-dynamic'; // Always fetch fresh data from WordPress
 
 // Simple fallback sections to avoid build issues
 const getFallbackSections = () => [

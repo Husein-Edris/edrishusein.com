@@ -4,7 +4,6 @@ import Footer from '@/src/components/Footer/Footer';
 import InfoCards from '@/src/components/InfoCards/InfoCards';
 import { DataFetcher } from '@/src/lib/data-fetcher';
 
-export const dynamic = 'force-dynamic'; // Always fetch fresh project data
 
 async function getAllProjects() {
   try {

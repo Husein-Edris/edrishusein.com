@@ -4,7 +4,6 @@ import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
 import '@/src/styles/pages/CaseStudy.scss';
 
-export const dynamic = 'force-dynamic'; // Always fetch fresh data from WordPress
 
 const client = new GraphQLClient(process.env.NEXT_PUBLIC_WORDPRESS_API_URL || '');
 

@@ -2,7 +2,6 @@ import { Metadata } from 'next';
 import LegalPage, { getLegalPageData, generateLegalMetadata } from '@/src/components/LegalPage/LegalPage';
 
 // Force dynamic rendering for fresh content
-export const dynamic = 'force-dynamic';
 
 // Generate metadata for the privacy policy page
 export async function generateMetadata(): Promise<Metadata> {

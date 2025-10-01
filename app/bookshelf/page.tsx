@@ -5,7 +5,6 @@ import Footer from '@/src/components/Footer/Footer';
 import SectionHeader from '@/src/components/SectionHeader/SectionHeader';
 import '@/src/styles/pages/Bookshelf.scss';
 
-export const dynamic = 'force-dynamic'; // Always fetch fresh data from WordPress
 
 const client = new GraphQLClient(process.env.NEXT_PUBLIC_WORDPRESS_API_URL || '');
 

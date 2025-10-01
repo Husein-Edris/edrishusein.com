@@ -6,7 +6,6 @@ import Footer from '@/src/components/Footer/Footer';
 import '@/src/styles/pages/Blog.scss';
 import { PostsApiResponse } from '@/src/types/api';
 
-export const dynamic = 'force-dynamic'; // Always fetch fresh blog data
 
 const client = new GraphQLClient(process.env.NEXT_PUBLIC_WORDPRESS_API_URL || '');
 
