@@ -1,45 +1,53 @@
-import { GraphQLClient } from 'graphql-request';
+'use client';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
 import '@/src/styles/pages/Blog.scss';
-import { PostsApiResponse } from '@/src/types/api';
 
+export default function BlogArchivePage() {
+    const [posts, setPosts] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-const client = new GraphQLClient(process.env.NEXT_PUBLIC_WORDPRESS_API_URL || '');
-
-const GET_POSTS = `
-  query GetPosts {
-    posts(first: 100) {
-      nodes {
-        id
-        title
-        excerpt
-        slug
-        featuredImage {
-          node {
-            sourceUrl
-            altText
-            mediaDetails {
-              height
-              width
+    useEffect(() => {
+        async function fetchPosts() {
+            try {
+                console.log('🔍 Fetching posts via REST API');
+                const response = await fetch(`${process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '')}/wp-json/wp/v2/posts?_embed&per_page=100`);
+                
+                if (response.ok) {
+                    const postsData = await response.json();
+                    
+                    const transformedPosts = postsData.map((post: any) => ({
+                        id: post.id.toString(),
+                        title: post.title?.rendered || post.title,
+                        excerpt: post.excerpt?.rendered || post.excerpt || '',
+                        slug: post.slug,
+                        featuredImage: post._embedded?.['wp:featuredmedia']?.[0] ? {
+                            node: {
+                                sourceUrl: post._embedded['wp:featuredmedia'][0].source_url,
+                                altText: post._embedded['wp:featuredmedia'][0].alt_text || post.title?.rendered || '',
+                                mediaDetails: {
+                                    width: post._embedded['wp:featuredmedia'][0].media_details?.width || 400,
+                                    height: post._embedded['wp:featuredmedia'][0].media_details?.height || 400
+                                }
+                            }
+                        } : null
+                    }));
+                    
+                    setPosts(transformedPosts);
+                    console.log(`✅ Loaded ${transformedPosts.length} posts`);
+                }
+            } catch (error) {
+                console.error('❌ Error fetching posts:', error);
+            } finally {
+                setLoading(false);
             }
-          }
         }
-      }
-    }
-  }
-`;
 
-async function getPostsData() {
-    // For static export, use fallback data only
-    console.log('📊 Using static fallback data for posts');
-    return [];
-}
-
-export default async function BlogArchivePage() {
-    const posts = await getPostsData();
+        fetchPosts();
+    }, []);
 
     return (
         <>
@@ -54,7 +62,11 @@ export default async function BlogArchivePage() {
 
                 <div className="container">
                     <div className="blog-grid">
-                        {posts.length > 0 ? (
+                        {loading ? (
+                            <div style={{ textAlign: 'center', padding: '4rem', color: '#666' }}>
+                                <p>Loading posts...</p>
+                            </div>
+                        ) : posts.length > 0 ? (
                             posts.map((post) => (
                                 <Link href={`/notebook/${post.slug}`} key={post.id} className="blog-card">
                                     <div className="card-content">
