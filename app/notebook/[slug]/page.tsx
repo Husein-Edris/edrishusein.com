@@ -8,6 +8,11 @@ import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
 import '@/src/styles/pages/BlogPost.scss';
 
+// Required for static export - return empty array to skip pre-generation
+export async function generateStaticParams() {
+  return [];
+}
+
 export default function BlogPostPage() {
   const params = useParams();
   const slug = params?.slug as string;
