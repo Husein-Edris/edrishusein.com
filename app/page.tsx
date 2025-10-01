@@ -12,7 +12,7 @@ const getFallbackSections = () => [
     component: 'hero' as const,
     props: {
       title: 'Edris Husein',
-      heroCopy: 'Full-stack developer crafting digital experiences with modern technologies.',
+      heroCopy: 'Number 1Full-stack developer crafting digital experiences with modern technologies.',
       heroImage: {
         node: {
           sourceUrl: '/images/Edris-Husein-Hero.png',
@@ -27,12 +27,12 @@ const getFallbackSections = () => [
 
 export default async function HomePage() {
   let sections;
-  
+
   try {
     // Try to load real data
     const { DataFetcher } = await import('@/src/lib/data-fetcher');
     const { SectionFactory } = await import('@/src/lib/section-registry');
-    
+
     const { homepage, projects, posts } = await DataFetcher.getHomepageBundle();
     sections = SectionFactory.createHomepageSections(
       homepage.data,
