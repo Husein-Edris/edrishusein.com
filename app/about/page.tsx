@@ -1,11 +1,9 @@
-// app/about/page.tsx
+'use client';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
-import { Metadata } from 'next';
-import { generateEnhancedMetadata, generateStructuredData } from '@/src/lib/seo-utils';
 import '@/src/styles/pages/About.scss';
-
 
 // Types based on actual ACF field structure
 interface ExperienceItem {
@@ -21,7 +19,6 @@ interface SkillPost {
   post_title: string;
   post_content?: string;
   post_excerpt?: string;
-  // Add more fields as needed
 }
 
 interface HobbyPost {
@@ -29,7 +26,6 @@ interface HobbyPost {
   post_title: string;
   post_content?: string;
   post_excerpt?: string;
-  // Add more fields as needed
 }
 
 interface AboutPageFields {
@@ -86,13 +82,6 @@ interface AboutPageData {
       };
     };
     aboutPageFields?: AboutPageFields;
-    seo?: {
-      title: string;
-      metaDesc: string;
-      opengraphImage?: {
-        sourceUrl: string;
-      };
-    };
   };
 }
 
@@ -140,382 +129,172 @@ const FALLBACK_ABOUT_DATA = {
   }
 };
 
-// Helper function to test WordPress API endpoint
-async function testWordPressAPI(baseUrl: string): Promise<{success: boolean, issue?: string}> {
-  try {
-    // console.log(`🔍 Testing WordPress API at: ${baseUrl}`);
-    
-    // Test basic WordPress API
-    const testResponse = await fetch(`${baseUrl}/wp-json/wp/v2/`, { 
-      cache: 'no-store',
-      headers: {
-        'Accept': 'application/json',
-      }
-    });
-    
-    if (!testResponse.ok) {
-      return { success: false, issue: `API returned ${testResponse.status} ${testResponse.statusText}` };
-    }
-    
-    const contentType = testResponse.headers.get('content-type');
-    if (!contentType?.includes('application/json')) {
-      const responseText = await testResponse.text();
-      return { 
-        success: false, 
-        issue: `Non-JSON response (${contentType}). Preview: ${responseText.substring(0, 100)}` 
-      };
-    }
-    
-    const apiData = await testResponse.json();
-    // console.log(`✅ WordPress API is accessible. Routes available:`, Object.keys(apiData.routes || {}).length);
-    return { success: true };
-    
-  } catch (error) {
-    return { 
-      success: false, 
-      issue: `Connection failed: ${error instanceof Error ? error.message : 'Unknown error'}` 
-    };
-  }
-}
+export default function AboutPage() {
+  const [aboutData, setAboutData] = useState<AboutPageData>(FALLBACK_ABOUT_DATA);
 
-async function getAboutPageData(): Promise<AboutPageData> {
-  try {
-    // console.log('🔍 About page: Trying GraphQL first, then REST API fallback');
-    
-    // Try GraphQL first
-    try {
-      const { client } = await import('@/src/lib/client');
-      const { GET_ABOUT_PAGE_DATA, GET_ALL_SKILLS, GET_ALL_HOBBIES } = await import('@/src/lib/queries/about');
-      
-      // Fetch all data in parallel via GraphQL
-      const [aboutResponse, skillsResponse, hobbiesResponse] = await Promise.allSettled([
-        client.request(GET_ABOUT_PAGE_DATA),
-        client.request(GET_ALL_SKILLS),
-        client.request(GET_ALL_HOBBIES)
-      ]);
-      
-      let aboutData = null;
-      let skillsData: any[] = [];
-      let hobbiesData: any[] = [];
-      
-      if (aboutResponse.status === 'fulfilled' && aboutResponse.value?.page) {
-        aboutData = aboutResponse.value.page;
-        // console.log('✅ About page: GraphQL data loaded successfully');
-      }
-      
-      if (skillsResponse.status === 'fulfilled' && skillsResponse.value?.skills?.nodes) {
-        skillsData = skillsResponse.value.skills.nodes;
-        // console.log(`✅ Found ${skillsData.length} skills via GraphQL`);
-      }
-      
-      if (hobbiesResponse.status === 'fulfilled' && hobbiesResponse.value?.hobbies?.nodes) {
-        hobbiesData = hobbiesResponse.value.hobbies.nodes;
-        // console.log(`✅ Found ${hobbiesData.length} hobbies via GraphQL`);
-      }
-      
-      if (aboutData) {
-        // Transform GraphQL response
-        const transformedData = {
-          page: {
-            id: aboutData.id,
-            title: aboutData.title,
-            content: aboutData.content,
-            featuredImage: aboutData.featuredImage,
-            aboutPageFields: {
-              ...aboutData.aboutPageFields,
-              // Handle experience section with validation
-              experienceSection: aboutData.aboutPageFields?.experienceSection?.experienceItems?.length > 0
-                ? aboutData.aboutPageFields.experienceSection
-                : FALLBACK_ABOUT_DATA.page.aboutPageFields?.experienceSection,
-              // If selected skills/hobbies are empty, use all available ones
-              skillsSection: {
-                ...aboutData.aboutPageFields?.skillsSection,
-                selectedSkills: aboutData.aboutPageFields?.skillsSection?.selectedSkills?.length > 0
-                  ? aboutData.aboutPageFields.skillsSection.selectedSkills
-                  : skillsData.map(skill => ({
-                      ID: skill.id,
-                      post_title: skill.title,
-                      post_content: skill.content,
-                      post_excerpt: skill.excerpt
-                    }))
-              },
-              personalSection: {
-                ...aboutData.aboutPageFields?.personalSection,
-                selectedHobbies: aboutData.aboutPageFields?.personalSection?.selectedHobbies?.length > 0
-                  ? aboutData.aboutPageFields.personalSection.selectedHobbies
-                  : hobbiesData.map(hobby => ({
-                      ID: hobby.id,
-                      post_title: hobby.title,
-                      post_content: hobby.content,
-                      post_excerpt: hobby.excerpt
-                    }))
-              }
-            },
-            seo: aboutData.seo
-          }
-        };
+  useEffect(() => {
+    async function fetchAboutData() {
+      try {
+        console.log('🔍 Fetching about page via REST API');
+        const WORDPRESS_REST_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '') || 'https://cms.edrishusein.com';
         
-        return transformedData;
-      }
-    } catch (graphqlError) {
-      // console.warn('⚠️ GraphQL failed, falling back to REST API:', graphqlError);
-    }
-    
-    // Fallback to REST API
-    // console.log('🔍 About page: Using REST API fallback');
-    const WORDPRESS_REST_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '') || 'https://cms.edrishusein.com';
-    
-    // Test WordPress API connection first
-    const apiTest = await testWordPressAPI(WORDPRESS_REST_URL);
-    if (!apiTest.success) {
-      // console.error(`❌ WordPress API test failed: ${apiTest.issue}`);
-      throw new Error(`WordPress API is not accessible: ${apiTest.issue}`);
-    }
-    
-    // Fetch about page, skills, and hobbies in parallel
-    const headers = {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    };
-    
-    const [aboutResponse, skillsResponse, hobbiesResponse] = await Promise.all([
-      fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/pages?slug=about-me&acf_format=standard`, { 
-        cache: 'no-store', 
-        headers 
-      }),
-      fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/skill?per_page=50`, { 
-        cache: 'no-store', 
-        headers 
-      }),
-      fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/hobby?per_page=50`, { 
-        cache: 'no-store', 
-        headers 
-      })
-    ]);
-    
-    if (!aboutResponse.ok) {
-      // console.error(`❌ WordPress REST API failed: ${aboutResponse.status} ${aboutResponse.statusText}`);
-      const errorText = await aboutResponse.text();
-      // console.error('Error response body:', errorText.substring(0, 200));
-      throw new Error(`WordPress REST API failed: ${aboutResponse.status}`);
-    }
-    
-    // Check if response is actually JSON
-    const contentType = aboutResponse.headers.get('content-type');
-    if (!contentType || !contentType.includes('application/json')) {
-      // console.error(`❌ WordPress returned non-JSON response. Content-Type: ${contentType}`);
-      const responseText = await aboutResponse.text();
-      // console.error('Response preview:', responseText.substring(0, 300));
-      throw new Error('WordPress returned HTML instead of JSON - likely a PHP error or wrong endpoint');
-    }
-    
-    const aboutPages = await aboutResponse.json();
-    
-    if (!aboutPages || aboutPages.length === 0) {
-      throw new Error('About page not found in WordPress');
-    }
-    
-    // Get skills and hobbies data with better error handling
-    let skillsData: any[] = [];
-    let hobbiesData: any[] = [];
-    
-    // Handle skills response
-    if (skillsResponse.ok) {
-      try {
-        const skillsContentType = skillsResponse.headers.get('content-type');
-        if (skillsContentType && skillsContentType.includes('application/json')) {
-          skillsData = await skillsResponse.json();
-          // console.log(`✅ Found ${skillsData.length} skills from WordPress`);
-        } else {
-          // console.warn('⚠️ Skills endpoint returned non-JSON response');
-          const skillsText = await skillsResponse.text();
-          // console.warn('Skills response preview:', skillsText.substring(0, 200));
-        }
-      } catch (error) {
-        // console.warn('⚠️ Error parsing skills JSON:', error);
-      }
-    } else {
-      // console.warn(`⚠️ Skills API failed: ${skillsResponse.status} ${skillsResponse.statusText}`);
-    }
-    
-    // Handle hobbies response
-    if (hobbiesResponse.ok) {
-      try {
-        const hobbiesContentType = hobbiesResponse.headers.get('content-type');
-        if (hobbiesContentType && hobbiesContentType.includes('application/json')) {
-          hobbiesData = await hobbiesResponse.json();
-          // console.log(`✅ Found ${hobbiesData.length} hobbies from WordPress`);
-        } else {
-          // console.warn('⚠️ Hobbies endpoint returned non-JSON response');
-          const hobbiesText = await hobbiesResponse.text();
-          // console.warn('Hobbies response preview:', hobbiesText.substring(0, 200));
-        }
-      } catch (error) {
-        // console.warn('⚠️ Error parsing hobbies JSON:', error);
-      }
-    } else {
-      // console.warn(`⚠️ Hobbies API failed: ${hobbiesResponse.status} ${hobbiesResponse.statusText}`);
-    }
-    
-    const aboutPage = aboutPages[0];
-    // console.log('✅ About page: WordPress REST API data loaded');
-    
-    // Transform WordPress REST data to expected format
-    const transformedData = {
-      page: {
-        id: aboutPage.id.toString(),
-        title: aboutPage.title?.rendered || 'About',
-        content: aboutPage.content?.rendered || '',
-        featuredImage: aboutPage._embedded?.['wp:featuredmedia']?.[0] ? {
-          node: {
-            sourceUrl: aboutPage._embedded['wp:featuredmedia'][0].source_url,
-            altText: aboutPage._embedded['wp:featuredmedia'][0].alt_text || 'About',
-            mediaDetails: {
-              width: aboutPage._embedded['wp:featuredmedia'][0].media_details?.width || 400,
-              height: aboutPage._embedded['wp:featuredmedia'][0].media_details?.height || 400
-            }
-          }
-        } : null,
-        aboutPageFields: {
-          // Hero Section
-          aboutHeroTitle: aboutPage.acf?.about_hero_title || FALLBACK_ABOUT_DATA.page.aboutPageFields?.aboutHeroTitle,
-          aboutHeroSubtitle: aboutPage.acf?.about_hero_subtitle || FALLBACK_ABOUT_DATA.page.aboutPageFields?.aboutHeroSubtitle,
-          aboutHeroImage: aboutPage.acf?.about_hero_image ? {
-            node: {
-              sourceUrl: aboutPage.acf.about_hero_image.url || aboutPage.acf.about_hero_image.source_url,
-              altText: aboutPage.acf.about_hero_image.alt || aboutPage.acf.about_hero_image.alt_text || 'About Hero Image',
-              mediaDetails: {
-                width: aboutPage.acf.about_hero_image.width || 400,
-                height: aboutPage.acf.about_hero_image.height || 400
-              }
-            }
-          } : null,
+        // Fetch about page, skills, and hobbies in parallel
+        const [aboutResponse, skillsResponse, hobbiesResponse] = await Promise.all([
+          fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/pages?slug=about-me&acf_format=standard&_embed`),
+          fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/skill?per_page=50`),
+          fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/hobby?per_page=50`)
+        ]);
+        
+        if (aboutResponse.ok) {
+          const aboutPages = await aboutResponse.json();
           
-          // Experience Section
-          experienceSection: {
-            sectionTitle: aboutPage.acf?.experience_section_title || "Experience",
-            experienceItems: (() => {
-              const experienceItems = aboutPage.acf?.experience_items;
-              
-              // Check if experience items exist and have proper structure
-              if (!experienceItems || !Array.isArray(experienceItems)) {
-                // console.warn('⚠️ No experience_items found or not an array');
-                return FALLBACK_ABOUT_DATA.page.aboutPageFields?.experienceSection?.experienceItems || [];
+          if (aboutPages && aboutPages.length > 0) {
+            const aboutPage = aboutPages[0];
+            
+            // Get skills and hobbies data
+            let skillsData: any[] = [];
+            let hobbiesData: any[] = [];
+            
+            if (skillsResponse.ok) {
+              try {
+                skillsData = await skillsResponse.json();
+              } catch (error) {
+                console.warn('⚠️ Error fetching skills:', error);
               }
-              
-              // Filter and transform valid experience items
-              const validItems = experienceItems
-                .filter((item: any) => {
-                  // Check if item has the expected field structure
-                  const hasValidFields = item.company_name || item.position || item.duration || item.description;
-                  if (!hasValidFields) {
-                    // console.warn('⚠️ Experience item missing required fields:', item);
-                    return false;
+            }
+            
+            if (hobbiesResponse.ok) {
+              try {
+                hobbiesData = await hobbiesResponse.json();
+              } catch (error) {
+                console.warn('⚠️ Error fetching hobbies:', error);
+              }
+            }
+            
+            // Transform WordPress REST data to expected format
+            const transformedData = {
+              page: {
+                id: aboutPage.id.toString(),
+                title: aboutPage.title?.rendered || 'About Edris Husein',
+                content: aboutPage.content?.rendered || '',
+                featuredImage: aboutPage._embedded?.['wp:featuredmedia']?.[0] ? {
+                  node: {
+                    sourceUrl: aboutPage._embedded['wp:featuredmedia'][0].source_url,
+                    altText: aboutPage._embedded['wp:featuredmedia'][0].alt_text || 'About',
+                    mediaDetails: {
+                      width: aboutPage._embedded['wp:featuredmedia'][0].media_details?.width || 400,
+                      height: aboutPage._embedded['wp:featuredmedia'][0].media_details?.height || 400
+                    }
                   }
-                  return true;
-                })
-                .map((item: any) => ({
-                  company_name: item.company_name || '',
-                  position: item.position || '',
-                  duration: item.duration || '',
-                  description: item.description || '',
-                  technologies: item.technologies // Keep raw technologies data for proper handling
-                }));
-              
-              if (validItems.length === 0) {
-                // console.warn('⚠️ No valid experience items found, using fallback data');
-                return FALLBACK_ABOUT_DATA.page.aboutPageFields?.experienceSection?.experienceItems || [];
-              }
-              
-              // console.log(`✅ Found ${validItems.length} valid experience items`);
-              return validItems;
-            })()
-          },
-          
-          // Skills Section
-          skillsSection: {
-            sectionTitle: aboutPage.acf?.skills_section_title || "Skills & Technologies",
-            selectedSkills: aboutPage.acf?.selected_skills?.length > 0 
-              ? aboutPage.acf.selected_skills.map((skill: any) => ({
-                  ID: skill.ID || skill.id,
-                  post_title: skill.post_title || skill.title?.rendered || skill.title,
-                  post_content: skill.post_content || skill.content?.rendered || skill.content,
-                  post_excerpt: skill.post_excerpt || skill.excerpt?.rendered || skill.excerpt
-                }))
-              : skillsData.map(skill => ({
-                  ID: skill.id,
-                  post_title: skill.title?.rendered || skill.title,
-                  post_content: skill.content?.rendered || skill.content,
-                  post_excerpt: skill.excerpt?.rendered || skill.excerpt
-                }))
-          },
-          
-          // Personal Section
-          personalSection: {
-            sectionTitle: aboutPage.acf?.personal_section_title || "Personal",
-            personalContent: aboutPage.acf?.personal_content || FALLBACK_ABOUT_DATA.page.aboutPageFields?.personalSection?.personalContent || "",
-            personalImage: aboutPage.acf?.personal_image ? {
-              node: {
-                sourceUrl: aboutPage.acf.personal_image.url || aboutPage.acf.personal_image.source_url,
-                altText: aboutPage.acf.personal_image.alt || aboutPage.acf.personal_image.alt_text || 'Personal Image',
-                mediaDetails: {
-                  width: aboutPage.acf.personal_image.width || 400,
-                  height: aboutPage.acf.personal_image.height || 400
+                } : null,
+                aboutPageFields: {
+                  // Hero Section
+                  aboutHeroTitle: aboutPage.acf?.about_hero_title || "About Edris Husein",
+                  aboutHeroSubtitle: aboutPage.acf?.about_hero_subtitle || "Full-stack developer passionate about creating exceptional digital experiences",
+                  aboutHeroImage: aboutPage.acf?.about_hero_image ? {
+                    node: {
+                      sourceUrl: aboutPage.acf.about_hero_image.url || aboutPage.acf.about_hero_image.source_url,
+                      altText: aboutPage.acf.about_hero_image.alt || aboutPage.acf.about_hero_image.alt_text || 'About Hero Image',
+                      mediaDetails: {
+                        width: aboutPage.acf.about_hero_image.width || 400,
+                        height: aboutPage.acf.about_hero_image.height || 400
+                      }
+                    }
+                  } : null,
+                  
+                  // Experience Section
+                  experienceSection: {
+                    sectionTitle: aboutPage.acf?.experience_section_title || "Experience",
+                    experienceItems: (() => {
+                      const experienceItems = aboutPage.acf?.experience_items;
+                      
+                      if (!experienceItems || !Array.isArray(experienceItems)) {
+                        return FALLBACK_ABOUT_DATA.page.aboutPageFields?.experienceSection?.experienceItems || [];
+                      }
+                      
+                      const validItems = experienceItems
+                        .filter((item: any) => item.company_name || item.position || item.duration || item.description)
+                        .map((item: any) => ({
+                          company_name: item.company_name || '',
+                          position: item.position || '',
+                          duration: item.duration || '',
+                          description: item.description || '',
+                          technologies: item.technologies
+                        }));
+                      
+                      if (validItems.length === 0) {
+                        return FALLBACK_ABOUT_DATA.page.aboutPageFields?.experienceSection?.experienceItems || [];
+                      }
+                      
+                      return validItems;
+                    })()
+                  },
+                  
+                  // Skills Section
+                  skillsSection: {
+                    sectionTitle: aboutPage.acf?.skills_section_title || "Skills & Technologies",
+                    selectedSkills: aboutPage.acf?.selected_skills?.length > 0 
+                      ? aboutPage.acf.selected_skills.map((skill: any) => ({
+                          ID: skill.ID || skill.id,
+                          post_title: skill.post_title || skill.title?.rendered || skill.title,
+                          post_content: skill.post_content || skill.content?.rendered || skill.content,
+                          post_excerpt: skill.post_excerpt || skill.excerpt?.rendered || skill.excerpt
+                        }))
+                      : skillsData.map(skill => ({
+                          ID: skill.id,
+                          post_title: skill.title?.rendered || skill.title,
+                          post_content: skill.content?.rendered || skill.content,
+                          post_excerpt: skill.excerpt?.rendered || skill.excerpt
+                        }))
+                  },
+                  
+                  // Personal Section
+                  personalSection: {
+                    sectionTitle: aboutPage.acf?.personal_section_title || "Personal",
+                    personalContent: aboutPage.acf?.personal_content || FALLBACK_ABOUT_DATA.page.aboutPageFields?.personalSection?.personalContent || "",
+                    personalImage: aboutPage.acf?.personal_image ? {
+                      node: {
+                        sourceUrl: aboutPage.acf.personal_image.url || aboutPage.acf.personal_image.source_url,
+                        altText: aboutPage.acf.personal_image.alt || aboutPage.acf.personal_image.alt_text || 'Personal Image',
+                        mediaDetails: {
+                          width: aboutPage.acf.personal_image.width || 400,
+                          height: aboutPage.acf.personal_image.height || 400
+                        }
+                      }
+                    } : null,
+                    selectedHobbies: aboutPage.acf?.selected_hobbies?.length > 0
+                      ? aboutPage.acf.selected_hobbies.map((hobby: any) => ({
+                          ID: hobby.ID || hobby.id,
+                          post_title: hobby.post_title || hobby.title?.rendered || hobby.title,
+                          post_content: hobby.post_content || hobby.content?.rendered || hobby.content,
+                          post_excerpt: hobby.post_excerpt || hobby.excerpt?.rendered || hobby.excerpt
+                        }))
+                      : hobbiesData.map(hobby => ({
+                          ID: hobby.id,
+                          post_title: hobby.title?.rendered || hobby.title,
+                          post_content: hobby.content?.rendered || hobby.content,
+                          post_excerpt: hobby.excerpt?.rendered || hobby.excerpt
+                        }))
+                  }
                 }
               }
-            } : null,
-            selectedHobbies: aboutPage.acf?.selected_hobbies?.length > 0
-              ? aboutPage.acf.selected_hobbies.map((hobby: any) => ({
-                  ID: hobby.ID || hobby.id,
-                  post_title: hobby.post_title || hobby.title?.rendered || hobby.title,
-                  post_content: hobby.post_content || hobby.content?.rendered || hobby.content,
-                  post_excerpt: hobby.post_excerpt || hobby.excerpt?.rendered || hobby.excerpt
-                }))
-              : hobbiesData.map(hobby => ({
-                  ID: hobby.id,
-                  post_title: hobby.title?.rendered || hobby.title,
-                  post_content: hobby.content?.rendered || hobby.content,
-                  post_excerpt: hobby.excerpt?.rendered || hobby.excerpt
-                }))
+            };
+            
+            setAboutData(transformedData);
+            console.log('✅ About page data loaded from WordPress');
           }
         }
+      } catch (error) {
+        console.error('❌ Error fetching about page data:', error);
+        // Keep fallback data
       }
-    };
-    
-    return transformedData;
-    
-  } catch (error) {
-    // console.error('❌ About page: WordPress API error, using fallback:', error);
-    return FALLBACK_ABOUT_DATA;
-  }
-}
-
-export async function generateMetadata(): Promise<Metadata> {
-  const data = await getAboutPageData();
-  const page = data.page;
-
-  return generateEnhancedMetadata(
-    page.seo,
-    {
-      title: 'About - Edris Husein',
-      description: 'Learn more about Edris Husein, full-stack developer passionate about creating exceptional digital experiences.',
-      path: '/about',
-      type: 'website'
     }
-  );
-}
 
-export default async function AboutPage() {
-  const data = await getAboutPageData();
-  const page = data.page;
+    fetchAboutData();
+  }, []);
+
+  const page = aboutData.page;
   const fields = page.aboutPageFields;
-
-  // Generate structured data
-  const structuredData = generateStructuredData('WebPage', {
-    title: page.title,
-    description: page.seo?.metaDesc || 'Learn more about Edris Husein',
-    canonical: page.seo?.canonical || 'https://edrishusein.com/about'
-  });
 
   return (
     <>
@@ -654,14 +433,6 @@ export default async function AboutPage() {
         )}
       </main>
       <Footer />
-      
-      {/* Structured Data for SEO */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(structuredData),
-        }}
-      />
     </>
   );
 }

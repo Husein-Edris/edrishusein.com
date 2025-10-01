@@ -42,10 +42,10 @@ export default function MoreProjects({ currentProjectSlug, allProjects = [] }: M
     title: project.title,
     description: truncateExcerpt(project.excerpt, 120),
     image: project.featuredImage?.node?.sourceUrl || '/images/Blog-sample-img.png',
-    link: `/projects/${project.slug}`,
+    link: `/projects?slug=${project.slug}`,
     variant: 'dark' as const,
     visitLink: project.caseStudy?.projectLinks?.liveSite || null,
-    caseStudyLink: `/projects/${project.slug}`
+    caseStudyLink: `/projects?slug=${project.slug}`
   }));
 
   // If no projects available, don't render anything

@@ -99,10 +99,10 @@ const Projects = ({ data }: ProjectsProps) => {
                   dangerouslySetInnerHTML={{ __html: project.excerpt }}
                 />
                 <div className="project-links">
-                  <Link href={`/projects/${project.uri}`} className="project-link">
+                  <Link href={`/projects?slug=${project.uri}`} className="project-link">
                     VISIT SITE
                   </Link>
-                  <Link href={`/projects/${project.uri}/case-study`} className="project-link">
+                  <Link href={`/projects?slug=${project.uri}`} className="project-link">
                     CASE STUDY
                   </Link>
                 </div>

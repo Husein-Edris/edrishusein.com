@@ -35,7 +35,7 @@ export class SectionTransformers {
       image: project.featuredImage?.node?.sourceUrl,
       variant: 'dark' as const,
       visitLink: project.caseStudy?.projectLinks?.liveSite || null,
-      caseStudyLink: project.slug ? `/projects/${project.slug}` : '#'
+      caseStudyLink: project.slug ? `/projects?slug=${project.slug}` : '#'
     }));
   }
 
@@ -46,7 +46,7 @@ export class SectionTransformers {
       title: post.title || 'Untitled Post',
       description: post.excerpt || 'No description available',
       image: post.featuredImage?.node?.sourceUrl || '/images/Blog-sample-img-optimized.webp',
-      link: post.slug ? `/notebook/${post.slug}` : '#',
+      link: post.slug ? `/notebook?slug=${post.slug}` : '#',
       variant: 'light' as const
     }));
   }

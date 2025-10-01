@@ -102,10 +102,10 @@ export function generateStructuredData(type: string, data: any): object {
         datePublished: data.date,
         dateModified: data.modifiedDate || data.date,
         image: data.featuredImage?.node?.sourceUrl,
-        url: data.canonical || `https://edrishusein.com/notebook/${data.slug}`,
+        url: data.canonical || `https://edrishusein.com/notebook?slug=${data.slug}`,
         mainEntityOfPage: {
           "@type": "WebPage",
-          "@id": data.canonical || `https://edrishusein.com/notebook/${data.slug}`
+          "@id": data.canonical || `https://edrishusein.com/notebook?slug=${data.slug}`
         },
         publisher: {
           "@type": "Person",

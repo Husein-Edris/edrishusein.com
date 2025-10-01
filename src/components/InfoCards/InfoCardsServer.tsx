@@ -123,10 +123,10 @@ async function getProjectsData() {
       title: project.title,
       description: truncateExcerpt(project.excerpt, 120),
       image: project.featuredImage?.node?.sourceUrl,
-      link: `/projects/${project.slug}`,
+      link: `/projects?slug=${project.slug}`,
       variant: 'dark' as const,
       visitLink: project.caseStudy?.projectLinks?.liveSite || '#',
-      caseStudyLink: `/projects/${project.slug}`
+      caseStudyLink: `/projects?slug=${project.slug}`
     }));
 
     return {
@@ -152,7 +152,7 @@ async function getPostsData() {
       title: post.title,
       description: truncateExcerpt(post.excerpt, 120),
       image: post.featuredImage?.node?.sourceUrl,
-      link: `/notebook/${post.uri}`,
+      link: `/notebook?slug=${post.uri}`,
       variant: 'light'
     }));
 
