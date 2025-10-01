@@ -31,57 +31,9 @@ const GET_BOOKS = `
 `;
 
 async function getBooksData() {
-  try {
-    console.log('🔍 Fetching books via GraphQL...');
-    const data = await client.request(GET_BOOKS) as any;
-    
-    if (data?.books?.nodes) {
-      console.log(`✅ Found ${data.books.nodes.length} books via GraphQL`);
-      return data.books.nodes;
-    }
-    
-    throw new Error('No books data received from GraphQL');
-    
-  } catch (error) {
-    console.error('❌ GraphQL books fetch failed:', error);
-    
-    // Try WordPress REST API as fallback
-    try {
-      const WORDPRESS_REST_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '') || 'https://cms.edrishusein.com';
-      console.log('🔄 Falling back to WordPress REST API for books...');
-      
-      const restResponse = await fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/book?_embed&per_page=100`, {
-        cache: 'no-store'
-      });
-      
-      if (restResponse.ok) {
-        const restBooks = await restResponse.json();
-        console.log(`✅ Found ${restBooks.length} books via REST API`);
-        
-        // Transform REST API data to match GraphQL structure
-        return restBooks.map((book: any) => ({
-          id: book.id.toString(),
-          title: book.title?.rendered || book.title,
-          excerpt: book.excerpt?.rendered || book.excerpt || '',
-          featuredImage: book._embedded?.['wp:featuredmedia']?.[0] ? {
-            node: {
-              sourceUrl: book._embedded['wp:featuredmedia'][0].source_url,
-              altText: book._embedded['wp:featuredmedia'][0].alt_text || book.title?.rendered || '',
-              mediaDetails: {
-                width: book._embedded['wp:featuredmedia'][0].media_details?.width || 300,
-                height: book._embedded['wp:featuredmedia'][0].media_details?.height || 400
-              }
-            }
-          } : null
-        }));
-      }
-    } catch (restError) {
-      console.error('❌ REST API fallback also failed:', restError);
-    }
-    
-    console.log('⚠️ Using empty books array as final fallback');
-    return [];
-  }
+  // For static export, use fallback data only
+  console.log('📊 Using static fallback data for books');
+  return [];
 }
 
 export default async function BookshelfPage() {

@@ -33,58 +33,9 @@ const GET_POSTS = `
 `;
 
 async function getPostsData() {
-    try {
-        console.log('🔍 Fetching all projects for projects page');
-        const data = await client.request(GET_POSTS) as PostsApiResponse;
-        
-        if (data?.posts?.nodes) {
-            console.log(`✅ Found ${data.posts.nodes.length} posts via GraphQL`);
-            return data.posts.nodes;
-        }
-        
-        throw new Error('No posts data received from GraphQL');
-        
-    } catch (error) {
-        console.error('Error fetching posts:', error);
-        
-        // Try WordPress REST API as fallback
-        try {
-            const WORDPRESS_REST_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '') || 'https://cms.edrishusein.com';
-            console.log('🔄 Falling back to WordPress REST API...');
-            
-            const restResponse = await fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/posts?_embed&per_page=100`, {
-                cache: 'no-store'
-            });
-            
-            if (restResponse.ok) {
-                const restPosts = await restResponse.json();
-                console.log(`✅ Found ${restPosts.length} posts via REST API`);
-                
-                // Transform REST API data to match GraphQL structure
-                return restPosts.map((post: any) => ({
-                    id: post.id.toString(),
-                    title: post.title?.rendered || post.title,
-                    excerpt: post.excerpt?.rendered || post.excerpt || '',
-                    slug: post.slug,
-                    featuredImage: post._embedded?.['wp:featuredmedia']?.[0] ? {
-                        node: {
-                            sourceUrl: post._embedded['wp:featuredmedia'][0].source_url,
-                            altText: post._embedded['wp:featuredmedia'][0].alt_text || post.title?.rendered || '',
-                            mediaDetails: {
-                                width: post._embedded['wp:featuredmedia'][0].media_details?.width || 400,
-                                height: post._embedded['wp:featuredmedia'][0].media_details?.height || 400
-                            }
-                        }
-                    } : null
-                }));
-            }
-        } catch (restError) {
-            console.error('REST API fallback also failed:', restError);
-        }
-        
-        console.log('⚠️ Using empty posts array as final fallback');
-        return [];
-    }
+    // For static export, use fallback data only
+    console.log('📊 Using static fallback data for posts');
+    return [];
 }
 
 export default async function BlogArchivePage() {
