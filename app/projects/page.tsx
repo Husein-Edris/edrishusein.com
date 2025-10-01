@@ -17,13 +17,14 @@ export default function ProjectsPage() {
         if (response.ok) {
           const projectsData = await response.json();
           
-          const transformedProjects = projectsData.map((project: any) => ({
-            title: project.title?.rendered || project.title,
+          const transformedProjects = projectsData.map((project: any, index: number) => ({
+            id: project.id || `project-${index}`,
+            title: project.title?.rendered || project.title || 'Untitled Project',
             description: project.excerpt?.rendered || project.excerpt || '',
             image: project._embedded?.['wp:featuredmedia']?.[0]?.source_url || '/images/Blog-sample-img.png',
-            variant: 'dark' as 'dark' | 'light',
+            variant: 'dark' as const,
             visitLink: project.acf?.project_links?.live_site || '#',
-            caseStudyLink: `/projects/${project.slug}`
+            caseStudyLink: `/projects/${project.slug || `project-${index}`}`
           }));
           
           setProjects(transformedProjects);
@@ -46,7 +47,7 @@ export default function ProjectsPage() {
           variant="dark"
           sectionTitle="All Projects"
           columns={3}
-          cards={projects}
+          cards={Array.isArray(projects) ? projects : []}
         />
       </main>
       <Footer />
