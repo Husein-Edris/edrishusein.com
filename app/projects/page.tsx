@@ -1,6 +1,6 @@
 'use client';
 // app/projects/page.tsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -9,9 +9,9 @@ import Footer from '@/src/components/Footer/Footer';
 import InfoCards from '@/src/components/InfoCards/InfoCards';
 import '@/src/styles/pages/CaseStudy.scss';
 
-export default function ProjectsPage() {
-  const [projects, setProjects] = useState([]);
-  const [currentProject, setCurrentProject] = useState(null);
+function ProjectsContent() {
+  const [projects, setProjects] = useState<any[]>([]);
+  const [currentProject, setCurrentProject] = useState<any | null>(null);
   const searchParams = useSearchParams();
   const slug = searchParams.get('slug');
 
@@ -19,7 +19,7 @@ export default function ProjectsPage() {
     async function fetchProjects() {
       try {
         console.log('🔍 Fetching projects via REST API');
-        const response = await fetch(`${process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '')}/wp-json/wp/v2/project?_embed&per_page=20`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '')}/wp-json/wp/v2/project?_embed&per_page=20&acf_format=standard`);
         
         if (response.ok) {
           const projectsData = await response.json();
@@ -176,5 +176,13 @@ export default function ProjectsPage() {
       </main>
       <Footer />
     </>
+  );
+}
+
+export default function ProjectsPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ProjectsContent />
+    </Suspense>
   );
 }

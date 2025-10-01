@@ -1,6 +1,6 @@
 // Modern Blog Post Styling
-@use '../../styles/variables' as *;
-@use '../../styles/mixins' as *;
+@use '../variables' as *;
+@use '../mixins' as *;
 
 .blog-post {
   background-color: $primary-dark;

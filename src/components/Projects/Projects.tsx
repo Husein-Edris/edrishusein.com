@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import './Projects.scss';
 import SectionHeader from '../SectionHeader/SectionHeader';
-import { useScrollAnimation, useStaggeredAnimation } from '../../hooks/useScrollAnimation';
+import { useScrollAnimation } from '../../hooks/useScrollAnimation';
 
 interface ProjectImage {
   node: {
@@ -74,16 +74,13 @@ const Projects = ({ data }: ProjectsProps) => {
           ref={gridAnimation.ref}
           className={`projects-grid animated-grid ${gridAnimation.className}`}
         >
-          {projects.map((project, index) => {
-            const cardAnimation = useStaggeredAnimation(index, 150);
-            
-            return (
-              <div 
-                key={project.id} 
-                ref={cardAnimation.ref}
-                className={`project-card ${index % 2 === 0 ? 'dark' : 'light'} ${cardAnimation.className}`}
-              >
-                <div className="project-image">
+          {projects.map((project, index) => (
+            <div 
+              key={project.id} 
+              className={`project-card ${index % 2 === 0 ? 'dark' : 'light'}`}
+              style={{ animationDelay: `${index * 150}ms` }}
+            >
+              <div className="project-image">
                 <Image
                   src={project.featuredImage.node.sourceUrl}
                   alt={project.featuredImage.node.altText || project.title}
@@ -107,9 +104,8 @@ const Projects = ({ data }: ProjectsProps) => {
                   </Link>
                 </div>
               </div>
-              </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
 
       </div>

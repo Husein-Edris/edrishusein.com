@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -8,9 +8,9 @@ import Footer from '@/src/components/Footer/Footer';
 import '@/src/styles/pages/Blog.scss';
 import '@/src/styles/pages/BlogPost.scss';
 
-export default function BlogArchivePage() {
-    const [posts, setPosts] = useState([]);
-    const [currentPost, setCurrentPost] = useState(null);
+function BlogArchiveContent() {
+    const [posts, setPosts] = useState<any[]>([]);
+    const [currentPost, setCurrentPost] = useState<any | null>(null);
     const searchParams = useSearchParams();
     const slug = searchParams.get('slug');
 
@@ -168,5 +168,13 @@ export default function BlogArchivePage() {
             </main>
             <Footer />
         </>
+    );
+}
+
+export default function BlogArchivePage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <BlogArchiveContent />
+        </Suspense>
     );
 }

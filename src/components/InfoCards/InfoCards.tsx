@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import './InfoCards.scss';
 import SectionHeader from '../SectionHeader/SectionHeader';
-import { useScrollAnimation, useStaggeredAnimation } from '../../hooks/useScrollAnimation';
+import { useScrollAnimation } from '../../hooks/useScrollAnimation';
 
 // Types
 interface InfoCardProps {
@@ -47,7 +47,6 @@ function truncateExcerpt(html: string, maxLength = 120): string {
   return truncatedText + '...';
 }
 
-
 // Modified InfoCards component
 function InfoCards({
   cards,
@@ -70,7 +69,7 @@ function InfoCards({
 
   const sectionClass = `info-cards ${skin} ${skin}-${variant} ${className}`;
 
-  // Animation hooks
+  // Animation hooks - only using basic scroll animation for the grid
   const headerAnimation = useScrollAnimation({ threshold: 0.2 });
   const gridAnimation = useScrollAnimation({ threshold: 0.1, delay: 200 });
 
@@ -102,7 +101,6 @@ function InfoCards({
           className={`cards-grid columns-${columns} animated-cards-grid ${gridAnimation.className}`}
         >
           {displayCards?.map((card, index) => {
-            const cardAnimation = useStaggeredAnimation(index, 120);
             if (skin !== 'projects' && !card.link) {
               return null; // Skip cards without links for non-project skins
             }
@@ -112,9 +110,9 @@ function InfoCards({
               return (
                 <Link 
                   key={index} 
-                  ref={cardAnimation.ref}
                   href={card.link || '#'} 
-                  className={`card ${card.variant || variant} ${cardAnimation.className}`}
+                  className={`card ${card.variant || variant}`}
+                  style={{ animationDelay: `${index * 120}ms` }}
                 >
                   <div className="card-content">
                     {card.image && (
@@ -157,8 +155,8 @@ function InfoCards({
             return (
               <div 
                 key={index} 
-                ref={cardAnimation.ref}
-                className={`card ${card.variant || variant} ${cardAnimation.className}`}
+                className={`card ${card.variant || variant}`}
+                style={{ animationDelay: `${index * 120}ms` }}
               >
                 <div className="card-content">
                   {card.image && (
