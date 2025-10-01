@@ -2,7 +2,7 @@
 @use '../../styles/mixins' as *;
 
 .info-cards {
-  padding: $spacing-2xl $container-padding;
+  padding: $spacing-4xl $container-padding;
   display: flex;
   justify-content: center;
 
@@ -13,6 +13,15 @@
   .container {
     max-width: $desktop;
     width: 100%;
+  }
+
+  // Animation classes
+  .animated-header {
+    @include fade-in-up;
+  }
+
+  .animated-cards-grid {
+    @include fade-in-up;
   }
 
   .section-header-wrapper {
@@ -147,7 +156,6 @@
     display: grid;
     gap: $spacing-md;
     margin: $spacing-3xl 0;
-    padding: $spacing-md;
 
     &.columns-1 {
       grid-template-columns: 1fr;
@@ -528,8 +536,10 @@
     border-radius: $border-radius-lg;
     overflow: hidden;
     text-decoration: none;
-    transition: all $transition-base;
     height: 100%;
+    @include scale-in;
+    @include magnetic-hover(6px);
+    transition: all $transition-smooth;
 
     .card-content {
       height: 100%;

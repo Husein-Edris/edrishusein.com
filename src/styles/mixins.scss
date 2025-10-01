@@ -49,7 +49,7 @@
   margin: 0 auto;
   padding-left: $container-padding;
   padding-right: $container-padding;
-  
+
   @include mobile {
     padding-left: $container-padding-mobile;
     padding-right: $container-padding-mobile;
@@ -58,7 +58,7 @@
 
 @mixin section-spacing {
   padding: $section-padding-y $container-padding;
-  
+
   @include mobile {
     padding: $section-padding-y-mobile $container-padding-mobile;
   }
@@ -94,7 +94,7 @@
   justify-content: center;
   text-align: center;
   white-space: nowrap;
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -102,17 +102,21 @@
 }
 
 @mixin button-size($size: 'md') {
-  @if $size == 'sm' {
+  @if $size =='sm' {
     font-size: $font-size-sm;
     padding: $spacing-sm $spacing-md;
     border-radius: $border-radius-sm;
     min-height: 36px;
-  } @else if $size == 'md' {
+  }
+
+  @else if $size =='md' {
     font-size: $font-size-base;
     padding: $spacing-md $spacing-lg;
     border-radius: $border-radius-md;
     min-height: 44px;
-  } @else if $size == 'lg' {
+  }
+
+  @else if $size =='lg' {
     font-size: $font-size-lg;
     padding: $spacing-lg $spacing-xl;
     border-radius: $border-radius-lg;
@@ -122,17 +126,18 @@
 
 @mixin button-primary {
   @include button-base;
-  background-color: $color-beige;
-  color: $primary-dark;
-  border: 2px solid $color-beige;
-  
+  background-color: $primary-dark;
+  color: $primary-light;
+  border: 2px solid $primary-dark;
+
   &:hover:not(:disabled) {
     background-color: transparent;
-    color: $color-beige;
-    transform: translateY(-2px);
-    box-shadow: $shadow-md;
+    color: $primary-dark;
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: $shadow-xl;
+    filter: brightness(1.1);
   }
-  
+
   &:active {
     transform: translateY(0);
   }
@@ -143,14 +148,15 @@
   background-color: transparent;
   color: $white;
   border: 2px solid $white;
-  
+
   &:hover:not(:disabled) {
     background-color: $white;
     color: $primary-dark;
-    transform: translateY(-2px);
-    box-shadow: $shadow-md;
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: $shadow-xl;
+    filter: brightness(1.1);
   }
-  
+
   &:active {
     transform: translateY(0);
   }
@@ -161,14 +167,14 @@
   background-color: transparent;
   color: $primary-dark;
   border: 2px solid $primary-dark;
-  
+
   &:hover:not(:disabled) {
     background-color: $primary-dark;
     color: $white;
     transform: translateY(-2px);
     box-shadow: $shadow-md;
   }
-  
+
   &:active {
     transform: translateY(0);
   }
@@ -179,15 +185,124 @@
   background-color: transparent;
   color: inherit;
   border: 2px solid transparent;
-  
+
   &:hover:not(:disabled) {
     background-color: $bg-gray-light;
     transform: translateY(-1px);
   }
-  
+
   &:active {
     transform: translateY(0);
   }
+}
+
+// ============================================================================
+// ANIMATION MIXINS
+// ============================================================================
+
+// Scroll-triggered fade-in animations
+@mixin fade-in-up {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity $animation-slower $ease-out-expo, transform $animation-slower $ease-out-expo;
+
+  &.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@mixin fade-in-left {
+  opacity: 0;
+  transform: translateX(-40px);
+  transition: opacity $animation-slower $ease-out-expo, transform $animation-slower $ease-out-expo;
+
+  &.animate-in {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@mixin fade-in-right {
+  opacity: 0;
+  transform: translateX(40px);
+  transition: opacity $animation-slower $ease-out-expo, transform $animation-slower $ease-out-expo;
+
+  &.animate-in {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@mixin scale-in {
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 1000ms $ease-out-expo, transform 1000ms $ease-spring;
+
+  &.animate-in {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// Staggered animations for cards
+@mixin stagger-animation($delay: 0ms) {
+  animation-delay: $delay;
+  animation-fill-mode: forwards;
+}
+
+// Text reveal animation
+@mixin text-reveal {
+  overflow: hidden;
+
+  .text-reveal-inner {
+    display: inline-block;
+    transform: translateY(100%);
+    transition: transform $animation-slow $ease-out-expo;
+  }
+
+  &.animate-in .text-reveal-inner {
+    transform: translateY(0);
+  }
+}
+
+// Magnetic hover effect
+@mixin magnetic-hover($strength: 8px) {
+  transition: transform $transition-base $ease-out-quart;
+
+  &:hover {
+    transform: translateY(-$strength) scale(1.02);
+  }
+}
+
+// Smooth hover glow
+@mixin hover-glow($color: $color-beige, $blur: 20px) {
+  position: relative;
+  transition: all $transition-base;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: $color;
+    opacity: 0;
+    filter: blur($blur);
+    z-index: -1;
+    transition: opacity $transition-base;
+  }
+
+  &:hover::before {
+    opacity: 0.1;
+  }
+}
+
+// Parallax transform
+@mixin parallax($speed: 0.5) {
+  transform: translateY(calc(var(--scroll-y, 0) * #{$speed}));
+  will-change: transform;
 }
 
 // ============================================================================
@@ -200,7 +315,7 @@
   overflow: hidden;
   transition: all $transition-base;
   box-shadow: $shadow-sm;
-  
+
   &:hover {
     box-shadow: $shadow-lg;
     transform: translateY(-4px);
@@ -210,7 +325,7 @@
 @mixin card-dark {
   background: $bg-gray-dark;
   color: $white;
-  
+
   &:hover {
     background: rgba($white, 0.1);
   }
@@ -256,7 +371,7 @@
   .section-title {
     color: $white;
     font-family: $font-family-syncopate;
-    font-size: $font-size-3xl;
+    font-size: $font-size-5xl;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     position: relative;

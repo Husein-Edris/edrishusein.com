@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import './Projects.scss';
 import SectionHeader from '../SectionHeader/SectionHeader';
+import { useScrollAnimation, useStaggeredAnimation } from '../../hooks/useScrollAnimation';
 
 interface ProjectImage {
   node: {
@@ -55,18 +56,34 @@ const Projects = ({ data }: ProjectsProps) => {
   const projects = data?.projects || fallbackProjects;
   const sectionTitle = data?.sectionTitle || 'Projects';
 
+  // Animation hooks
+  const headerAnimation = useScrollAnimation({ threshold: 0.2 });
+  const gridAnimation = useScrollAnimation({ threshold: 0.1, delay: 200 });
+
   return (
     <section className="projects">
       <div className="container">
-        <SectionHeader title={sectionTitle} hideNumber={true} />
+        <div 
+          ref={headerAnimation.ref} 
+          className={`section-header-animated ${headerAnimation.className}`}
+        >
+          <SectionHeader title={sectionTitle} hideNumber={true} />
+        </div>
         
-        <div className="projects-grid">
-          {projects.map((project, index) => (
-            <div 
-              key={project.id} 
-              className={`project-card ${index % 2 === 0 ? 'dark' : 'light'}`}
-            >
-              <div className="project-image">
+        <div 
+          ref={gridAnimation.ref}
+          className={`projects-grid animated-grid ${gridAnimation.className}`}
+        >
+          {projects.map((project, index) => {
+            const cardAnimation = useStaggeredAnimation(index, 150);
+            
+            return (
+              <div 
+                key={project.id} 
+                ref={cardAnimation.ref}
+                className={`project-card ${index % 2 === 0 ? 'dark' : 'light'} ${cardAnimation.className}`}
+              >
+                <div className="project-image">
                 <Image
                   src={project.featuredImage.node.sourceUrl}
                   alt={project.featuredImage.node.altText || project.title}
@@ -90,8 +107,9 @@ const Projects = ({ data }: ProjectsProps) => {
                   </Link>
                 </div>
               </div>
-            </div>
-          ))}
+              </div>
+            );
+          })}
         </div>
 
       </div>

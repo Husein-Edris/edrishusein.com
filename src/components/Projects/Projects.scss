@@ -27,6 +27,15 @@
     }
   }
 
+  // Animation classes
+  .section-header-animated {
+    @include fade-in-up;
+  }
+
+  .animated-grid {
+    @include fade-in-up;
+  }
+
   .projects-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -55,19 +64,22 @@
     background-color: rgba($text-light-gray, 0.1);
     position: relative;
     width: 100%;
+    @include scale-in;
     
     // Desktop-only effects
     @media (min-width: $mobile) {
       filter: grayscale(100%);
-      transition: all $transition-base;
+      transition: all $transition-smooth, box-shadow $transition-base;
       cursor: pointer;
+      @include hover-glow($color-beige, 20px);
 
       &:hover {
         filter: grayscale(0%);
-        transform: scale(1.1);
+        transform: scale(1.1) translateY(-8px);
         z-index: 2;
         background-color: $bg-dark;
         width: 115%;
+        box-shadow: $shadow-2xl;
 
         .project-content {
           background-color: $bg-dark;

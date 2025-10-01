@@ -1,6 +1,9 @@
+'use client';
+
 import './about.scss';
 import SectionHeader from '../SectionHeader/SectionHeader';
 import Link from 'next/link';
+import { useScrollAnimation } from '../../hooks/useScrollAnimation';
 
 interface AboutProps {
   data?: {
@@ -13,17 +16,31 @@ const About = ({ data }: AboutProps) => {
   // Use data from props if available, otherwise use fallbacks
   const title = data?.title || "About Me";
   
+  // Animation hooks
+  const headerAnimation = useScrollAnimation({ threshold: 0.2 });
+  const descriptionAnimation = useScrollAnimation({ threshold: 0.1, delay: 300 });
+  const ctaAnimation = useScrollAnimation({ threshold: 0.2, delay: 600 });
+  
   return (
     <section className="about">
       <div className="container">
-        <SectionHeader title={title} variant="light" hideNumber={true} />
+        <div 
+          ref={headerAnimation.ref}
+          className={`about-header-animated ${headerAnimation.className}`}
+        >
+          <SectionHeader title={title} variant="light" hideNumber={true} />
+        </div>
         {data?.aboutMeText ? (
           <div 
-            className="description"
+            ref={descriptionAnimation.ref}
+            className={`description animated-description ${descriptionAnimation.className}`}
             dangerouslySetInnerHTML={{ __html: data.aboutMeText }}
           />
         ) : (
-          <div className="description">
+          <div 
+            ref={descriptionAnimation.ref}
+            className={`description animated-description ${descriptionAnimation.className}`}
+          >
             <p>I'm Edris, a WordPress Developer based in Dornbirn, Austria. I specialize in WordPress development, PHP, and modern web technologies, always looking for ways to build better, faster, and more efficient web solutions.</p>
 
             <h3>What I do</h3>
@@ -44,7 +61,10 @@ const About = ({ data }: AboutProps) => {
           </div>
         )}
         
-        <div className="about-cta">
+        <div 
+          ref={ctaAnimation.ref}
+          className={`about-cta animated-cta ${ctaAnimation.className}`}
+        >
           <Link href="/about" className="learn-more-btn">
             Learn more about me
           </Link>
