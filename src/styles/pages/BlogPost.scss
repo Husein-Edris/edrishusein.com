@@ -89,6 +89,7 @@
             color: rgba($primary-dark, 0.8);
             text-decoration: none;
             transition: color $transition-base;
+           
 
             &:hover {
               color: $primary-dark;
@@ -134,7 +135,7 @@
           .reading-time {
             background: rgba($primary-dark, 0.1);
             color: $primary-dark;
-            padding: $spacing-xs !important;
+            padding: $spacing-3xl !important;
             line-height: 2rem;
             border-radius: $border-radius-full;
             font-size: $font-size-sm;
