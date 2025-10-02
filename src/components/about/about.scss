@@ -127,6 +127,10 @@
       .learn-more-btn {
         @include button-primary;
         @include button-size('md');
+
+        @include mobile {
+          width: 100%;
+        }
         
       }
     }

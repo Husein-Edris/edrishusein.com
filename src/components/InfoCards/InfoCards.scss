@@ -7,7 +7,7 @@
   justify-content: center;
 
   @include mobile {
-    padding: $spacing-lg $container-padding-mobile;
+    padding: $spacing-2xl $container-padding-mobile;
   }
 
   .container {
@@ -89,6 +89,10 @@
       font-size: $font-size-sm;
       text-decoration: none;
 
+      @include mobile {
+        width: 100%;
+      }
+
       &::after {
         content: '→';
         font-size: $font-size-base;
@@ -130,8 +134,6 @@
     // Light mode mobile button styling
     .view-more-mobile {
       .view-more-link {
-        @include button-outline;
-        @include button-size('sm');
         display: inline-flex;
         align-items: center;
         gap: $spacing-xs;
@@ -197,7 +199,7 @@
 
       .card {
         border: 2px solid $white;
-        
+
         .card-info {
           background-color: $bg-dark;
         }
@@ -221,7 +223,7 @@
 
       .card {
         border: 2px solid $light-black;
-        
+
         .card-info {
           background-color: $primary-color;
         }
@@ -273,7 +275,7 @@
 
     .card {
       @include card-hover-effect;
-      
+
       &:hover {
         .card-image img {
           transform: scale(1.05);
@@ -289,8 +291,13 @@
 
     .cards-grid {
       column-gap: $spacing-md;
-      row-gap:  $spacing-xl;   
-     }
+      row-gap: $spacing-xl;
+
+      @include tablet {
+        margin: 0;
+        padding: 0;
+      }
+    }
 
     .card {
       border-radius: $border-radius-lg;
@@ -314,7 +321,7 @@
 
       @media (min-width: $mobile) {
         @include card-hover-effect;
-        
+
         &:hover {
           box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
         }
@@ -360,6 +367,7 @@
       overflow: hidden;
 
       @include tablet {
+        margin: 0;
         height: 240px !important; // Same height on tablet
       }
 
@@ -452,20 +460,21 @@
 
   // Blog skin styles
   &.blog {
+
     // Hide images for blog cards
     .card-image {
       display: none;
     }
-    
+
     // Slightly reduce padding for blog cards
     .card-info {
       padding: $spacing-lg !important;
-      
+
       @include mobile {
         padding: $spacing-md !important;
       }
     }
-    
+
     &.blog-light {
       background-color: $white;
       border-radius: $border-radius-xl;
