@@ -149,7 +149,7 @@ const FALLBACK_ABOUT_DATA = {
         mediaDetails: { width: 450, height: 450 }
       }
     },
-    aboutPageFieldsNew: {
+    aboutPageFields: {
       aboutHeroTitle: "About Edris Husein",
       aboutHeroSubtitle: "Full-stack developer passionate about creating exceptional digital experiences",
       aboutHeroImage: {
@@ -589,9 +589,9 @@ export class DataFetcher {
                         }
                       }
                     } : FALLBACK_ABOUT_DATA.page.featuredImage,
-                    aboutPageFieldsNew: {
-                      aboutHeroTitle: aboutPage.acf?.about_hero_title || FALLBACK_ABOUT_DATA.page.aboutPageFieldsNew.aboutHeroTitle,
-                      aboutHeroSubtitle: aboutPage.acf?.about_hero_subtitle || FALLBACK_ABOUT_DATA.page.aboutPageFieldsNew.aboutHeroSubtitle,
+                    aboutPageFields: {
+                      aboutHeroTitle: aboutPage.acf?.about_hero_title || FALLBACK_ABOUT_DATA.page.aboutPageFields.aboutHeroTitle,
+                      aboutHeroSubtitle: aboutPage.acf?.about_hero_subtitle || FALLBACK_ABOUT_DATA.page.aboutPageFields.aboutHeroSubtitle,
                       aboutHeroImage: aboutPage.acf?.about_hero_image ? {
                         sourceUrl: aboutPage.acf.about_hero_image.url || aboutPage.acf.about_hero_image.source_url,
                         altText: aboutPage.acf.about_hero_image.alt || aboutPage.acf.about_hero_image.alt_text || 'About Hero Image',
@@ -599,13 +599,13 @@ export class DataFetcher {
                           width: aboutPage.acf.about_hero_image.width || 450,
                           height: aboutPage.acf.about_hero_image.height || 450
                         }
-                      } : FALLBACK_ABOUT_DATA.page.aboutPageFieldsNew.aboutHeroImage,
-                      experienceSectionTitle: aboutPage.acf?.experience_section_title || FALLBACK_ABOUT_DATA.page.aboutPageFieldsNew.experienceSectionTitle,
-                      experienceItems: aboutPage.acf?.experience_items || FALLBACK_ABOUT_DATA.page.aboutPageFieldsNew.experienceItems,
-                      skillsSectionTitle: aboutPage.acf?.skills_section_title || FALLBACK_ABOUT_DATA.page.aboutPageFieldsNew.skillsSectionTitle,
-                      selectedSkills: aboutPage.acf?.selected_skills || FALLBACK_ABOUT_DATA.page.aboutPageFieldsNew.selectedSkills,
-                      personalSectionTitle: aboutPage.acf?.personal_section_title || FALLBACK_ABOUT_DATA.page.aboutPageFieldsNew.personalSectionTitle,
-                      personalContent: aboutPage.acf?.personal_content || FALLBACK_ABOUT_DATA.page.aboutPageFieldsNew.personalContent,
+                      } : FALLBACK_ABOUT_DATA.page.aboutPageFields.aboutHeroImage,
+                      experienceSectionTitle: aboutPage.acf?.experience_section_title || FALLBACK_ABOUT_DATA.page.aboutPageFields.experienceSectionTitle,
+                      experienceItems: aboutPage.acf?.experience_items || FALLBACK_ABOUT_DATA.page.aboutPageFields.experienceItems,
+                      skillsSectionTitle: aboutPage.acf?.skills_section_title || FALLBACK_ABOUT_DATA.page.aboutPageFields.skillsSectionTitle,
+                      selectedSkills: aboutPage.acf?.selected_skills || FALLBACK_ABOUT_DATA.page.aboutPageFields.selectedSkills,
+                      personalSectionTitle: aboutPage.acf?.personal_section_title || FALLBACK_ABOUT_DATA.page.aboutPageFields.personalSectionTitle,
+                      personalContent: aboutPage.acf?.personal_content || FALLBACK_ABOUT_DATA.page.aboutPageFields.personalContent,
                       personalImage: aboutPage.acf?.personal_image ? {
                         sourceUrl: aboutPage.acf.personal_image.url || aboutPage.acf.personal_image.source_url,
                         altText: aboutPage.acf.personal_image.alt || aboutPage.acf.personal_image.alt_text || 'Personal Image',
@@ -613,8 +613,8 @@ export class DataFetcher {
                           width: aboutPage.acf.personal_image.width || 450,
                           height: aboutPage.acf.personal_image.height || 450
                         }
-                      } : FALLBACK_ABOUT_DATA.page.aboutPageFieldsNew.personalImage,
-                      selectedHobbies: aboutPage.acf?.selected_hobbies || FALLBACK_ABOUT_DATA.page.aboutPageFieldsNew.selectedHobbies
+                      } : FALLBACK_ABOUT_DATA.page.aboutPageFields.personalImage,
+                      selectedHobbies: aboutPage.acf?.selected_hobbies || FALLBACK_ABOUT_DATA.page.aboutPageFields.selectedHobbies
                     }
                   }
                 };

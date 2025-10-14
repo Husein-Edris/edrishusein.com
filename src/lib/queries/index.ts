@@ -97,7 +97,7 @@ export const GET_POSTS_FOR_NOTEBOOK = `
 
 export const GET_CASE_STUDY = `
   query GetCaseStudy($slug: ID!) {
-    project(id: $slug, idType: SLUG) {
+    project(id: $slug, idType: URI) {
       title
       excerpt
       content
@@ -191,7 +191,7 @@ export const GET_CASE_STUDY = `
 
 export const GET_POST_BY_SLUG = `
   query GetPostBySlug($slug: ID!) {
-    post(id: $slug, idType: SLUG) {
+    post(id: $slug, idType: URI) {
       title
       content
       excerpt

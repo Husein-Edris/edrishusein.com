@@ -2,7 +2,7 @@ import { gql } from 'graphql-request';
 
 export const GET_ABOUT_PAGE_DATA = gql`
   query GetAboutPageData {
-    page(id: "about-me", idType: SLUG) {
+    page(id: "about-me", idType: URI) {
       id
       title
       content
@@ -16,7 +16,7 @@ export const GET_ABOUT_PAGE_DATA = gql`
           }
         }
       }
-      aboutPageFieldsNew {
+      aboutPageFields {
         aboutHeroTitle
         aboutHeroSubtitle
         aboutHeroImage {
@@ -34,13 +34,15 @@ export const GET_ABOUT_PAGE_DATA = gql`
           duration
           description
           technologies {
-            ... on Tech {
-              id
-              title
-              featuredImage {
-                node {
-                  sourceUrl
-                  altText
+            nodes {
+              ... on Tech {
+                id
+                title
+                featuredImage {
+                  node {
+                    sourceUrl
+                    altText
+                  }
                 }
               }
             }
@@ -48,15 +50,17 @@ export const GET_ABOUT_PAGE_DATA = gql`
         }
         skillsSectionTitle
         selectedSkills {
-          ... on Skill {
-            id
-            title
-            content
-            excerpt
-            featuredImage {
-              node {
-                sourceUrl
-                altText
+          nodes {
+            ... on Skill {
+              id
+              title
+              content
+              excerpt
+              featuredImage {
+                node {
+                  sourceUrl
+                  altText
+                }
               }
             }
           }
@@ -72,15 +76,17 @@ export const GET_ABOUT_PAGE_DATA = gql`
           }
         }
         selectedHobbies {
-          ... on Hobby {
-            id
-            title
-            content
-            excerpt
-            featuredImage {
-              node {
-                sourceUrl
-                altText
+          nodes {
+            ... on Hobby {
+              id
+              title
+              content
+              excerpt
+              featuredImage {
+                node {
+                  sourceUrl
+                  altText
+                }
               }
             }
           }
