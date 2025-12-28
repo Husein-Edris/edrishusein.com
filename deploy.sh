@@ -115,10 +115,22 @@ fi
 echo "🧹 Ensuring no conflicting processes..."
 pkill -f "next-server" 2>/dev/null && echo "✅ Stopped additional next-server processes" || true
 pkill -f "node.*server.js" 2>/dev/null && echo "✅ Stopped additional node processes" || true
+pkill -f "sh -c next start" 2>/dev/null && echo "✅ Stopped shell wrapper processes" || true
 
 # Also kill any process using port 3000
 lsof -ti:3000 | xargs kill -9 2>/dev/null && echo "✅ Freed up port 3000" || true
-sleep 2
+sleep 3
+
+# Double check - show any remaining Node.js processes
+REMAINING=$(ps aux | grep -E "(node|next)" | grep -v grep || true)
+if [ ! -z "$REMAINING" ]; then
+    echo "⚠️ Found remaining Node.js processes:"
+    echo "$REMAINING"
+    echo "🧹 Force killing remaining processes..."
+    pkill -9 -f "next" 2>/dev/null || true
+    pkill -9 -f "node" 2>/dev/null || true
+    sleep 2
+fi
 
 # Verify port 3000 is available
 if lsof -i:3000 >/dev/null 2>&1; then
