@@ -142,8 +142,28 @@ echo "🆔 Started server with PID: $SERVER_PID"
 sleep 3
 if kill -0 $SERVER_PID 2>/dev/null; then
     echo "✅ Deployment successful! Process is running."
+    echo "🔗 Testing server response..."
+    if curl -s -I http://localhost:3000/ | head -1 | grep -q "200\|301\|302"; then
+        echo "✅ Server responding correctly"
+    else
+        echo "⚠️ Server running but not responding properly"
+    fi
 else
     echo "❌ Server failed to start"
+    echo "🔍 Checking logs for error details:"
+    echo "----------------------------------------"
+    tail -20 server.log
+    echo "----------------------------------------"
+    echo "🔍 Checking what's using port 3000:"
+    lsof -i:3000 || echo "No process found on port 3000"
+    echo "🔍 Checking for any Node.js processes:"
+    ps aux | grep -E "(node|next)" | grep -v grep || echo "No Node.js processes found"
+    echo "🔍 Checking if server.js exists:"
+    if [ -f ".next/standalone/server.js" ]; then
+        echo "✅ server.js exists"
+    else
+        echo "❌ server.js not found!"
+    fi
     rm -f $PID_FILE
     exit 1
 fi
