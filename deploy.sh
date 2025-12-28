@@ -98,8 +98,10 @@ echo "✅ Static files copied to document root"
 
 # 5. Safer process restart using PID file
 echo "🔄 Managing server process..."
+
+# First try to stop via PID file
 if [ -f "$PID_FILE" ]; then
-    echo "🛑 Stopping existing process..."
+    echo "🛑 Stopping existing process via PID file..."
     if kill $(cat $PID_FILE) 2>/dev/null; then
         echo "✅ Stopped existing process"
         sleep 2
@@ -108,6 +110,26 @@ if [ -f "$PID_FILE" ]; then
     fi
     rm -f $PID_FILE
 fi
+
+# Force kill any remaining Node.js processes to prevent port conflicts
+echo "🧹 Ensuring no conflicting processes..."
+pkill -f "next-server" 2>/dev/null && echo "✅ Stopped additional next-server processes" || true
+pkill -f "node.*server.js" 2>/dev/null && echo "✅ Stopped additional node processes" || true
+
+# Also kill any process using port 3000
+lsof -ti:3000 | xargs kill -9 2>/dev/null && echo "✅ Freed up port 3000" || true
+sleep 2
+
+# Verify port 3000 is available
+if lsof -i:3000 >/dev/null 2>&1; then
+    echo "❌ Port 3000 is still in use, waiting..."
+    sleep 3
+    if lsof -i:3000 >/dev/null 2>&1; then
+        echo "❌ Cannot free port 3000. Manual intervention needed."
+        exit 1
+    fi
+fi
+echo "✅ Port 3000 is available"
 
 # Start the application in background
 echo "▶️ Starting Next.js server..."
