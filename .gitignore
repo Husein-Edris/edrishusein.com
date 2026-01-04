@@ -46,12 +46,11 @@ wordpress-exports/
 .claude/
 deploy.sh
 ssl-setup.sh
+# Documentation directory - keep local only
 docs/
 *.tar.gz
 claude.json
 TODO.md
 server.log
 CLAUDE.md
-server.log
-server.log
 dev.log
