@@ -48,6 +48,7 @@ deploy.sh
 ssl-setup.sh
 # Documentation directory - keep local only
 docs/
+docs_backup_20260105_142937/
 *.tar.gz
 claude.json
 TODO.md
