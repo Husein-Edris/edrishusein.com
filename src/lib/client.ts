@@ -7,6 +7,6 @@ export const client = new GraphQLClient(endpoint, {
     'Content-Type': 'application/json',
     'Cache-Control': 'no-cache, no-store, must-revalidate',
   },
-  timeout: 10000, // 10 second timeout
+  timeout: 30000, // 30 second timeout (increased for server builds)
   fetch: fetch,
 });

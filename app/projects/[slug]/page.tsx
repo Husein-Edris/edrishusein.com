@@ -16,15 +16,28 @@ export async function generateStaticParams() {
   ];
 
   try {
-    // Try to fetch more projects from API
-    const response = await fetch(`${process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '')}/wp-json/wp/v2/project?per_page=20`);
+    // Try to fetch more projects from API with timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 second timeout
+    
+    const apiUrl = process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '') || 'https://cms.edrishusein.com';
+    const response = await fetch(`${apiUrl}/wp-json/wp/v2/project?per_page=20`, {
+      signal: controller.signal,
+      cache: 'no-store',
+    });
+    
+    clearTimeout(timeoutId);
+    
     if (response.ok) {
       const projects = await response.json();
       const apiSlugs = projects.map((project: any) => ({ slug: project.slug }));
       return [...knownSlugs, ...apiSlugs];
     }
-  } catch (error) {
-    console.error('Error fetching projects for static generation:', error);
+  } catch (error: any) {
+    // Don't fail build if API is unreachable - use known slugs
+    if (error.name !== 'AbortError') {
+      console.error('Error fetching projects for static generation:', error.message || error);
+    }
   }
 
   return knownSlugs;
