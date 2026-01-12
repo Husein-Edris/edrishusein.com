@@ -1,8 +1,9 @@
+@use 'sass:color';
 @use '../variables' as *;
 @use '../mixins' as *;
 
 .wordpress-page {
-  background: linear-gradient(135deg, $primary-color 0%, darken($primary-color, 8%) 100%);
+  background: linear-gradient(135deg, $primary-color 0%, color.adjust($primary-color, $lightness: -8%) 100%);
   color: $white;
   min-height: 100vh;
 
@@ -243,7 +244,7 @@
         transition: color $transition-base;
 
         &:hover {
-          color: lighten($info-color, 10%);
+          color: color.adjust($info-color, $lightness: 10%);
         }
       }
 

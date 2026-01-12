@@ -30,8 +30,11 @@
 
 .cookie-banner-content {
   @include container;
-  padding-top: $spacing-lg;
-  padding-bottom: $spacing-lg;
+  
+  & {
+    padding-top: $spacing-lg;
+    padding-bottom: $spacing-lg;
+  }
 }
 
 .cookie-banner-main {
