@@ -1,9 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -47,11 +44,11 @@ const nextConfig: NextConfig = {
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
           
           // Tech Stack Showcase Headers
-          { key: 'X-Powered-By', value: 'WordPress (Headless CMS) + Next.js 15' },
+          { key: 'X-Powered-By', value: 'WordPress (Headless CMS) + Next.js 16' },
           { key: 'X-Framework', value: 'Next.js' },
           { key: 'X-CMS', value: 'WordPress' },
           { key: 'X-Architecture', value: 'Headless' },
-          { key: 'X-Frontend-Stack', value: 'React 19, Next.js 15, TypeScript, SCSS' },
+          { key: 'X-Frontend-Stack', value: 'React 19, Next.js 16, TypeScript, SCSS' },
           { key: 'X-Backend-Stack', value: 'WordPress, GraphQL, WPGraphQL, Advanced Custom Fields' },
           { key: 'X-Deployment', value: 'PM2, Node.js, Custom Server' },
         ],
