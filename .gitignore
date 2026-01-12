@@ -15,6 +15,7 @@
 
 # next.js
 /.next/
+/_next/
 /out/
 
 # production
@@ -55,3 +56,4 @@ TODO.md
 server.log
 CLAUDE.md
 dev.log
+*.log
