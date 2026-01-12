@@ -42,7 +42,7 @@ const nextConfig: NextConfig = {
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'origin-when-cross-origin' },
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
-          
+
           // Tech Stack Showcase Headers
           { key: 'X-Powered-By', value: 'WordPress (Headless CMS) + Next.js 16' },
           { key: 'X-Framework', value: 'Next.js' },

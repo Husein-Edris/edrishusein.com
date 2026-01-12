@@ -18,8 +18,11 @@ async function fetchAllPosts() {
     
     const response = await client.request(query);
     return response.posts?.nodes || [];
-  } catch (error) {
-    console.error('Error fetching posts for sitemap:', error);
+  } catch (error: any) {
+    // Silently fail - return empty array so sitemap still generates
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('⚠️ Could not fetch posts for sitemap:', error.message || error);
+    }
     return [];
   }
 }
@@ -41,8 +44,11 @@ async function fetchAllProjects() {
     
     const response = await client.request(query);
     return response.projects?.nodes || [];
-  } catch (error) {
-    console.error('Error fetching projects for sitemap:', error);
+  } catch (error: any) {
+    // Silently fail - return empty array so sitemap still generates
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('⚠️ Could not fetch projects for sitemap:', error.message || error);
+    }
     return [];
   }
 }
