@@ -32,8 +32,16 @@ echo "✅ Git pull completed"
 # Restore stashed changes if any
 if [ "$STASHED" = true ]; then
     echo "📌 Applying previously stashed changes..."
-    git stash pop || echo "⚠️ Could not apply stashed changes automatically. Check 'git stash list'"
+    if git stash apply; then
+        git stash drop
+    else
+        echo "⚠️ Could not apply stashed changes automatically. Check 'git stash list'"
+        echo "📝 Conflicting files:"
+        git diff --name-only --diff-filter=U
+        echo "💡 Resolve conflicts manually, then run 'git stash drop' if needed."
+    fi
 fi
+echo "✅ Git synchronization complete"
 
 # Check environment files
 echo "🔧 Checking environment configuration..."
