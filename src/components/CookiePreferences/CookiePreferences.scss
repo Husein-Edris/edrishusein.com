@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use '../../styles/variables' as *;
 @use '../../styles/mixins' as *;
 
@@ -361,7 +362,7 @@
       color: $primary-dark;
 
       &:hover {
-        background: lighten($color-beige, 10%);
+        background: color.adjust($color-beige, $lightness: 10%);
       }
     }
 
@@ -386,7 +387,7 @@
       }
 
       &:hover {
-        background: lighten($color-beige, 10%);
+        background: color.adjust($color-beige, $lightness: 10%);
         box-shadow: 0 6px 12px rgba($color-beige, 0.4);
       }
     }
@@ -414,7 +415,10 @@
 
   .container {
     @include container;
-    max-width: 1200px;
+    
+    & {
+      max-width: 1200px;
+    }
   }
 
   .page-header {

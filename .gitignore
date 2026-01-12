@@ -54,6 +54,8 @@ docs_backup_20260105_142937/
 claude.json
 TODO.md
 server.log
+server.log.*
 CLAUDE.md
 dev.log
 *.log
+tmp/
