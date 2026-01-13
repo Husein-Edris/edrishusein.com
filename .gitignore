@@ -59,5 +59,7 @@ CLAUDE.md
 dev.log
 *.log
 tmp/
-# Diagnostic tools
-test-wp-api.js
+
+# Spec-Driven Development (SDD/Speckit) - Personal workflow, not needed on GitHub
+.specify/
+specs/
