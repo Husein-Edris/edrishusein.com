@@ -1,8 +1,8 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
-/node_modules
-/.pnp
+# ============================================
+# Dependencies
+# ============================================
+node_modules/
+.pnp
 .pnp.*
 .yarn/*
 !.yarn/patches
@@ -10,54 +10,225 @@
 !.yarn/releases
 !.yarn/versions
 
-# testing
-/coverage
+# ============================================
+# Testing
+# ============================================
+coverage/
+.nyc_output/
+*.lcov
 
-# next.js
-/.next/
-/_next/
-/out/
-
-# production
-/build
-
-# misc
-.DS_Store
-*.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# env files (can opt-in for committing if needed)
-.env*
-
-# vercel
+# ============================================
+# Next.js
+# ============================================
+.next/
+_next/
+out/
+.next/cache/
 .vercel
 
-# typescript
+# ============================================
+# Production / Build
+# ============================================
+build/
+dist/
 *.tsbuildinfo
 next-env.d.ts
 
-# Development and deployment files (not needed in production)
-acf-exports/
-wordpress-exports/
-.claude/
-deploy.sh
-ssl-setup.sh
-# Documentation directory - keep local only
-docs/
-docs_backup_20260105_142937/
-*.tar.gz
-claude.json
-TODO.md
+# ============================================
+# Environment Variables
+# ============================================
+.env
+.env*.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+
+# ============================================
+# Logs
+# ============================================
+*.log
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 server.log
 server.log.*
-CLAUDE.md
 dev.log
-*.log
+error_log
+logs/
+*.log.*
+
+# ============================================
+# Runtime & Process Management
+# ============================================
+# PM2
+.pm2/
+ecosystem.config.js.bak
+*.pid
+*.seed
+*.pid.lock
+
+# ============================================
+# OS Files
+# ============================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ============================================
+# IDE & Editors
+# ============================================
+# VSCode
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+# Cursor
+.cursor/
+
+# JetBrains IDEs
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Vim
+*.swp
+*.swo
+*~
+.netrwhist
+Session.vim
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# ============================================
+# Temporary Files
+# ============================================
 tmp/
-# Diagnostic tools
-test-wp-api.js
+temp/
+*.tmp
+*.temp
+*.cache
+.cache/
+
+# ============================================
+# Backup Files
+# ============================================
+*.backup
+*.bak
+*.old
+*backup*.php
+*-backup.*
+*~backup*
+*.orig
+*.save
+*.swp
+*~
+
+# Archives
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+*.rar
+*.7z
+*.gz
+
+# ============================================
+# Security & Secrets
+# ============================================
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+*.pfx
+secrets/
+.secrets
+
+# ============================================
+# Development & Deployment Files
+# ============================================
+# WordPress exports
+acf-exports/
+wordpress-exports/
+
+# AI Assistant files
+.claude/
+claude.json
+CLAUDE.md
+
+# Build flags and deployment scripts (uncomment if these are generated)
+# BUILD_FLAG
+# deploy.sh
+
+# ============================================
+# Documentation (Local Only)
+# ============================================
+docs/
+docs_backup_*/
+TODO.md
+
+# ============================================
+# Spec-Driven Development
+# ============================================
+.specify/
+specs/
+
+# ============================================
+# Miscellaneous
+# ============================================
+*.pid
+*.seed
+*.pid.lock
+.eslintcache
+.stylelintcache
+
+
