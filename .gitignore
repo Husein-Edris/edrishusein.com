@@ -1,8 +1,8 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
-/node_modules
-/.pnp
+# ============================================
+# Dependencies
+# ============================================
+node_modules/
+.pnp
 .pnp.*
 .yarn/*
 !.yarn/patches
@@ -10,58 +10,202 @@
 !.yarn/releases
 !.yarn/versions
 
-# testing
-/coverage
+# ============================================
+# Testing
+# ============================================
+coverage/
 .vitest/
 .vitest-cache/
+.nyc_output/
+*.lcov
 
-# next.js
-/.next/
-/_next/
-/out/
-
-# production
-/build
-
-# misc
-.DS_Store
-*.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# env files (can opt-in for committing if needed)
-.env*
-
-# vercel
+# ============================================
+# Next.js
+# ============================================
+.next/
+_next/
+out/
+.next/cache/
 .vercel
 
-# typescript
+# ============================================
+# Production / Build
+# ============================================
+build/
+dist/
 *.tsbuildinfo
 next-env.d.ts
 
-# Development and deployment files (not needed in production)
-acf-exports/
-wordpress-exports/
-.claude/
-deploy.sh
-ssl-setup.sh
-# Documentation directory - keep local only
-docs/
-docs_backup_20260105_142937/
-*.tar.gz
-claude.json
-TODO.md
+# ============================================
+# Environment Variables
+# ============================================
+.env
+.env*.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+
+# ============================================
+# Logs
+# ============================================
+*.log
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 server.log
 server.log.*
-CLAUDE.md
 dev.log
-*.log
-tmp/
+error_log
+logs/
 
-# Spec-Driven Development (SDD/Speckit) - Personal workflow, not needed on GitHub
+# ============================================
+# Runtime & Process Management
+# ============================================
+.pm2/
+ecosystem.config.js.bak
+*.pid
+*.seed
+*.pid.lock
+
+# ============================================
+# OS Files
+# ============================================
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+*~
+.directory
+.Trash-*
+
+# ============================================
+# IDE & Editors
+# ============================================
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+.cursor/
+
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+*.swp
+*.swo
+.netrwhist
+Session.vim
+
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+*.sublime-project
+*.sublime-workspace
+
+# ============================================
+# Temporary Files
+# ============================================
+tmp/
+temp/
+*.tmp
+*.temp
+*.cache
+.cache/
+
+# ============================================
+# Backup Files
+# ============================================
+*.backup
+*.bak
+*.old
+*backup*.php
+*-backup.*
+*~backup*
+*.orig
+*.save
+*.swp
+*~
+
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+*.rar
+*.7z
+*.gz
+
+# ============================================
+# Security & Secrets
+# ============================================
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+*.pfx
+secrets/
+.secrets
+
+# ============================================
+# Development & Deployment Files
+# ============================================
+acf-exports/
+wordpress-exports/
+
+.claude/
+claude.json
+CLAUDE.md
+
+# ============================================
+# Documentation (Local Only)
+# ============================================
+docs/
+docs_backup_*/
+TODO.md
+
+# ============================================
+# Spec-Driven Development
+# ============================================
 .specify/
 specs/
+
+# ============================================
+# Miscellaneous
+# ============================================
+.eslintcache
+.stylelintcache
