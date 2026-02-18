@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
+import { rewriteImageUrls } from '@/src/lib/image-utils';
 import '@/src/styles/pages/Blog.scss';
 import { PostsApiResponse } from '@/src/types/api';
 
@@ -40,7 +41,7 @@ async function getPostsData() {
         
         if (data?.posts?.nodes) {
             console.log(`✅ Found ${data.posts.nodes.length} posts via GraphQL`);
-            return data.posts.nodes;
+            return rewriteImageUrls(data.posts.nodes);
         }
         
         throw new Error('No posts data received from GraphQL');
@@ -62,7 +63,7 @@ async function getPostsData() {
                 console.log(`✅ Found ${restPosts.length} posts via REST API`);
                 
                 // Transform REST API data to match GraphQL structure
-                return restPosts.map((post: any) => ({
+                return rewriteImageUrls(restPosts.map((post: any) => ({
                     id: post.id.toString(),
                     title: post.title?.rendered || post.title,
                     excerpt: post.excerpt?.rendered || post.excerpt || '',
@@ -77,7 +78,7 @@ async function getPostsData() {
                             }
                         }
                     } : null
-                }));
+                })));
             }
         } catch (restError) {
             console.error('REST API fallback also failed:', restError);

@@ -2,6 +2,7 @@ import { GraphQLClient } from 'graphql-request';
 import Image from 'next/image';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
+import { rewriteImageUrls } from '@/src/lib/image-utils';
 import '@/src/styles/pages/CaseStudy.scss';
 
 export const dynamic = 'force-dynamic'; // Always fetch fresh data from WordPress
@@ -31,8 +32,8 @@ async function getTechStackData() {
     if (response.ok) {
       const techs = await response.json();
       console.log('✅ Tech stack data loaded via REST API');
-      
-      return techs.map((tech: any) => ({
+
+      return rewriteImageUrls(techs.map((tech: any) => ({
         id: tech.id.toString(),
         title: tech.title?.rendered || tech.title,
         excerpt: tech.excerpt?.rendered || tech.excerpt || '',
@@ -46,7 +47,7 @@ async function getTechStackData() {
             }
           }
         } : null
-      }));
+      })));
     }
   } catch (error) {
     console.error('❌ Tech stack fetch failed:', error);
@@ -60,7 +61,7 @@ async function getTechStackData() {
         console.log(`✅ Found ${restTechs.length} tech items via REST API`);
         
         // Transform REST API data to match GraphQL structure
-        return restTechs.map((tech: any) => ({
+        return rewriteImageUrls(restTechs.map((tech: any) => ({
           id: tech.id.toString(),
           title: tech.title?.rendered || tech.title,
           excerpt: tech.excerpt?.rendered || tech.excerpt || '',
@@ -74,7 +75,7 @@ async function getTechStackData() {
               }
             }
           } : null
-        }));
+        })));
       }
     } catch (restError) {
       console.error('❌ REST API also failed:', restError);

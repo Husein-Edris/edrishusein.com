@@ -4,6 +4,7 @@ import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
 import { Metadata } from 'next';
 import { generateEnhancedMetadata, generateStructuredData } from '@/src/lib/seo-utils';
+import { rewriteImageUrls } from '@/src/lib/image-utils';
 import '@/src/styles/pages/About.scss';
 
 export const dynamic = 'force-dynamic'; // Always fetch fresh data from WordPress
@@ -368,7 +369,7 @@ async function testWordPressAPI(baseUrl: string): Promise<{success: boolean, iss
           }
         };
 
-      return transformedData;
+      return rewriteImageUrls(transformedData);
       }
     } catch (graphqlError) {
         // console.warn('⚠️ GraphQL failed, falling back to REST API:', graphqlError);
@@ -595,8 +596,8 @@ async function testWordPressAPI(baseUrl: string): Promise<{success: boolean, iss
       }
     };
 
-      return transformedData;
-    
+      return rewriteImageUrls(transformedData);
+
   } catch (error) {
     // console.error('❌ About page: WordPress API error, using fallback:', error);
     return FALLBACK_ABOUT_DATA;
