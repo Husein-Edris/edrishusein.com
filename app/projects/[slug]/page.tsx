@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
 import MoreProjects from '@/src/components/MoreProjects/MoreProjects';
+import { rewriteImageUrls } from '@/src/lib/image-utils';
 import '@/src/styles/pages/CaseStudy.scss';
 
 // Generate static params for all projects
@@ -87,7 +88,7 @@ async function getAllProjectsForMoreProjects() {
     if (!Array.isArray(projects)) return null;
 
     // Transform to match GraphQL structure
-    return {
+    return rewriteImageUrls({
       projects: {
         nodes: projects.map((project: any) => ({
           id: project.id.toString(),
@@ -115,7 +116,7 @@ async function getAllProjectsForMoreProjects() {
           }
         }))
       }
-    };
+    });
   } catch (error) {
     console.error('Error fetching projects for MoreProjects:', error);
     return null;
@@ -136,7 +137,7 @@ async function getProject(slug: string) {
 
     const project = projects[0];
 
-    return {
+    return rewriteImageUrls({
       id: project.id.toString(),
       title: project.title?.rendered || project.title,
       slug: project.slug,
@@ -176,7 +177,7 @@ async function getProject(slug: string) {
         },
         projectGallery: (project.acf_fields || project.acf)?.project_gallery || []
       } : null
-    };
+    });
   } catch (error) {
     console.error('Error fetching project:', error);
     return null;

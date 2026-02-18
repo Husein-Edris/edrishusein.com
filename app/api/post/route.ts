@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { client } from '@/src/lib/client';
 import { GET_POST_BY_SLUG } from '@/src/lib/queries';
 import { PostsApiResponse, WordPressPost } from '@/src/types/api';
+import { rewriteImageUrls } from '@/src/lib/image-utils';
 
 // Helper function to calculate reading time
 function calculateReadingTime(content: string): string {
@@ -60,10 +61,10 @@ export async function GET(request: NextRequest) {
           readingTime: calculateReadingTime(post.excerpt || '')
         }));
 
-        return NextResponse.json({
+        return NextResponse.json(rewriteImageUrls({
           success: true,
           posts
-        });
+        }));
       }
     } catch (error) {
       console.error('❌ Error fetching multiple posts:', error);
@@ -170,10 +171,10 @@ export async function GET(request: NextRequest) {
 
     console.log('✅ Successfully fetched post:', enhancedPost.title);
 
-    return NextResponse.json({
+    return NextResponse.json(rewriteImageUrls({
       success: true,
       post: enhancedPost
-    });
+    }));
 
   } catch (error) {
     console.error('❌ Error fetching post:', error);

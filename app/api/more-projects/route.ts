@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GraphQLClient } from 'graphql-request';
 import { ProjectsApiResponse, WordPressProject } from '@/src/types/api';
+import { rewriteImageUrls } from '@/src/lib/image-utils';
 
 const client = new GraphQLClient(process.env.NEXT_PUBLIC_WORDPRESS_API_URL || '');
 
@@ -104,11 +105,11 @@ export async function GET(request: NextRequest) {
     
     const limitedProjects = data.projects.nodes.slice(0, 3);
     
-    return NextResponse.json({
+    return NextResponse.json(rewriteImageUrls({
       projects: {
         nodes: limitedProjects
       }
-    });
+    }));
   } catch (error) {
     try {
       const restUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '')}/wp-json/wp/v2/project?_embed&per_page=10`;
@@ -150,12 +151,12 @@ export async function GET(request: NextRequest) {
             }
           }));
         
-        return NextResponse.json({
+        return NextResponse.json(rewriteImageUrls({
           projects: {
             nodes: transformedProjects
           },
           source: 'wordpress-rest'
-        });
+        }));
       }
       
       throw new Error('REST API also failed');

@@ -4,6 +4,7 @@ import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
 import { Metadata } from 'next';
 import { generateEnhancedMetadata, generateStructuredData } from '@/src/lib/seo-utils';
+import { rewriteImageUrls } from '@/src/lib/image-utils';
 import '@/src/styles/pages/WordPressPage.scss';
 
 export const dynamic = 'force-dynamic'; // Always fetch fresh data from WordPress
@@ -164,7 +165,7 @@ async function getWordPressPage(slug: string): Promise<WordPressPageData | null>
     console.log(`✅ Found page "${page.title?.rendered}" via REST API`);
     
     // Transform WordPress REST data to expected format
-    return {
+    return rewriteImageUrls({
       page: {
         id: page.id.toString(),
         title: page.title?.rendered || '',
@@ -188,8 +189,8 @@ async function getWordPressPage(slug: string): Promise<WordPressPageData | null>
           } : undefined
         }
       }
-    };
-    
+    });
+
   } catch (error) {
     console.error('❌ Error fetching WordPress page:', error);
     return null;

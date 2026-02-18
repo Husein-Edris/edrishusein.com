@@ -3,6 +3,7 @@ import { client } from './client';
 import { GET_HOMEPAGE_DATA, GET_PROJECTS_FOR_GRID, GET_POSTS_FOR_NOTEBOOK, GET_ABOUT_PAGE_DATA } from './queries';
 import { discoverWordPressSchema, WORKING_QUERIES } from './schema-discovery';
 import { HomepageResponse, ProjectsResponse, HomepageSections } from '@/src/types/wordpress';
+import { rewriteImageUrls } from './image-utils';
 
 // Fallback data when WordPress is unavailable
 const FALLBACK_HOMEPAGE_DATA: HomepageSections = {
@@ -195,11 +196,11 @@ export class DataFetcher {
   ): Promise<FetchResult<T>> {
     try {
       const data = await fetchFn();
-      return {
+      return rewriteImageUrls({
         data,
         error: null,
         source: 'wordpress'
-      };
+      });
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
         console.error(`${errorContext}:`, error);
@@ -649,14 +650,14 @@ export class DataFetcher {
     ]);
 
     return {
-      homepage: homepage.status === 'fulfilled' 
-        ? homepage.value 
+      homepage: homepage.status === 'fulfilled'
+        ? homepage.value
         : { data: FALLBACK_HOMEPAGE_DATA, error: 'Failed to fetch', source: 'fallback' },
-      projects: projects.status === 'fulfilled' 
-        ? projects.value 
+      projects: projects.status === 'fulfilled'
+        ? projects.value
         : { data: FALLBACK_PROJECTS_DATA, error: 'Failed to fetch', source: 'fallback' },
-      posts: posts.status === 'fulfilled' 
-        ? posts.value 
+      posts: posts.status === 'fulfilled'
+        ? posts.value
         : { data: FALLBACK_POSTS_DATA, error: 'Failed to fetch', source: 'fallback' }
     };
   }
