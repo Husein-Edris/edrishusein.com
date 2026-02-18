@@ -1,6 +1,7 @@
 // REST API endpoint for About page data
 import { NextRequest, NextResponse } from 'next/server';
 import { AboutPageACF, ACFImageField } from '@/src/types/api';
+import { rewriteImageUrls } from '@/src/lib/image-utils';
 
 const WORDPRESS_REST_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '') || 'https://cms.edrishusein.com';
 
@@ -59,13 +60,13 @@ export async function GET() {
     
     console.log('✅ About page data transformed successfully');
     
-    return NextResponse.json({
+    return NextResponse.json(rewriteImageUrls({
       data: transformedData,
       _meta: {
         source: 'wordpress-rest',
         hasACF: !!acfData
       }
-    });
+    }));
     
   } catch (error) {
     console.error('❌ About page REST API error:', error);

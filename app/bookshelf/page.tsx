@@ -9,6 +9,8 @@ export const dynamic = 'force-dynamic'; // Always fetch fresh data from WordPres
 
 const client = new GraphQLClient(process.env.NEXT_PUBLIC_WORDPRESS_API_URL || '');
 
+import { rewriteUploadUrl } from '@/src/lib/image-utils';
+
 const GET_BOOKS = `
   query GetBooks {
     books(first: 100) {
@@ -38,7 +40,15 @@ async function getBooksData() {
     
     if (data?.books?.nodes) {
       console.log(`✅ Found ${data.books.nodes.length} books via GraphQL`);
-      return data.books.nodes;
+      return data.books.nodes.map((book: any) => ({
+        ...book,
+        featuredImage: book.featuredImage?.node ? {
+          node: {
+            ...book.featuredImage.node,
+            sourceUrl: rewriteUploadUrl(book.featuredImage.node.sourceUrl),
+          }
+        } : book.featuredImage,
+      }));
     }
     
     throw new Error('No books data received from GraphQL');
@@ -66,7 +76,7 @@ async function getBooksData() {
           excerpt: book.excerpt?.rendered || book.excerpt || '',
           featuredImage: book._embedded?.['wp:featuredmedia']?.[0] ? {
             node: {
-              sourceUrl: book._embedded['wp:featuredmedia'][0].source_url,
+              sourceUrl: rewriteUploadUrl(book._embedded['wp:featuredmedia'][0].source_url),
               altText: book._embedded['wp:featuredmedia'][0].alt_text || book.title?.rendered || '',
               mediaDetails: {
                 width: book._embedded['wp:featuredmedia'][0].media_details?.width || 300,
