@@ -412,6 +412,17 @@
     }
   }
 
+  @include tablet {
+    .section-title {
+      font-size: $font-size-h3;
+
+      &::after {
+        width: 60px;
+        left: calc(100% + #{$spacing-sm});
+      }
+    }
+  }
+
   @include mobile {
     margin-bottom: $spacing-3xl;
 
