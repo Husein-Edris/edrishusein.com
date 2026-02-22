@@ -5,6 +5,10 @@
   background-color: $primary-color;
   padding: $spacing-md $container-padding;
 
+  @include tablet {
+    padding: $spacing-md $spacing-2xl;
+  }
+
   @include mobile {
     padding: $spacing-md;
   }
@@ -25,6 +29,10 @@
     img {
       height: 90px;
       pointer-events: auto;
+
+      @include tablet {
+        height: 64px;
+      }
     }
 
     &:hover {
@@ -132,22 +140,21 @@
       }
 
       .main-nav {
-        display: block;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         height: 100%;
         padding: $spacing-2xl $spacing-lg;
-        overflow: hidden; // Prevent any scrolling within the menu
+        overflow: hidden;
       }
 
       .navList {
-        height: 100%;
         display: flex;
         flex-direction: column;
-        justify-content: center;
-        align-items: center;
+        align-items: flex-start;
         gap: $spacing-lg;
         transform: translateY(20px);
         transition: transform 0.3s ease;
-        overflow: hidden; // Ensure no scrolling
 
         @media (max-height: 600px) {
           gap: $spacing-md;
@@ -160,14 +167,16 @@
 
       .navLink {
         font-family: $font-family-syncopate;
-        font-size: $font-size-xl;
+        font-size: $font-size-3xl;
         color: $white;
         text-decoration: none;
         transition: color $transition-base;
-        text-align: center;
+        display: grid;
+        grid-template-columns: 3rem 1fr;
+        align-items: baseline;
 
         @media (max-height: 600px) {
-          font-size: $font-size-lg;
+          font-size: $font-size-2xl;
         }
 
         &:hover {
@@ -179,10 +188,8 @@
         }
 
         .navNumber {
-          display: block;
-          font-size: $font-size-sm;
+          font-size: $font-size-2xl;
           color: $text-light-gray;
-          margin-bottom: $spacing-xs;
         }
 
         .navText {
@@ -193,67 +200,73 @@
   }
 
   // Desktop nav styles
-  .main-nav {
-    flex: 1;
-    margin: 0 $spacing-md;
+  @media (min-width: #{$mobile + 1}) {
+    .main-nav {
+      flex: 1;
+      margin: 0 $spacing-md;
 
-    .navList {
-      display: flex;
-      justify-content: center;
-      gap: 30px;
-      list-style: none;
-      margin: 0;
-      padding: 0;
+      .navList {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
 
-      .navItem {
-        position: relative;
-
-        &:hover,
-        &:focus,
-        &:active {
-          .navNumber,
-          .navText {
-            color: $color-beige;
-          }
+        @media (max-width: $tablet) {
+          gap: $spacing-lg;
         }
 
-        .navLink {
-          font-family: $font-family-syncopate;
-          text-decoration: none;
-          color: $white;
-          font-weight: $font-weight-bold;
-          font-size: $font-size-base;
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          gap: $spacing-xs;
+        .navItem {
+          position: relative;
 
-          @include mobile {
-            flex-direction: row;
+          &:hover,
+          &:focus,
+          &:active {
+            .navNumber,
+            .navText {
+              color: $color-beige;
+            }
           }
 
-          &::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            top: 45%;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background-color: $white;
-            opacity: 0.3;
-            transform-origin: center;
-            transition: all 0.3s ease;
-          }
+          .navLink {
+            font-family: $font-family-syncopate;
+            text-decoration: none;
+            color: $white;
+            font-weight: $font-weight-bold;
+            font-size: $font-size-base;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: $spacing-xs;
 
-          .navNumber {
-            font-size: $font-size-sm;
-            color: $text-light-gray;
-            margin-bottom: $spacing-xs;
-          }
+            @media (max-width: $tablet) {
+              font-size: $font-size-sm;
+            }
 
-          .navText {
-            position: relative;
+            &::after {
+              content: "";
+              position: absolute;
+              bottom: 0;
+              top: 45%;
+              left: 0;
+              right: 0;
+              height: 2px;
+              background-color: $white;
+              opacity: 0.3;
+              transform-origin: center;
+              transition: all 0.3s ease;
+            }
+
+            .navNumber {
+              font-size: $font-size-sm;
+              color: $text-light-gray;
+              margin-bottom: $spacing-xs;
+            }
+
+            .navText {
+              position: relative;
+            }
           }
         }
       }

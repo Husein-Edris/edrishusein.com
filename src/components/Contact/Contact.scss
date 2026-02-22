@@ -75,15 +75,13 @@
         }
 
         @include tablet {
-            font-size: $font-size-lg;
-            word-break: break-all;
-            overflow-wrap: break-word;
+            font-size: clamp(14px, 4vw, $font-size-5xl);
+            white-space: nowrap;
         }
 
         @include mobile {
-            font-size: $font-size-lg;
-            word-break: break-all;
-            overflow-wrap: break-word;
+            font-size: clamp(11px, 5.2vw, $font-size-5xl);
+            white-space: nowrap;
         }
     }
 
@@ -99,12 +97,6 @@
 
         .title {
             font-size: $font-size-4xl;
-        }
-
-        .email {
-            font-size: $font-size-lg;
-            max-width: 90vw;
-            text-align: center;
         }
     }
 
