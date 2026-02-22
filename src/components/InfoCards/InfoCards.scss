@@ -7,7 +7,7 @@
   justify-content: center;
 
   @include mobile {
-    padding: $spacing-2xl $container-padding-mobile;
+    padding: $spacing-2xl $spacing-md;
   }
 
   .container {
@@ -34,6 +34,7 @@
       flex-direction: column;
       align-items: flex-start;
       gap: $spacing-md;
+      margin-bottom: $spacing-lg;
     }
 
     .section-header {
@@ -187,8 +188,8 @@
     @include mobile {
       grid-template-columns: 1fr !important;
       gap: $spacing-xl;
-      margin-bottom: $spacing-3xl;
-      padding: $spacing-sm;
+      margin: $spacing-lg 0 $spacing-2xl;
+      padding: 0;
     }
   }
 
@@ -386,8 +387,8 @@
       min-height: 160px;
 
       @include mobile {
-        min-height: 140px;
-        padding: $spacing-xl;
+        min-height: 120px;
+        padding: $spacing-md !important;
       }
     }
 
@@ -413,6 +414,12 @@
       margin-top: $spacing-md;
       position: relative;
       z-index: 10;
+
+      @include mobile {
+        transform: translateY(0);
+        opacity: 1;
+        flex-wrap: wrap;
+      }
     }
 
     .project-link {
