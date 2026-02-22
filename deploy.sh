@@ -1,47 +1,13 @@
 #!/bin/bash
 set -e
 
-echo "🚀 Starting deployment with Git sync..."
+echo "🚀 Starting deployment..."
 
 # Set Node.js path for Plesk environment
 export PATH=/opt/plesk/node/24/bin:$PATH
 
 # Variables
 PID_FILE=".next/standalone/server.pid"
-STASHED=false
-
-# 1. Git safety checks - protect against local changes
-echo "🔍 Checking for local changes..."
-if ! git diff-index --quiet HEAD --; then
-    echo "⚠️ You have local changes. Stashing them temporarily..."
-    git stash push -m "auto-stash-before-deploy-$(date +%Y%m%d-%H%M%S)" || {
-        echo "❌ Failed to stash changes"
-        exit 1
-    }
-    STASHED=true
-fi
-
-# Pull latest changes from Git
-echo "📥 Pulling latest changes..."
-git pull origin main || {
-    echo "❌ Git pull failed"
-    exit 1
-}
-echo "✅ Git pull completed"
-
-# Restore stashed changes if any
-if [ "$STASHED" = true ]; then
-    echo "📌 Applying previously stashed changes..."
-    if git stash apply; then
-        git stash drop
-    else
-        echo "⚠️ Could not apply stashed changes automatically. Check 'git stash list'"
-        echo "📝 Conflicting files:"
-        git diff --name-only --diff-filter=U
-        echo "💡 Resolve conflicts manually, then run 'git stash drop' if needed."
-    fi
-fi
-echo "✅ Git synchronization complete"
 
 # Check environment files
 echo "🔧 Checking environment configuration..."
@@ -72,7 +38,7 @@ echo "✅ Build caches cleared - prevents JavaScript console errors!"
 echo "🧹 Clearing npm cache for thorough cleanup..."
 npm cache clean --force 2>/dev/null || echo "⚠️ NPM cache clean failed (non-critical)"
 
-# 2. Install dependencies with better error handling
+# 1. Install dependencies with better error handling
 echo "📦 Installing dependencies..."
 npm install || {
     echo "❌ npm install failed"
@@ -97,14 +63,14 @@ else
     echo "✅ No vulnerabilities found"
 fi
 
-# 3. Build application with error handling
+# 2. Build application with error handling
 echo "🔨 Building application..."
 npm run build || {
     echo "❌ Build failed"
     exit 1
 }
 
-# 4. Check build artifacts exist
+# 3. Check build artifacts exist
 if [ ! -f ".next/standalone/server.js" ]; then
     echo "❌ Build failed: server.js not found!"
     exit 1
@@ -122,7 +88,7 @@ mkdir -p _next
 cp -r .next/static _next/
 echo "✅ Static files copied to document root"
 
-# 5. Safer process restart using PID file
+# 4. Safer process restart using PID file
 echo "🔄 Managing server process..."
 
 # First try to stop via PID file
@@ -206,10 +172,9 @@ else
     exit 1
 fi
 
-# 6. Deployment summary
+# 5. Deployment summary
 echo ""
 echo "🎉 Deployment completed successfully!"
-echo "📌 Deployed commit: $(git rev-parse HEAD)"
 echo "📅 Deployment time: $(date '+%Y-%m-%d %H:%M:%S')"
 echo "🌍 Site updated at: https://edrishusein.com"
 echo "📊 Check logs with: tail -f server.log"
