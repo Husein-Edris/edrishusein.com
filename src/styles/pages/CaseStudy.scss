@@ -263,6 +263,28 @@
       strong {
         color: $white;
       }
+
+      code {
+        background: rgba($text-light-gray, 0.2);
+        padding: calc($spacing-unit * 0.25) calc($spacing-unit * 0.5);
+        border-radius: 4px;
+        font-family: 'Monaco', 'Consolas', monospace;
+        color: $color-beige;
+        font-size: calc($font-size-base * 0.9);
+      }
+
+      pre {
+        background: rgba($text-light-gray, 0.1);
+        padding: calc($spacing-unit * 2);
+        border-radius: 8px;
+        overflow-x: auto;
+        margin: calc($spacing-unit * 2) 0;
+
+        code {
+          background: none;
+          padding: 0;
+        }
+      }
     }
   }
 
