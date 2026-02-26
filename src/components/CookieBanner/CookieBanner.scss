@@ -95,13 +95,13 @@
   }
 
   &.cookie-btn-accept {
-    background-color: $color-beige;
-    color: $primary-dark;
-    border: 2px solid $color-beige;
+    background-color: transparent;
+    color: $white;
+    border: 2px solid rgba($white, 0.5);
 
     &:hover {
-      background-color: transparent;
-      color: $color-beige;
+      background-color: rgba($white, 0.08);
+      border-color: $white;
       transform: translateY(-2px);
     }
   }
@@ -109,24 +109,25 @@
   &.cookie-btn-reject {
     background-color: transparent;
     color: $white;
-    border: 2px solid rgba($white, 0.3);
+    border: 2px solid rgba($white, 0.5);
 
     &:hover {
+      background-color: rgba($white, 0.08);
       border-color: $white;
-      background-color: rgba($white, 0.1);
       transform: translateY(-2px);
     }
   }
 
   &.cookie-btn-settings {
-    background-color: transparent;
-    color: $text-light-gray;
-    border: 2px solid rgba($text-light-gray, 0.3);
+    background-color: $white;
+    color: $primary-dark;
+    border: 2px solid $white;
+    font-weight: $font-weight-semibold;
+    letter-spacing: 0.025em;
 
     &:hover {
-      color: $white;
-      border-color: rgba($white, 0.5);
-      background-color: rgba($white, 0.05);
+      background-color: rgba($white, 0.88);
+      box-shadow: 0 6px 20px rgba($white, 0.2);
       transform: translateY(-2px);
     }
   }
