@@ -53,9 +53,9 @@
       text-align: center;
 
       .project-featured-image {
-        max-width: 800px;
-        width: 800px;
-        max-height: 800px;
+        max-width: 600px;
+        width: 600px;
+        max-height: 500px;
         height: auto !important;
         object-fit: contain !important;
         border-radius: 12px;
@@ -244,7 +244,7 @@
       p {
         color: $text-light-gray;
         line-height: 1.8;
-        margin-bottom: calc($spacing-unit * 1.5);
+        margin-bottom: calc($spacing-unit * 2.5);
         font-size: calc($font-size-base * 1.1);
       }
 
@@ -252,11 +252,11 @@
       ol {
         color: $text-light-gray;
         margin-left: calc($spacing-unit * 3);
-        margin-bottom: calc($spacing-unit * 2);
+        margin-bottom: calc($spacing-unit * 3);
 
         li {
-          margin-bottom: calc($spacing-unit);
-          line-height: 1.6;
+          margin-bottom: calc($spacing-unit * 1.5);
+          line-height: 1.8;
         }
       }
 
