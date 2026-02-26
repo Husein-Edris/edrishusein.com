@@ -30,13 +30,7 @@ fi
 # Clear caches (fixes chunk loading errors)
 echo "🧹 Clearing caches..."
 rm -rf .next
-rm -rf node_modules/.cache 2>/dev/null || true
-rm -rf .next/cache 2>/dev/null || true
 echo "✅ Build caches cleared - prevents JavaScript console errors!"
-
-# Clear npm cache for thorough cleanup
-echo "🧹 Clearing npm cache for thorough cleanup..."
-npm cache clean --force 2>/dev/null || echo "⚠️ NPM cache clean failed (non-critical)"
 
 # 1. Install dependencies with better error handling
 echo "📦 Installing dependencies..."
