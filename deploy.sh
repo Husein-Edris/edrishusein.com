@@ -47,7 +47,7 @@ npm install || {
 
 # Fix vulnerabilities automatically if possible
 echo "🔒 Checking and fixing security vulnerabilities..."
-AUDIT_OUTPUT=$(npm audit --audit-level=moderate 2>&1)
+AUDIT_OUTPUT=$(npm audit --audit-level=moderate 2>&1) || true
 if echo "$AUDIT_OUTPUT" | grep -qE "found [0-9]+.*vulnerabilit|vulnerabilities found"; then
     echo "⚠️ Found vulnerabilities. Attempting to fix automatically..."
     # Try regular fix first (safer)
