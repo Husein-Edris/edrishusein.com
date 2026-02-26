@@ -45,24 +45,6 @@ npm install || {
     exit 1
 }
 
-# Fix vulnerabilities automatically if possible
-echo "🔒 Checking and fixing security vulnerabilities..."
-AUDIT_OUTPUT=$(npm audit --audit-level=moderate 2>&1) || true
-if echo "$AUDIT_OUTPUT" | grep -qE "found [0-9]+.*vulnerabilit|vulnerabilities found"; then
-    echo "⚠️ Found vulnerabilities. Attempting to fix automatically..."
-    # Try regular fix first (safer)
-    if npm audit fix 2>/dev/null; then
-        echo "✅ Vulnerabilities fixed automatically"
-        # Reinstall to ensure lock file is updated
-        npm install 2>/dev/null || true
-    else
-        echo "⚠️ Some vulnerabilities could not be auto-fixed. Run 'npm audit' for details."
-        echo "💡 Continuing deployment, but consider reviewing vulnerabilities manually."
-    fi
-else
-    echo "✅ No vulnerabilities found"
-fi
-
 # 2. Build application with error handling
 echo "🔨 Building application..."
 npm run build || {
