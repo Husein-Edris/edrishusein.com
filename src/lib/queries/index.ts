@@ -17,7 +17,7 @@ export const GET_HOMEPAGE_DATA = `
 
 export const GET_PROJECTS_FOR_GRID = `
   query GetProjects {
-    projects(first: 3) {
+    projects(first: 3, where: { orderby: { field: MENU_ORDER, order: ASC } }) {
       nodes {
         id
         title
@@ -45,7 +45,7 @@ export const GET_PROJECTS_FOR_GRID = `
 
 export const GET_ALL_PROJECTS = `
   query GetAllProjects {
-    projects(first: 100, where: { orderby: { field: DATE, order: DESC } }) {
+    projects(first: 100, where: { orderby: { field: MENU_ORDER, order: ASC } }) {
       nodes {
         id
         title

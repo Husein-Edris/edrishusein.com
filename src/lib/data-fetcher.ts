@@ -343,7 +343,7 @@ export class DataFetcher {
         // First, try the custom post type query
         const PROJECTS_QUERY = `
           query GetProjects($limit: Int!) {
-            projects(first: $limit, where: { orderby: { field: DATE, order: DESC } }) {
+            projects(first: $limit, where: { orderby: { field: MENU_ORDER, order: ASC } }) {
               nodes {
                 id
                 title
@@ -382,7 +382,7 @@ export class DataFetcher {
           
           // Try to get projects via WordPress REST API directly
           try {
-            const restResponse = await fetch(`${process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '')}/wp-json/wp/v2/project?_embed`);
+            const restResponse = await fetch(`${process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '')}/wp-json/wp/v2/project?_embed&orderby=menu_order&order=asc`);
             
             if (restResponse.ok) {
               const restProjects = await restResponse.json();

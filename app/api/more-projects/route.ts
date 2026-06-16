@@ -8,7 +8,7 @@ const client = new GraphQLClient(process.env.NEXT_PUBLIC_WORDPRESS_API_URL || ''
 
 const GET_OTHER_PROJECTS = `
   query GetOtherProjects($excludeSlug: String!) {
-    projects(first: 3, where: { nameNotIn: [$excludeSlug] }) {
+    projects(first: 3, where: { nameNotIn: [$excludeSlug], orderby: { field: MENU_ORDER, order: ASC } }) {
       nodes {
         id
         title
@@ -38,7 +38,7 @@ const GET_OTHER_PROJECTS = `
 // Fallback query if the nameNotIn filter doesn't work
 const GET_ALL_PROJECTS = `
   query GetAllProjects {
-    projects(first: 10) {
+    projects(first: 10, where: { orderby: { field: MENU_ORDER, order: ASC } }) {
       nodes {
         id
         title
@@ -112,7 +112,7 @@ export async function GET(request: NextRequest) {
     }));
   } catch (error) {
     try {
-      const restUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '')}/wp-json/wp/v2/project?_embed&per_page=10`;
+      const restUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '')}/wp-json/wp/v2/project?_embed&per_page=10&orderby=menu_order&order=asc`;
       const restResponse = await fetch(restUrl);
       
       if (restResponse.ok) {
