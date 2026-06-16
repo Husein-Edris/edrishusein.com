@@ -4,7 +4,10 @@ import Header from '@/src/components/Header/Header';
 import SectionRenderer from '@/src/components/SectionRenderer/SectionRenderer';
 import Footer from '@/src/components/Footer/Footer';
 
-export const dynamic = 'force-dynamic'; // Always fetch fresh data from WordPress
+// ISR: serve a cached homepage render and refresh it at most once per window
+// (see CMS_REVALIDATE in src/lib/client.ts) instead of re-fetching WordPress on
+// every visit. This is the main fix for the slow loading screen.
+export const revalidate = 60;
 
 // Simple fallback sections to avoid build issues
 const getFallbackSections = () => [

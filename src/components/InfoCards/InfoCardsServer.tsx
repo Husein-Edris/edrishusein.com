@@ -15,7 +15,7 @@ const GET_PROJECTS_DATA = `
         }
       }
     }
-    projects(first: 3) {
+    projects(first: 3, where: { orderby: { field: MENU_ORDER, order: ASC } }) {
       nodes {
         id
         title
