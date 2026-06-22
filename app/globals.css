@@ -212,12 +212,11 @@ ul {
     scroll-behavior: auto !important;
   }
 
-  /* Make sure scroll-reveal content is shown, never left stuck at opacity:0. */
-  .animated-header,
-  .animated-cards-grid,
-  .text-reveal-inner,
-  [class*="fade-in"],
-  [class*="scale-in"] {
+  /* Make sure scroll-reveal content is shown, never left stuck at opacity:0
+     (belt-and-suspenders for the useScrollAnimation reduced-motion path). */
+  [class*="animated-"],
+  .animate-in,
+  .text-reveal-inner {
     opacity: 1 !important;
     transform: none !important;
   }
