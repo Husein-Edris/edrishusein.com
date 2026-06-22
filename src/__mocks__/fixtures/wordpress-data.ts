@@ -263,20 +263,29 @@ export const mockRESTPosts = [
   }
 ];
 
+// REST homepage shape: the theme exposes ACF under the custom `acf_fields` key
+// as nested groups (the standard `acf` key is empty for the home page).
 export const mockRESTHomepage = [
   {
     id: 1,
-    acf: {
-      hero_title: "REST Hero Title",
-      hero_copy: "REST hero copy",
-      hero_image: {
-        url: "/images/rest-hero.png",
-        alt: "REST Hero"
+    acf_fields: {
+      hero_section: {
+        hero_copy: "REST hero copy",
+        hero_image: {
+          url: "https://mock-cms.example.com/wp-content/uploads/rest-hero.png",
+          alt: "REST Hero",
+          width: 429,
+          height: 430,
+        },
       },
-      about_title: "About",
-      about_text: "REST about text"
-    }
-  }
+      about_me_section: { title: "About me", about_me_text: "REST about text" },
+      bookshelf_section: { title: "BOOKSHELF", description: "Books" },
+      techstack_section: { title: "TECH STACK", description: "Tools" },
+      notebook_section: { title: "NOTEBOOK" },
+      contact_section: { sub_title: "Let's work together", title: "SAY HI!", email: "kontakt@edrishusein.com" },
+      projects_section: { title: "Projects" },
+    },
+  },
 ];
 
 // SEO data fixtures

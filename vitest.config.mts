@@ -15,6 +15,9 @@ export default defineConfig({
         'src/lib/data-fetcher.ts',
         'src/lib/section-registry.ts',
         'src/lib/seo-utils.ts',
+        'src/lib/rest-client.ts',
+        'src/lib/sitemap-content.ts',
+        'src/lib/transform/*.ts',
         'src/hooks/*.ts',
       ],
       exclude: [
