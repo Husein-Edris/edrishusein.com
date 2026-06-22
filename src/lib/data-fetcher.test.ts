@@ -1,35 +1,17 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
-  mockHomepageResponse,
-  mockProjectsResponse,
-  mockPostsResponse,
-  mockAboutPageResponse,
   mockRESTProjects,
   mockRESTPosts,
   mockRESTHomepage,
 } from '../__mocks__/fixtures/wordpress-data';
-
-// Mock the GraphQL client - use vi.hoisted to create mock before vi.mock
-const { mockRequest } = vi.hoisted(() => ({
-  mockRequest: vi.fn(),
-}));
-
-vi.mock('./client', () => ({
-  client: {
-    request: mockRequest,
-  },
-}));
-
-// Import after mock setup
 import { DataFetcher, logDataSources } from './data-fetcher';
 
-// Mock fetch for REST API fallback
+// The data layer is REST-only; every CMS read goes through global fetch.
 const mockFetch = vi.fn();
 
 describe('DataFetcher', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRequest.mockReset();
     mockFetch.mockReset();
     global.fetch = mockFetch as unknown as typeof fetch;
     // Suppress console output in tests
@@ -45,19 +27,7 @@ describe('DataFetcher', () => {
   });
 
   describe('getHomepageData', () => {
-    it('should return WordPress data when GraphQL succeeds', async () => {
-      mockRequest.mockResolvedValueOnce(mockHomepageResponse);
-
-      const result = await DataFetcher.getHomepageData();
-
-      expect(result.source).toBe('wordpress');
-      expect(result.error).toBeNull();
-      expect(result.data).toBeDefined();
-      expect(result.data?.aboutSection).toBeDefined();
-    });
-
-    it('should fall back to REST API when GraphQL fails', async () => {
-      mockRequest.mockRejectedValueOnce(new Error('GraphQL error'));
+    it('should return WordPress data when REST succeeds', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve(mockRESTHomepage),
@@ -66,33 +36,23 @@ describe('DataFetcher', () => {
       const result = await DataFetcher.getHomepageData();
 
       expect(result.source).toBe('wordpress');
-      expect(result.data).toBeDefined();
+      expect(result.error).toBeNull();
+      expect(result.data?.aboutSection?.title).toBe('About me');
+      expect(result.data?.heroSection?.title).toBe('Edris Husein');
       expect(mockFetch).toHaveBeenCalled();
     });
 
-    it('should return fallback data when both GraphQL and REST fail', async () => {
-      mockRequest.mockRejectedValueOnce(new Error('GraphQL error'));
+    it('should return fallback data when REST fails', async () => {
       mockFetch.mockRejectedValueOnce(new Error('REST error'));
 
       const result = await DataFetcher.getHomepageData();
 
       expect(result.source).toBe('fallback');
       expect(result.error).toBeDefined();
-      expect(result.data).toBeDefined();
       expect(result.data?.heroSection?.title).toBe('Edris Husein');
     });
 
-    it('should throw when GraphQL returns no homepage sections', async () => {
-      mockRequest.mockResolvedValueOnce({ page: { homepageSections: null } });
-      mockFetch.mockRejectedValueOnce(new Error('REST error'));
-
-      const result = await DataFetcher.getHomepageData();
-
-      expect(result.source).toBe('fallback');
-    });
-
-    it('should handle REST API returning empty array', async () => {
-      mockRequest.mockRejectedValueOnce(new Error('GraphQL error'));
+    it('should return fallback when REST returns an empty array', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve([]),
@@ -102,32 +62,22 @@ describe('DataFetcher', () => {
 
       expect(result.source).toBe('fallback');
     });
+
+    it('should return fallback when REST responds non-ok', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        json: () => Promise.resolve({}),
+      });
+
+      const result = await DataFetcher.getHomepageData();
+
+      expect(result.source).toBe('fallback');
+    });
   });
 
   describe('getProjectsData', () => {
-    it('should return WordPress projects when GraphQL succeeds', async () => {
-      mockRequest.mockResolvedValueOnce(mockProjectsResponse);
-
-      const result = await DataFetcher.getProjectsData();
-
-      expect(result.source).toBe('wordpress');
-      expect(result.error).toBeNull();
-      expect(result.data?.projects.nodes).toHaveLength(2);
-    });
-
-    it('should accept custom limit parameter', async () => {
-      mockRequest.mockResolvedValueOnce(mockProjectsResponse);
-
-      await DataFetcher.getProjectsData(10);
-
-      expect(mockRequest).toHaveBeenCalledWith(
-        expect.any(String),
-        { limit: 10 }
-      );
-    });
-
-    it('should fall back to REST API when GraphQL fails', async () => {
-      mockRequest.mockRejectedValueOnce(new Error('GraphQL error'));
+    it('should return WordPress projects when REST succeeds', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve(mockRESTProjects),
@@ -136,11 +86,22 @@ describe('DataFetcher', () => {
       const result = await DataFetcher.getProjectsData();
 
       expect(result.source).toBe('wordpress');
-      expect(result.data?.projects.nodes).toBeDefined();
+      expect(result.error).toBeNull();
+      expect(result.data?.projects.nodes).toHaveLength(mockRESTProjects.length);
     });
 
-    it('should return fallback data when both APIs fail', async () => {
-      mockRequest.mockRejectedValueOnce(new Error('GraphQL error'));
+    it('should pass the limit through as per_page in the REST URL', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockRESTProjects),
+      });
+
+      await DataFetcher.getProjectsData(10);
+
+      expect(mockFetch.mock.calls[0][0]).toContain('per_page=10');
+    });
+
+    it('should return fallback data when REST fails', async () => {
       mockFetch.mockRejectedValueOnce(new Error('REST error'));
 
       const result = await DataFetcher.getProjectsData();
@@ -150,8 +111,7 @@ describe('DataFetcher', () => {
       expect(result.data?.projects.nodes).toBeDefined();
     });
 
-    it('should transform REST API data to match GraphQL structure', async () => {
-      mockRequest.mockRejectedValueOnce(new Error('GraphQL error'));
+    it('should transform REST API data to the domain structure', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve(mockRESTProjects),
@@ -162,33 +122,12 @@ describe('DataFetcher', () => {
 
       expect(project?.title).toBe('REST Project 1');
       expect(project?.featuredImage?.node?.sourceUrl).toBeDefined();
+      expect(project?.caseStudy?.projectLinks?.liveSite).toBe('https://rest-project-1.com');
     });
   });
 
   describe('getPostsData', () => {
-    it('should return WordPress posts when GraphQL succeeds', async () => {
-      mockRequest.mockResolvedValueOnce(mockPostsResponse);
-
-      const result = await DataFetcher.getPostsData();
-
-      expect(result.source).toBe('wordpress');
-      expect(result.error).toBeNull();
-      expect(result.data?.posts.nodes).toHaveLength(3);
-    });
-
-    it('should accept custom limit parameter', async () => {
-      mockRequest.mockResolvedValueOnce(mockPostsResponse);
-
-      await DataFetcher.getPostsData(5);
-
-      expect(mockRequest).toHaveBeenCalledWith(
-        expect.any(String),
-        { limit: 5 }
-      );
-    });
-
-    it('should fall back to REST API when GraphQL fails', async () => {
-      mockRequest.mockRejectedValueOnce(new Error('GraphQL error'));
+    it('should return WordPress posts when REST succeeds', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve(mockRESTPosts),
@@ -197,11 +136,23 @@ describe('DataFetcher', () => {
       const result = await DataFetcher.getPostsData();
 
       expect(result.source).toBe('wordpress');
-      expect(result.data?.posts.nodes).toBeDefined();
+      expect(result.error).toBeNull();
+      expect(result.data?.posts.nodes).toHaveLength(mockRESTPosts.length);
+      expect(result.data?.posts.nodes[0].title).toBe('REST Post 1');
     });
 
-    it('should return fallback data when both APIs fail', async () => {
-      mockRequest.mockRejectedValueOnce(new Error('GraphQL error'));
+    it('should pass the limit through as per_page in the REST URL', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockRESTPosts),
+      });
+
+      await DataFetcher.getPostsData(5);
+
+      expect(mockFetch.mock.calls[0][0]).toContain('per_page=5');
+    });
+
+    it('should return fallback data when REST fails', async () => {
       mockFetch.mockRejectedValueOnce(new Error('REST error'));
 
       const result = await DataFetcher.getPostsData();
@@ -212,7 +163,6 @@ describe('DataFetcher', () => {
     });
 
     it('should handle posts without featured images', async () => {
-      mockRequest.mockRejectedValueOnce(new Error('GraphQL error'));
       const postsWithoutImages = [{
         id: 1,
         title: { rendered: 'No Image Post' },
@@ -234,18 +184,7 @@ describe('DataFetcher', () => {
   });
 
   describe('getAboutPageData', () => {
-    it('should return WordPress about data when GraphQL succeeds', async () => {
-      mockRequest.mockResolvedValueOnce(mockAboutPageResponse);
-
-      const result = await DataFetcher.getAboutPageData();
-
-      expect(result.source).toBe('wordpress');
-      expect(result.error).toBeNull();
-      expect(result.data?.page?.aboutPageFields).toBeDefined();
-    });
-
-    it('should fall back to REST API when GraphQL fails', async () => {
-      mockRequest.mockRejectedValueOnce(new Error('GraphQL error'));
+    it('should return WordPress about data when REST succeeds', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve([{
@@ -253,8 +192,9 @@ describe('DataFetcher', () => {
           title: { rendered: 'About Me' },
           content: { rendered: '<p>About content</p>' },
           _embedded: {},
-          acf: {
+          acf_fields: {
             about_hero_title: 'REST About Title',
+            selected_skills: [{ ID: 1, post_title: 'Adaptability' }],
           },
         }]),
       });
@@ -262,11 +202,13 @@ describe('DataFetcher', () => {
       const result = await DataFetcher.getAboutPageData();
 
       expect(result.source).toBe('wordpress');
-      expect(result.data?.page).toBeDefined();
+      expect(result.error).toBeNull();
+      expect(result.data?.page?.aboutPageFields).toBeDefined();
+      expect(result.data?.page?.aboutPageFields.aboutHeroTitle).toBe('REST About Title');
+      expect(result.data?.page?.aboutPageFields.skillsSection.selectedSkills).toHaveLength(1);
     });
 
-    it('should return fallback data when both APIs fail', async () => {
-      mockRequest.mockRejectedValueOnce(new Error('GraphQL error'));
+    it('should return fallback data when REST fails', async () => {
       mockFetch.mockRejectedValueOnce(new Error('REST error'));
 
       const result = await DataFetcher.getAboutPageData();
@@ -275,14 +217,23 @@ describe('DataFetcher', () => {
       expect(result.error).toBeDefined();
       expect(result.data?.page?.aboutPageFields).toBeDefined();
     });
+
+    it('should return fallback when REST returns an empty array', async () => {
+      mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve([]) });
+
+      const result = await DataFetcher.getAboutPageData();
+
+      expect(result.source).toBe('fallback');
+    });
   });
 
   describe('getHomepageBundle', () => {
+    // Homepage, projects and posts are all REST now (mockFetch, in invocation order: home, projects, posts).
     it('should fetch all homepage data in parallel', async () => {
-      mockRequest
-        .mockResolvedValueOnce(mockHomepageResponse)
-        .mockResolvedValueOnce(mockProjectsResponse)
-        .mockResolvedValueOnce(mockPostsResponse);
+      mockFetch
+        .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockRESTHomepage) })
+        .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockRESTProjects) })
+        .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockRESTPosts) });
 
       const result = await DataFetcher.getHomepageBundle();
 
@@ -291,26 +242,24 @@ describe('DataFetcher', () => {
       expect(result.posts.source).toBe('wordpress');
     });
 
-    it('should use limit of 3 for projects and posts', async () => {
-      mockRequest
-        .mockResolvedValueOnce(mockHomepageResponse)
-        .mockResolvedValueOnce(mockProjectsResponse)
-        .mockResolvedValueOnce(mockPostsResponse);
+    it('should request 3 projects and 3 posts (per_page=3) for the homepage', async () => {
+      mockFetch
+        .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockRESTHomepage) })
+        .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockRESTProjects) })
+        .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockRESTPosts) });
 
       await DataFetcher.getHomepageBundle();
 
-      // Check that the projects and posts queries were called with limit 3
-      const calls = mockRequest.mock.calls;
-      const hasProjectsLimit3 = calls.some(call => call[1]?.limit === 3);
-      expect(hasProjectsLimit3).toBe(true);
+      const perPage3 = mockFetch.mock.calls.filter(c => String(c[0]).includes('per_page=3'));
+      expect(perPage3.length).toBe(2); // projects + posts
     });
 
     it('should handle partial failures gracefully', async () => {
-      mockRequest
-        .mockResolvedValueOnce(mockHomepageResponse)
-        .mockRejectedValueOnce(new Error('Projects failed'))
-        .mockResolvedValueOnce(mockPostsResponse);
-      mockFetch.mockRejectedValueOnce(new Error('REST also failed'));
+      // home REST ok; projects REST fails; posts REST ok
+      mockFetch
+        .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockRESTHomepage) })
+        .mockRejectedValueOnce(new Error('Projects REST failed'))
+        .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockRESTPosts) });
 
       const result = await DataFetcher.getHomepageBundle();
 
@@ -320,10 +269,6 @@ describe('DataFetcher', () => {
     });
 
     it('should return fallback for all if all requests fail', async () => {
-      mockRequest
-        .mockRejectedValueOnce(new Error('Homepage failed'))
-        .mockRejectedValueOnce(new Error('Projects failed'))
-        .mockRejectedValueOnce(new Error('Posts failed'));
       mockFetch.mockRejectedValue(new Error('REST failed'));
 
       const result = await DataFetcher.getHomepageBundle();
@@ -336,7 +281,7 @@ describe('DataFetcher', () => {
 
   describe('FetchResult structure', () => {
     it('should always include source property', async () => {
-      mockRequest.mockResolvedValueOnce(mockHomepageResponse);
+      mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockRESTHomepage) });
       const result = await DataFetcher.getHomepageData();
 
       expect(result).toHaveProperty('source');
@@ -344,14 +289,13 @@ describe('DataFetcher', () => {
     });
 
     it('should have null error on success', async () => {
-      mockRequest.mockResolvedValueOnce(mockProjectsResponse);
+      mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockRESTProjects) });
       const result = await DataFetcher.getProjectsData();
 
       expect(result.error).toBeNull();
     });
 
     it('should have error message on failure', async () => {
-      mockRequest.mockRejectedValueOnce(new Error('Test error'));
       mockFetch.mockRejectedValueOnce(new Error('REST error'));
       const result = await DataFetcher.getHomepageData();
 
@@ -360,7 +304,6 @@ describe('DataFetcher', () => {
     });
 
     it('should always have data (either real or fallback)', async () => {
-      mockRequest.mockRejectedValueOnce(new Error('Error'));
       mockFetch.mockRejectedValueOnce(new Error('REST error'));
       const result = await DataFetcher.getHomepageData();
 
@@ -370,7 +313,6 @@ describe('DataFetcher', () => {
 
   describe('Error handling', () => {
     it('should handle non-Error exceptions', async () => {
-      mockRequest.mockRejectedValueOnce('String error');
       mockFetch.mockRejectedValueOnce('String REST error');
 
       const result = await DataFetcher.getHomepageData();
@@ -379,9 +321,8 @@ describe('DataFetcher', () => {
       expect(result.error).toBe('Unknown error');
     });
 
-    it('should handle undefined response from GraphQL', async () => {
-      mockRequest.mockResolvedValueOnce(undefined);
-      mockFetch.mockRejectedValueOnce(new Error('REST error'));
+    it('should handle REST returning undefined', async () => {
+      mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(undefined) });
 
       const result = await DataFetcher.getHomepageData();
 
@@ -389,7 +330,6 @@ describe('DataFetcher', () => {
     });
 
     it('should handle REST API returning non-ok status', async () => {
-      mockRequest.mockRejectedValueOnce(new Error('GraphQL error'));
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 500,
