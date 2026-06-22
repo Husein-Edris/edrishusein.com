@@ -1,6 +1,7 @@
 import type { WordPressImage } from '@/src/types/wordpress';
 import { transformMedia } from './transformMedia';
 import { rendered } from './transformProjects';
+import { asArray } from './asArray';
 
 interface RestTerm { name?: string; slug?: string; taxonomy?: string }
 
@@ -110,7 +111,7 @@ export function transformPostDetail(post: RestPost): PostDetail {
     conclusionSection: conclusion
       ? {
           conclusionTitle: conclusion.conclusion_title ?? '',
-          conclusionPoints: (conclusion.conclusion_points ?? []).map((p) => ({ pointText: p.point_text ?? '' })),
+          conclusionPoints: asArray<{ point_text?: string }>(conclusion.conclusion_points).map((p) => ({ pointText: p.point_text ?? '' })),
         }
       : null,
   };

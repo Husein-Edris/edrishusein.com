@@ -1,6 +1,7 @@
 import type { WordPressImage } from '@/src/types/wordpress';
 import { transformMedia, type RestMedia } from './transformMedia';
 import { rendered } from './transformProjects';
+import { asArray } from './asArray';
 
 interface RelationPost {
   ID?: number;
@@ -66,7 +67,7 @@ export interface AboutPageData {
 }
 
 function mapRelation(items: RelationPost[] | undefined): RelationItem[] {
-  return (items ?? []).map((p) => ({
+  return asArray<RelationPost>(items).map((p) => ({
     ID: Number(p.ID ?? p.id ?? 0),
     post_title: p.post_title ?? '',
     post_excerpt: p.post_excerpt ?? '',
@@ -96,7 +97,7 @@ export function transformAbout(page: RestAboutPage): AboutPageData {
         aboutHeroImage: transformMedia(acf.about_hero_image),
         experienceSection: {
           sectionTitle: acf.experience_section_title || 'Experience',
-          experienceItems: (acf.experience_items ?? []).map((item) => ({
+          experienceItems: asArray<ExperienceItem>(acf.experience_items).map((item) => ({
             company_name: item.company_name ?? '',
             position: item.position ?? '',
             duration: item.duration ?? '',

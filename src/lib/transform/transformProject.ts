@@ -1,6 +1,7 @@
 import type { WordPressImage } from '@/src/types/wordpress';
 import { transformMedia } from './transformMedia';
 import { rendered } from './transformProjects';
+import { asArray } from './asArray';
 
 interface TechStackItem { ID?: number; id?: number; post_title?: string; title?: string }
 
@@ -41,7 +42,7 @@ export interface CaseStudyProject {
 /** Tech-relation post IDs for a project (FR-8: used to resolve tech badge images separately). */
 export function extractTechIds(project: RestProjectDetail): number[] {
   const acf = project.acf_fields ?? project.acf ?? {};
-  return (acf.project_overview?.tech_stack ?? [])
+  return asArray<TechStackItem>(acf.project_overview?.tech_stack)
     .map((t) => Number(t.ID ?? t.id))
     .filter((n) => Number.isFinite(n));
 }
@@ -68,7 +69,7 @@ export function transformProject(
     featuredImage: transformMedia(featured as never),
     caseStudy: {
       projectOverview: {
-        technologies: (acf.project_overview?.tech_stack ?? []).map((t) => {
+        technologies: asArray<TechStackItem>(acf.project_overview?.tech_stack).map((t) => {
           const id = Number(t.ID ?? t.id);
           return {
             id,
@@ -82,7 +83,7 @@ export function transformProject(
         solution: acf.project_content?.solution ?? '',
         // key_features lives at the TOP of acf_fields (not under project_content)
         // and is text-only {title, description} (research C5).
-        keyFeatures: (acf.key_features ?? []).map((f) => ({
+        keyFeatures: asArray<{ title?: string; description?: string }>(acf.key_features).map((f) => ({
           title: f.title ?? '',
           description: f.description ?? '',
         })),
@@ -91,7 +92,7 @@ export function transformProject(
         liveSite: acf.project_links?.live_site ?? '',
         github: acf.project_links?.github ?? '',
       },
-      projectGallery: acf.project_gallery ?? [],
+      projectGallery: asArray<{ url?: string; alt?: string; width?: number; height?: number }>(acf.project_gallery),
     },
   };
 }

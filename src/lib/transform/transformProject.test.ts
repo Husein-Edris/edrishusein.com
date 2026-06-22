@@ -52,4 +52,24 @@ describe('transformProject', () => {
     // a tech with no entry in the map resolves to null, not undefined
     expect(result.caseStudy.projectOverview.technologies[0].featuredImage).toBeNull();
   });
+
+  it('survives ACF empty repeaters serialized as false (prod data shape)', () => {
+    // ACF over REST returns `false` for empty repeater/relation/gallery fields,
+    // which a bare `?? []` does not guard against (regression: illwerke project).
+    const emptyAcf = {
+      ...detail,
+      acf_fields: {
+        ...detail.acf_fields,
+        key_features: false,
+        project_gallery: false,
+        project_overview: { tech_stack: false },
+      },
+    };
+    expect(() => transformProject(emptyAcf)).not.toThrow();
+    const out = transformProject(emptyAcf);
+    expect(out.caseStudy.projectContent.keyFeatures).toEqual([]);
+    expect(out.caseStudy.projectGallery).toEqual([]);
+    expect(out.caseStudy.projectOverview.technologies).toEqual([]);
+    expect(extractTechIds(emptyAcf)).toEqual([]);
+  });
 });
