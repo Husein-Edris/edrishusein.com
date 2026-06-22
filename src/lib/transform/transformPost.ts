@@ -15,7 +15,7 @@ interface PostAcf {
   } | false;
 }
 
-interface RestPost {
+export interface RestPost {
   id: number | string;
   slug: string;
   date?: string;

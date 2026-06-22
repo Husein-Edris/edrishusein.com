@@ -32,7 +32,11 @@ export function toSitemapEntries(
     .filter((item) => item.slug)
     .map((item) => ({
       url: `${baseUrl}/${segment}/${item.slug}`,
-      lastModified: new Date(item.modified || item.date || 0),
+      // Omit lastModified entirely when no date is available — an epoch date
+      // (1970) would mislead crawlers into deprioritizing the page.
+      lastModified: item.modified || item.date
+        ? new Date((item.modified || item.date) as string)
+        : undefined,
       changeFrequency,
       priority,
     }));

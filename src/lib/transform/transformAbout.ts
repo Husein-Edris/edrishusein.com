@@ -33,7 +33,7 @@ interface AboutAcf {
   selected_hobbies?: RelationPost[];
 }
 
-interface RestAboutPage {
+export interface RestAboutPage {
   id?: number | string;
   title?: { rendered?: string } | string;
   content?: { rendered?: string } | string;

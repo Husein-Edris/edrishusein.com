@@ -4,8 +4,8 @@ import { rewriteImageUrls } from './image-utils';
 import { cmsRest } from './rest-client';
 import { transformHomepage } from './transform/transformHomepage';
 import { transformProjects, type RestProjectListItem } from './transform/transformProjects';
-import { transformPostListItem } from './transform/transformPost';
-import { transformAbout } from './transform/transformAbout';
+import { transformPostListItem, type RestPost, type PostListItem } from './transform/transformPost';
+import { transformAbout, type RestAboutPage, type AboutPageData } from './transform/transformAbout';
 
 // Fallback data when WordPress is unavailable
 const FALLBACK_HOMEPAGE_DATA: HomepageSections = {
@@ -261,10 +261,12 @@ export class DataFetcher {
     );
   }
 
-  static async getPostsData(limit: number = 6): Promise<FetchResult<any>> {
-    return this.fetchWithFallback<any>(
+  static async getPostsData(
+    limit: number = 6
+  ): Promise<FetchResult<{ posts: { nodes: PostListItem[] } }>> {
+    return this.fetchWithFallback(
       async () => {
-        const posts = await cmsRest<unknown[]>(
+        const posts = await cmsRest<RestPost[]>(
           `/posts?_embed&per_page=${limit}&orderby=date&order=desc`
         );
 
@@ -276,17 +278,19 @@ export class DataFetcher {
           console.log(`✅ ${posts.length} posts loaded via REST API`);
         }
 
-        return { posts: { nodes: posts.map((p) => transformPostListItem(p as never)) } };
+        return { posts: { nodes: posts.map(transformPostListItem) } };
       },
       FALLBACK_POSTS_DATA,
       'Error fetching posts data'
     );
   }
 
-  static async getAboutPageData(): Promise<FetchResult<any>> {
-    return this.fetchWithFallback<any>(
+  static async getAboutPageData(): Promise<FetchResult<AboutPageData>> {
+    return this.fetchWithFallback(
       async () => {
-        const pages = await cmsRest<unknown[]>('/pages?slug=about-me&acf_format=standard&_embed');
+        const pages = await cmsRest<RestAboutPage[]>(
+          '/pages?slug=about-me&acf_format=standard&_embed'
+        );
 
         if (!Array.isArray(pages) || pages.length === 0) {
           throw new Error('About page not found in WordPress REST');
@@ -296,7 +300,7 @@ export class DataFetcher {
           console.log('✅ About page data loaded via REST API');
         }
 
-        return transformAbout(pages[0] as never);
+        return transformAbout(pages[0]);
       },
       FALLBACK_ABOUT_DATA,
       'Error fetching about page data'
