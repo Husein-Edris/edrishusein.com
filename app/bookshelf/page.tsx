@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
@@ -6,10 +7,16 @@ import { rewriteImageUrls } from '@/src/lib/image-utils';
 import { cmsRest } from '@/src/lib/rest-client';
 import { transformMedia } from '@/src/lib/transform/transformMedia';
 import { rendered } from '@/src/lib/transform/transformProjects';
+import { decodeEntities } from '@/src/lib/transform/decodeEntities';
 import '@/src/styles/pages/Bookshelf.scss';
 
 // ISR — cached render refreshed at most once per 60s (keep in sync with CMS_REVALIDATE = 60).
 export const revalidate = 60;
+
+export const metadata: Metadata = {
+  title: 'Bookshelf - Edris Husein',
+  description: 'Books and pieces of wisdom Edris Husein has enjoyed reading, spanning software craft, design, and personal growth.',
+};
 
 async function getBooksData() {
   try {
@@ -23,7 +30,7 @@ async function getBooksData() {
     return rewriteImageUrls(
       books.map((book) => ({
         id: String(book.id),
-        title: rendered(book.title as never),
+        title: decodeEntities(rendered(book.title as never)),
         excerpt: rendered(book.excerpt as never),
         featuredImage: transformMedia(book._embedded?.['wp:featuredmedia']?.[0] as never),
       }))
@@ -40,7 +47,7 @@ export default async function BookshelfPage() {
   return (
     <>
       <Header />
-      <main className="bookshelf-page">
+      <main id="main-content" className="bookshelf-page">
         {/* Hero Section */}
         <div className="hero-section">
           <div className="container">

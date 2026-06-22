@@ -300,7 +300,7 @@ async function getAboutPageData(): Promise<AboutPageData> {
         return (
         <>
           <Header />
-          <main className="about-page">
+          <main id="main-content" className="about-page">
             {/* Hero Section */}
             <section className="about-hero">
               <div className="container">

@@ -1,6 +1,7 @@
 import type { WordPressImage } from '@/src/types/wordpress';
 import { transformMedia } from './transformMedia';
 import { rendered } from './transformProjects';
+import { decodeEntities } from './decodeEntities';
 import { asArray } from './asArray';
 
 interface RestTerm { name?: string; slug?: string; taxonomy?: string }
@@ -70,7 +71,7 @@ export function transformPostListItem(post: RestPost): PostListItem {
   const featured = post._embedded?.['wp:featuredmedia']?.[0];
   return {
     id: String(post.id),
-    title: rendered(post.title),
+    title: decodeEntities(rendered(post.title)),
     excerpt: rendered(post.excerpt),
     slug: post.slug,
     date: post.date ?? '',

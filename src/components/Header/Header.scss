@@ -61,9 +61,14 @@
     pointer-events: auto;
 
     @include mobile {
+      // Bars stay visually 30px wide; box grows to a ≥44px tap target (WCAG 2.5.5).
       display: flex;
       flex-direction: column;
+      justify-content: center;
+      align-items: center;
       gap: var(--bar-gap);
+      min-width: 44px;
+      min-height: 44px;
       z-index: 1002;
     }
 
@@ -153,6 +158,9 @@
         flex-direction: column;
         align-items: flex-start;
         gap: $spacing-lg;
+        list-style: none;
+        margin: 0;
+        padding: 0;
         transform: translateY(20px);
         transition: transform 0.3s ease;
 

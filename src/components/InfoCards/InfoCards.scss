@@ -207,7 +207,7 @@
 
         .card-title {
           word-wrap: break-word;
-          hyphens: auto;
+          hyphens: none;
           overflow-wrap: break-word;
           color: $white;
           width: 80%;
@@ -312,8 +312,8 @@
 
       .card-title {
         word-wrap: break-word;
-        hyphens: auto;
-        overflow-wrap: anywhere;
+        hyphens: none;
+        overflow-wrap: break-word;
       }
 
       @include mobile {

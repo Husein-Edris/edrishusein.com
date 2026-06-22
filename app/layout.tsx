@@ -56,6 +56,7 @@ export default function RootLayout({
         {/* Recent updates: Footer layout, cookie settings, case-study spacing */}
       </head>
       <body suppressHydrationWarning={true}>
+        <a href="#main-content" className="skip-link">Skip to main content</a>
         {children}
         <CookieBanner />
       </body>

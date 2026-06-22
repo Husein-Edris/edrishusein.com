@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
@@ -9,6 +10,11 @@ import '@/src/styles/pages/CaseStudy.scss';
 
 // Kept dynamic on purpose: the tech grid is shuffled per request (below).
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Tech Stack - Edris Husein',
+  description: 'The tools, languages, and frameworks Edris Husein uses to build modern web applications.',
+};
 
 // Fisher-Yates shuffle algorithm for random array ordering
 function shuffleArray<T>(array: T[]): T[] {
@@ -52,7 +58,7 @@ export default async function TechStackPage() {
   return (
     <>
       <Header />
-      <main className="case-study">
+      <main id="main-content" className="case-study">
         {/* Hero Section */}
         <div className="hero-section">
           <div className="container">

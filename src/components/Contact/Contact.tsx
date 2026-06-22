@@ -8,9 +8,11 @@ interface ContactProps {
     title?: string;
     email?: string;
   }
+  /** Optional short paragraph shown under the email — used to give the standalone /contact page more presence. */
+  intro?: string;
 }
 
-const Contact = ({ data }: ContactProps) => {
+const Contact = ({ data, intro }: ContactProps) => {
   // Use data from props if available, otherwise use fallbacks
   const subtitle = data?.subTitle || "WANT TO WORK TOGETHER?";
   const title = data?.title || "SAY HI!";
@@ -20,8 +22,9 @@ const Contact = ({ data }: ContactProps) => {
     <section className="contact">
       <div className="container">
         <div className="contact-content">
-          <h3 className="subtitle">{subtitle}</h3>
+          <p className="subtitle">{subtitle}</p>
           <h2 className="title">{title}</h2>
+          {intro && <p className="contact-intro">{intro}</p>}
           <a href={`mailto:${email}`} className="email">
             {email.toUpperCase()}
           </a>

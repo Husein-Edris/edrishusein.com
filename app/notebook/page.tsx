@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import Header from '@/src/components/Header/Header';
@@ -9,6 +10,11 @@ import '@/src/styles/pages/Blog.scss';
 
 // ISR — cached render refreshed at most once per 60s (keep in sync with CMS_REVALIDATE = 60).
 export const revalidate = 60;
+
+export const metadata: Metadata = {
+  title: 'Notebook - Edris Husein',
+  description: 'Thoughts, insights, and reflections on web development, technology, and the craft of building software by Edris Husein.',
+};
 
 async function getPostsData() {
     try {
@@ -30,7 +36,7 @@ export default async function BlogArchivePage() {
     return (
         <>
             <Header />
-            <main className="blog-archive">
+            <main id="main-content" className="blog-archive">
                 <div className="hero-section">
                     <h1 className="title">NOTEBOOK</h1>
                     <p className="description">

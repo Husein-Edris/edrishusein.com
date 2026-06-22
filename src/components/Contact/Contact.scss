@@ -35,6 +35,15 @@
         letter-spacing: 0.1em;
     }
 
+    .contact-intro {
+        color: $text-light-gray;
+        font-family: $font-family-base;
+        font-size: $font-size-lg;
+        line-height: 1.6;
+        max-width: 38ch;
+        margin-top: -$spacing-sm;
+    }
+
     .title {
         color: $white;
         font-family: $font-family-syncopate;
@@ -80,8 +89,9 @@
         }
 
         @include mobile {
-            font-size: clamp(11px, 5.2vw, $font-size-5xl);
+            font-size: clamp(11px, 4.4vw, $font-size-5xl);
             white-space: nowrap;
+            max-width: 100%;
         }
     }
 

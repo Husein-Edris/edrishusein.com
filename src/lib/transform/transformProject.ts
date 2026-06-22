@@ -1,6 +1,7 @@
 import type { WordPressImage } from '@/src/types/wordpress';
 import { transformMedia } from './transformMedia';
 import { rendered } from './transformProjects';
+import { decodeEntities } from './decodeEntities';
 import { asArray } from './asArray';
 
 interface TechStackItem { ID?: number; id?: number; post_title?: string; title?: string }
@@ -62,7 +63,7 @@ export function transformProject(
 
   return {
     id: String(project.id),
-    title: rendered(project.title),
+    title: decodeEntities(rendered(project.title)),
     slug: project.slug,
     content: rendered(project.content),
     excerpt: rendered(project.excerpt),
@@ -73,7 +74,7 @@ export function transformProject(
           const id = Number(t.ID ?? t.id);
           return {
             id,
-            title: t.post_title ?? t.title ?? '',
+            title: decodeEntities(t.post_title ?? t.title ?? ''),
             featuredImage: techImages.get(id) ?? null,
           };
         }),
@@ -84,7 +85,7 @@ export function transformProject(
         // key_features lives at the TOP of acf_fields (not under project_content)
         // and is text-only {title, description} (research C5).
         keyFeatures: asArray<{ title?: string; description?: string }>(acf.key_features).map((f) => ({
-          title: f.title ?? '',
+          title: decodeEntities(f.title ?? ''),
           description: f.description ?? '',
         })),
       },

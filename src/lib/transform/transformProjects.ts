@@ -1,5 +1,6 @@
 import type { ProjectsResponse, WordPressProject } from '@/src/types/wordpress';
 import { transformMedia } from './transformMedia';
+import { decodeEntities } from './decodeEntities';
 
 type Rendered = { rendered?: string } | string | undefined;
 
@@ -23,7 +24,7 @@ export function transformProjectListItem(project: RestProjectListItem): WordPres
 
   return {
     id: String(project.id),
-    title: rendered(project.title),
+    title: decodeEntities(rendered(project.title)),
     excerpt: rendered(project.excerpt),
     slug: project.slug,
     featuredImage: transformMedia(featured as never) ?? undefined,
