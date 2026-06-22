@@ -1,41 +1,25 @@
 # edrishusein.com
 
-My portfolio site. I built it on Next.js and run the content from a headless WordPress install, so I can edit projects, posts, and the homepage from wp-admin without touching the code or redeploying.
+My portfolio and writing, built on Next.js with a headless WordPress backend. I run the content out of WordPress so I can publish projects and posts from wp-admin without redeploying, while the frontend stays a fast, statically rendered Next app.
 
-## Stack
+## What it does
 
-- Next.js 16 (App Router), React 19, TypeScript, SCSS
-- WordPress as a headless CMS, read over its REST API with Advanced Custom Fields
-- A static copy of the content baked into the repo for when the CMS is unreachable
+The site holds my work, a notebook of writing, a bookshelf, and my tech stack. All of it is edited in WordPress. The Next frontend reads that content and renders it, and it keeps working even when the CMS is unavailable.
 
-## How the data works
+## Architecture
 
-Each page asks WordPress for its content over REST. If WordPress is slow or down, the page serves a static copy from `src/data/` instead of throwing, so visitors never hit a broken site. Cached reads use ISR with a 60-second window, which keeps responses fast and still picks up edits within a minute.
+- **Frontend:** Next.js 16 (App Router), React 19, TypeScript, SCSS
+- **Content:** WordPress as a headless CMS, read over its REST API with Advanced Custom Fields
+- **Resilience:** every page reads from REST and falls back to a static copy in `src/data/` when WordPress is slow or down, so a CMS outage never reaches a visitor
+- **Performance:** cached reads use ISR with a 60-second window, so pages serve fast and still reflect edits within a minute
 
-Older versions ran on GraphQL. I tore that layer out in 2026 and moved everything to REST.
+The site first ran on GraphQL. In 2026 I migrated it to REST only, which removed three client libraries, cut the data layer by roughly 2,900 lines, and let me switch off the WPGraphQL plugins on the CMS for a smaller attack surface.
 
-## Finding your way around
+## How the code is organized
 
-- `src/lib/rest-client.ts` — the `cmsRest` wrapper every page uses to read WordPress
-- `src/lib/data-fetcher.ts` — the fetch-then-fall-back logic
-- `src/lib/transform/` — reshapes raw WordPress responses into what the components expect
-- `src/lib/section-registry.ts` — assembles the homepage from ACF sections
-- `src/components/InfoCards/` — one card component with skins for projects, blog, bookshelf, and tech
-- `src/styles/variables.scss` — colors, spacing, and type
-
-## Running it locally
-
-```bash
-npm install
-npm run dev
-```
-
-Set `NEXT_PUBLIC_WORDPRESS_API_URL` in `.env.local` to point at a WordPress install. Skip that and the site renders straight from the static fallback data.
-
-## Deploying
-
-`deploy.sh` builds the standalone Next output and restarts it as a plain node process (PID file, port 3000) behind Apache on Plesk. It builds whatever sits in the working tree, so commit your changes first.
-
----
-
-Built and maintained by Edris Husein. Questions about the build are welcome at kontakt@edrishusein.com.
+- `src/lib/rest-client.ts` - the `cmsRest` wrapper every page uses to read WordPress
+- `src/lib/data-fetcher.ts` - fetch-then-fall-back logic
+- `src/lib/transform/` - reshapes raw WordPress responses into the shapes the components expect
+- `src/lib/section-registry.ts` - assembles the homepage from ACF sections
+- `src/components/InfoCards/` - one card component with skins for projects, blog, bookshelf, and tech
+- `src/styles/variables.scss` - colors, spacing, and type
