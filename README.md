@@ -1,40 +1,41 @@
-# Edris Husein Portfolio
+# edrishusein.com
 
-A modern portfolio website built with Next.js and headless WordPress. The site pulls content from WordPress via GraphQL and falls back to static data when needed.
+My portfolio site. I built it on Next.js and run the content from a headless WordPress install, so I can edit projects, posts, and the homepage from wp-admin without touching the code or redeploying.
 
-## Tech Stack
+## Stack
 
-- **Frontend**: Next.js 15, TypeScript, React 19, SCSS
-- **CMS**: WordPress with WPGraphQL and Advanced Custom Fields
-- **Data**: GraphQL with REST API fallback and static fallback data
+- Next.js 16 (App Router), React 19, TypeScript, SCSS
+- WordPress as a headless CMS, read over its REST API with Advanced Custom Fields
+- A static copy of the content baked into the repo for when the CMS is unreachable
 
-## How It Works
+## How the data works
 
-The site uses a three-tier data strategy:
-1. Try to get content from WordPress GraphQL
-2. If that fails, try WordPress REST API
-3. If that fails, use static fallback data
+Each page asks WordPress for its content over REST. If WordPress is slow or down, the page serves a static copy from `src/data/` instead of throwing, so visitors never hit a broken site. Cached reads use ISR with a 60-second window, which keeps responses fast and still picks up edits within a minute.
 
-This means the site always works, even if WordPress is down.
+Older versions ran on GraphQL. I tore that layer out in 2026 and moved everything to REST.
 
-## Key Files
+## Finding your way around
 
-- `src/lib/data-fetcher.ts` - Handles all data fetching with fallbacks
-- `src/lib/section-registry.ts` - Converts WordPress data to React components
-- `src/components/InfoCards/` - Universal card component with different skins
-- `src/styles/variables.scss` - Design system colors, spacing, typography
+- `src/lib/rest-client.ts` — the `cmsRest` wrapper every page uses to read WordPress
+- `src/lib/data-fetcher.ts` — the fetch-then-fall-back logic
+- `src/lib/transform/` — reshapes raw WordPress responses into what the components expect
+- `src/lib/section-registry.ts` — assembles the homepage from ACF sections
+- `src/components/InfoCards/` — one card component with skins for projects, blog, bookshelf, and tech
+- `src/styles/variables.scss` — colors, spacing, and type
 
-Import the ACF field groups from `/wordpress-exports/` to get the content structure set up.
+## Running it locally
 
+```bash
+npm install
+npm run dev
+```
 
+Set `NEXT_PUBLIC_WORDPRESS_API_URL` in `.env.local` to point at a WordPress install. Skip that and the site renders straight from the static fallback data.
 
-## Content Management
+## Deploying
 
-The homepage is built from WordPress ACF sections. Each section gets converted to a React component automatically. Projects, blog posts, and other content types are managed through WordPress custom post types.
+`deploy.sh` builds the standalone Next output and restarts it as a plain node process (PID file, port 3000) behind Apache on Plesk. It builds whatever sits in the working tree, so commit your changes first.
 
-## Deployment
+---
 
-The site runs on PM2 with a custom Node.js server.
-
-
-Built with ❤️ by Edris Husein
+Built and maintained by Edris Husein. Questions about the build are welcome at kontakt@edrishusein.com.
