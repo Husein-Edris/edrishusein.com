@@ -49,7 +49,7 @@ export default async function HomePage() {
   }
 
   return (
-    <main>
+    <main id="main-content">
       <Header />
       <Suspense fallback={<div className="loading-skeleton">Loading content...</div>}>
         <SectionRenderer sections={sections} />

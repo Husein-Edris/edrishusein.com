@@ -13,7 +13,9 @@ export function useScrollAnimation(options: UseScrollAnimationOptions = {}) {
   const {
     threshold = 0.1,
     triggerOnce = true,
-    rootMargin = '0px 0px -50px 0px',
+    // Positive bottom margin reveals content ~300px before it scrolls into view,
+    // so normal scrolling never lands on a not-yet-revealed (blank) section.
+    rootMargin = '0px 0px 300px 0px',
     delay = 0
   } = options;
 
@@ -23,6 +25,17 @@ export function useScrollAnimation(options: UseScrollAnimationOptions = {}) {
   useEffect(() => {
     const element = elementRef.current;
     if (!element) return;
+
+    // Respect reduced-motion: reveal content immediately, skip the observer so
+    // nothing animates and content is never left stuck at opacity:0.
+    const prefersReducedMotion =
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+      setIsVisible(true);
+      return;
+    }
 
     const observer = new IntersectionObserver(
       ([entry]) => {

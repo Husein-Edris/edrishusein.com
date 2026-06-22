@@ -136,7 +136,7 @@ function InfoCards({
                         <div className="card-arrow">
                           <Image
                             src="/icons/arrow-active.svg"
-                            alt="Arrow"
+                            alt=""
                             width={40}
                             height={40}
                             className="arrow-simple"

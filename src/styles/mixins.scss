@@ -336,6 +336,7 @@
   &:hover {
     transform: translateY(-8px);
     filter: grayscale(0%);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
 
     .card-image img {
       transform: scale(1.05);

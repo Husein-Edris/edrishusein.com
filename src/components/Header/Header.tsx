@@ -72,8 +72,9 @@ const Header: FC = () => {
           />
         </Link>
 
-        <div 
-          className={`mobile-menu ${isMenuOpen ? 'active' : ''}`} 
+        <div
+          id="mobile-menu"
+          className={`mobile-menu ${isMenuOpen ? 'active' : ''}`}
           onClick={closeMenu}
           onTouchMove={(e) => e.preventDefault()} // Prevent touch scrolling
         >
@@ -117,7 +118,13 @@ const Header: FC = () => {
           </nav>
         </div>
 
-        <button className="menu-toggle" onClick={toggleMenu} aria-label="Toggle menu">
+        <button
+          className="menu-toggle"
+          onClick={toggleMenu}
+          aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={isMenuOpen}
+          aria-controls="mobile-menu"
+        >
           <span className="menu-icon"></span>
         </button>
 

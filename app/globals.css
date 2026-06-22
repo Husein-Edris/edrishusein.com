@@ -45,6 +45,50 @@ a {
   text-underline-offset: 0.25em;
 }
 
+/* ---- Accessibility: focus, skip-link, screen-reader-only ---- */
+
+/* Keyboard focus ring. `currentColor` adapts to each section: a white ring on
+   dark backgrounds, a dark ring on light ones — both high-contrast, no new color. */
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Visually hidden, but available to screen readers. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Skip-to-content link: hidden until focused, then pinned top-left. */
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2000;
+  padding: 0.75rem 1.25rem;
+  background: #0a0a0a;
+  color: #fff;
+  font-family: 'Syncopate', sans-serif;
+  font-size: 0.875rem;
+  border: 2px solid #fff;
+  border-radius: 0 0 8px 0;
+  transform: translateY(-150%);
+  transition: transform 0.2s ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
 ul {
   margin-left: 1.5rem;
 }
@@ -155,5 +199,26 @@ ul {
   backface-visibility: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---- Respect users who prefer reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Make sure scroll-reveal content is shown, never left stuck at opacity:0
+     (belt-and-suspenders for the useScrollAnimation reduced-motion path). */
+  [class*="animated-"],
+  .animate-in,
+  .text-reveal-inner {
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
 

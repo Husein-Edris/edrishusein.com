@@ -1,6 +1,7 @@
 import type { WordPressImage } from '@/src/types/wordpress';
 import { transformMedia, type RestMedia } from './transformMedia';
 import { rendered } from './transformProjects';
+import { decodeEntities } from './decodeEntities';
 import { asArray } from './asArray';
 
 interface RelationPost {
@@ -69,7 +70,7 @@ export interface AboutPageData {
 function mapRelation(items: RelationPost[] | undefined): RelationItem[] {
   return asArray<RelationPost>(items).map((p) => ({
     ID: Number(p.ID ?? p.id ?? 0),
-    post_title: p.post_title ?? '',
+    post_title: decodeEntities(p.post_title ?? ''),
     post_excerpt: p.post_excerpt ?? '',
     post_content: p.post_content ?? '',
   }));
@@ -88,7 +89,7 @@ export function transformAbout(page: RestAboutPage): AboutPageData {
   return {
     page: {
       id: String(page.id ?? 'about'),
-      title: rendered(page.title) || 'About',
+      title: decodeEntities(rendered(page.title)) || 'About',
       content: rendered(page.content),
       featuredImage: transformMedia(featured as never),
       aboutPageFields: {

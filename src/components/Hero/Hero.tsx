@@ -20,7 +20,7 @@ const Hero = ({ data }: HeroProps) => {
     heroImage: {
       node: {
         sourceUrl: "/images/Edris-Husein-Hero.png",
-        altText: "Profile Image",
+        altText: "Portrait of Edris Husein",
         mediaDetails: {
           width: 450,
           height: 450
@@ -40,7 +40,7 @@ const Hero = ({ data }: HeroProps) => {
   // Image properties - updated for ACF GraphQL structure
   const imageProps = {
     src: content.heroImage?.node?.sourceUrl || '/images/Edris-Husein-Hero.png',
-    alt: content.heroImage?.node?.altText || 'Profile Image',
+    alt: content.heroImage?.node?.altText || 'Portrait of Edris Husein',
     width: content.heroImage?.node?.mediaDetails?.width || 450,
     height: content.heroImage?.node?.mediaDetails?.height || 450,
   };

@@ -128,7 +128,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     return (
       <>
         <Header />
-        <main className="case-study blog-post">
+        <main id="main-content" className="case-study blog-post">
           {/* Hero Section */}
           <div className="hero-section">
             <div className="container">
