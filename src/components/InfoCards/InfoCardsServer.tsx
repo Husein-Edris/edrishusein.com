@@ -1,76 +1,6 @@
-// Server component wrapper for InfoCards with data fetching
-import { GraphQLClient } from 'graphql-request';
+// Server component wrapper for InfoCards with REST data fetching
 import InfoCards from './InfoCards';
-
-// GraphQL client setup
-const client = new GraphQLClient(process.env.NEXT_PUBLIC_WORDPRESS_API_URL || '');
-
-// GraphQL queries
-const GET_PROJECTS_DATA = `
-  query GetProjectsData {
-    page(id: "home", idType: URI) {
-      homepageSections {
-        projectsSection {
-          title
-        }
-      }
-    }
-    projects(first: 3, where: { orderby: { field: MENU_ORDER, order: ASC } }) {
-      nodes {
-        id
-        title
-        excerpt
-        slug
-        featuredImage {
-          node {
-            sourceUrl
-            altText
-            mediaDetails {
-              height
-              width
-            }
-          }
-        }
-        caseStudy {
-          projectLinks {
-            liveSite
-            github
-          }
-        }
-      }
-    }
-  }
-`;
-
-const GET_POSTS_DATA = `
-  query GetPostsData {
-    page(id: "home", idType: URI) {
-      homepageSections {
-        notebookSection {
-          title
-        }
-      }
-    }
-    posts(first: 3) {
-      nodes {
-        id
-        title
-        excerpt
-        featuredImage {
-          node {
-            sourceUrl
-            altText
-            mediaDetails {
-              height
-              width
-            }
-          }
-        }
-        uri
-      }
-    }
-  }
-`;
+import { DataFetcher } from '@/src/lib/data-fetcher';
 
 // Types
 interface InfoCardProps {
@@ -108,30 +38,27 @@ function truncateExcerpt(html: string, maxLength = 120): string {
   return truncatedText + '...';
 }
 
-// Data fetching functions
+// Data fetching functions (REST via DataFetcher)
 async function getProjectsData() {
   try {
-    const data = await client.request(GET_PROJECTS_DATA);
+    const [projectsResult, homeResult] = await Promise.all([
+      DataFetcher.getProjectsData(3),
+      DataFetcher.getHomepageData(),
+    ]);
 
-    const projectCards: InfoCardProps[] = (data as any).projects.nodes.map((project: { 
-      title: string; 
-      excerpt: string; 
-      slug: string; 
-      featuredImage?: { node?: { sourceUrl?: string } }; 
-      caseStudy?: { projectLinks?: { liveSite?: string } } 
-    }) => ({
+    const projectCards: InfoCardProps[] = (projectsResult.data?.projects?.nodes ?? []).map((project) => ({
       title: project.title,
       description: truncateExcerpt(project.excerpt, 120),
       image: project.featuredImage?.node?.sourceUrl,
       link: `/projects/${project.slug}`,
       variant: 'dark' as const,
       visitLink: project.caseStudy?.projectLinks?.liveSite || '#',
-      caseStudyLink: `/projects/${project.slug}`
+      caseStudyLink: `/projects/${project.slug}`,
     }));
 
     return {
       cards: projectCards,
-      sectionTitle: (data as any).page.homepageSections.projectsSection.title
+      sectionTitle: homeResult.data?.projectsSection?.title,
     };
   } catch (error) {
     console.error('Error fetching projects:', error);
@@ -141,24 +68,22 @@ async function getProjectsData() {
 
 async function getPostsData() {
   try {
-    const data = await client.request(GET_POSTS_DATA);
+    const [postsResult, homeResult] = await Promise.all([
+      DataFetcher.getPostsData(3),
+      DataFetcher.getHomepageData(),
+    ]);
 
-    const postCards: InfoCardProps[] = (data as any).posts.nodes.map((post: { 
-      title: string; 
-      excerpt: string; 
-      uri: string; 
-      featuredImage?: { node?: { sourceUrl?: string } } 
-    }) => ({
+    const postCards: InfoCardProps[] = (postsResult.data?.posts?.nodes ?? []).map((post: { title: string; excerpt: string; slug: string; featuredImage?: { node?: { sourceUrl?: string } } }) => ({
       title: post.title,
       description: truncateExcerpt(post.excerpt, 120),
       image: post.featuredImage?.node?.sourceUrl,
-      link: `/notebook/${post.uri}`,
-      variant: 'light'
+      link: `/notebook/${post.slug}`,
+      variant: 'light',
     }));
 
     return {
       cards: postCards,
-      sectionTitle: (data as any).page.homepageSections.notebookSection.title
+      sectionTitle: homeResult.data?.notebookSection?.title,
     };
   } catch (error) {
     console.error('Error fetching posts:', error);

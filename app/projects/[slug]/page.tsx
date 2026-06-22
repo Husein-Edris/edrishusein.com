@@ -6,6 +6,11 @@ import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
 import MoreProjects from '@/src/components/MoreProjects/MoreProjects';
 import { rewriteImageUrls } from '@/src/lib/image-utils';
+import { cmsRest } from '@/src/lib/rest-client';
+import { transformProject, extractTechIds } from '@/src/lib/transform/transformProject';
+import { transformProjects } from '@/src/lib/transform/transformProjects';
+import { transformMedia } from '@/src/lib/transform/transformMedia';
+import type { WordPressImage } from '@/src/types/wordpress';
 import '@/src/styles/pages/CaseStudy.scss';
 
 // Generate static params for all projects
@@ -17,28 +22,12 @@ export async function generateStaticParams() {
   ];
 
   try {
-    // Try to fetch more projects from API with timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 second timeout
-    
-    const apiUrl = process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '') || 'https://cms.edrishusein.com';
-    const response = await fetch(`${apiUrl}/wp-json/wp/v2/project?per_page=20`, {
-      signal: controller.signal,
-      cache: 'no-store',
-    });
-    
-    clearTimeout(timeoutId);
-    
-    if (response.ok) {
-      const projects = await response.json();
-      const apiSlugs = projects.map((project: any) => ({ slug: project.slug }));
-      return [...knownSlugs, ...apiSlugs];
-    }
-  } catch (error: any) {
-    // Don't fail build if API is unreachable - use known slugs
-    if (error.name !== 'AbortError') {
-      console.error('Error fetching projects for static generation:', error.message || error);
-    }
+    const projects = await cmsRest<Array<{ slug: string }>>('/project?per_page=20&_fields=slug');
+    const apiSlugs = projects.map((project) => ({ slug: project.slug }));
+    return [...knownSlugs, ...apiSlugs];
+  } catch (error: unknown) {
+    // Don't fail the build if the CMS is unreachable - use known slugs
+    console.error('Error fetching projects for static generation:', error instanceof Error ? error.message : error);
   }
 
   return knownSlugs;
@@ -50,6 +39,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   try {
     const project = await getProject(slug);
+    if (!project) {
+      return {
+        title: 'Project | Projects - Edris Husein',
+        description: 'View this project by Edris Husein',
+      };
+    }
 
     return {
       title: `${project.title} | Projects - Edris Husein`,
@@ -78,106 +73,47 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 // Fetch all projects for "More Projects" section
 async function getAllProjectsForMoreProjects() {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '')}/wp-json/wp/v2/project?_embed&per_page=10`, {
-      cache: 'no-store'
-    });
-
-    if (!response.ok) return null;
-
-    const projects = await response.json();
+    const projects = await cmsRest<unknown[]>(
+      '/project?_embed&per_page=10&orderby=menu_order&order=asc&acf_format=standard'
+    );
     if (!Array.isArray(projects)) return null;
-
-    // Transform to match GraphQL structure
-    return rewriteImageUrls({
-      projects: {
-        nodes: projects.map((project: any) => ({
-          id: project.id.toString(),
-          title: project.title?.rendered || project.title,
-          excerpt: project.excerpt?.rendered || project.excerpt || '',
-          slug: project.slug,
-          featuredImage: (() => {
-            const featuredMedia = project._embedded && project._embedded['wp:featuredmedia'] && project._embedded['wp:featuredmedia'][0];
-            return featuredMedia ? {
-              node: {
-                sourceUrl: featuredMedia.source_url,
-                altText: featuredMedia.alt_text || project.title?.rendered || '',
-                mediaDetails: {
-                  width: featuredMedia.media_details?.width || 800,
-                  height: featuredMedia.media_details?.height || 600
-                }
-              }
-            } : null;
-          })(),
-          caseStudy: {
-            projectLinks: {
-              liveSite: project.acf_fields?.project_links?.live_site || project.acf?.project_links?.live_site || project.acf_fields?.live_site || project.acf?.live_site || null,
-              github: project.acf_fields?.project_links?.github || project.acf?.project_links?.github || null
-            }
-          }
-        }))
-      }
-    });
+    return rewriteImageUrls(transformProjects(projects as never));
   } catch (error) {
     console.error('Error fetching projects for MoreProjects:', error);
     return null;
   }
 }
 
+// Resolve tech-badge images for a project (FR-8): the tech_stack relation objects
+// don't carry image URLs, so fetch the Tech CPT featured images by ID.
+async function resolveTechImages(ids: number[]): Promise<Map<number, WordPressImage | null>> {
+  const map = new Map<number, WordPressImage | null>();
+  if (ids.length === 0) return map;
+  try {
+    const techs = await cmsRest<Array<{ id: number; _embedded?: { 'wp:featuredmedia'?: unknown[] } }>>(
+      `/tech?include=${ids.join(',')}&_embed&per_page=100`
+    );
+    for (const tech of techs) {
+      map.set(Number(tech.id), transformMedia(tech._embedded?.['wp:featuredmedia']?.[0] as never));
+    }
+  } catch (error) {
+    console.error('Error resolving tech images:', error);
+  }
+  return map;
+}
+
 // Server-side data fetching
 async function getProject(slug: string) {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '')}/wp-json/wp/v2/project?slug=${slug}&_embed&acf_format=standard`, {
-      cache: 'no-store' // Always fetch fresh data
-    });
-
-    if (!response.ok) return null;
-
-    const projects = await response.json();
+    const projects = await cmsRest<unknown[]>(
+      `/project?slug=${slug}&_embed&acf_format=standard`
+    );
     if (!Array.isArray(projects) || projects.length === 0) return null;
 
-    const project = projects[0];
+    const project = projects[0] as never;
+    const techImages = await resolveTechImages(extractTechIds(project));
 
-    return rewriteImageUrls({
-      id: project.id.toString(),
-      title: project.title?.rendered || project.title,
-      slug: project.slug,
-      content: project.content?.rendered || project.content || '',
-      excerpt: project.excerpt?.rendered || project.excerpt || '',
-      featuredImage: project._embedded?.['wp:featuredmedia']?.[0] ? {
-        node: {
-          sourceUrl: project._embedded['wp:featuredmedia'][0].source_url,
-          altText: project._embedded['wp:featuredmedia'][0].alt_text,
-          mediaDetails: {
-            width: project._embedded['wp:featuredmedia'][0].media_details?.width,
-            height: project._embedded['wp:featuredmedia'][0].media_details?.height
-          }
-        }
-      } : null,
-      caseStudy: project.acf_fields || project.acf ? {
-        projectOverview: {
-          technologies: ((project.acf_fields || project.acf)?.project_overview?.tech_stack || []).map((tech: any) => ({
-            id: tech.ID || tech.id,
-            title: tech.post_title,
-            featuredImage: tech.featured_image ? {
-              node: {
-                sourceUrl: tech.featured_image.source_url || tech.featured_image,
-                altText: tech.post_title
-              }
-            } : null
-          }))
-        },
-        projectContent: {
-          challenge: (project.acf_fields || project.acf)?.project_content?.challenge || '',
-          solution: (project.acf_fields || project.acf)?.project_content?.solution || '',
-          keyFeatures: (project.acf_fields || project.acf)?.project_content?.key_features || []
-        },
-        projectLinks: {
-          liveSite: (project.acf_fields || project.acf)?.project_links?.live_site || (project.acf_fields || project.acf)?.live_site || '',
-          github: (project.acf_fields || project.acf)?.project_links?.github || ''
-        },
-        projectGallery: (project.acf_fields || project.acf)?.project_gallery || []
-      } : null
-    });
+    return rewriteImageUrls(transformProject(project, techImages));
   } catch (error) {
     console.error('Error fetching project:', error);
     return null;
@@ -259,15 +195,13 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
           {/* Technologies */}
           {(() => {
-            // Handle both GraphQL structure (technologies.nodes) and fallback structure (technologies array)
-            const technologies = project.caseStudy?.projectOverview?.technologies?.nodes ||
-              project.caseStudy?.projectOverview?.technologies || [];
+            const technologies = project.caseStudy?.projectOverview?.technologies || [];
 
             return technologies.length > 0 ? (
               <section className="tech-stack">
                 <h2>Technologies Used</h2>
                 <div className="tech-grid">
-                  {technologies.map((tech: any) => (
+                  {technologies.map((tech) => (
                     <div key={tech.id} className="tech-item">
                       {tech.featuredImage?.node && (
                         <Image
@@ -276,10 +210,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                           width={40}
                           height={40}
                           className="tech-icon"
-                          onError={(e) => {
-                            // Fallback to a default icon if the image fails to load
-                            e.currentTarget.src = '/icons/code.svg';
-                          }}
+                          unoptimized
                         />
                       )}
                       <span>{tech.title}</span>
@@ -378,5 +309,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   );
 }
 
-// Enable ISR (Incremental Static Regeneration)
-export const dynamic = 'force-dynamic'; // Always fetch fresh project data
+// Enable ISR (Incremental Static Regeneration) — cached render refreshed at most
+// once per 60s instead of fetching WordPress on every request. Next requires this
+// segment export to be a static literal (keep in sync with CMS_REVALIDATE = 60).
+export const revalidate = 60;

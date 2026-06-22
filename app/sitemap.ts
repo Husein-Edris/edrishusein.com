@@ -1,57 +1,5 @@
 import { MetadataRoute } from 'next'
-import { client } from '@/src/lib/client';
-
-// Fetch all blog posts for sitemap
-async function fetchAllPosts() {
-  try {
-    const query = `
-      query GetAllPostsForSitemap {
-        posts(first: 100, where: { orderby: { field: DATE, order: DESC } }) {
-          nodes {
-            slug
-            date
-            modified
-          }
-        }
-      }
-    `;
-    
-    const response = await client.request(query);
-    return response.posts?.nodes || [];
-  } catch (error: any) {
-    // Silently fail - return empty array so sitemap still generates
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('⚠️ Could not fetch posts for sitemap:', error.message || error);
-    }
-    return [];
-  }
-}
-
-// Fetch all projects for sitemap
-async function fetchAllProjects() {
-  try {
-    const query = `
-      query GetAllProjectsForSitemap {
-        projects(first: 100, where: { orderby: { field: DATE, order: DESC } }) {
-          nodes {
-            slug
-            date
-            modified
-          }
-        }
-      }
-    `;
-    
-    const response = await client.request(query);
-    return response.projects?.nodes || [];
-  } catch (error: any) {
-    // Silently fail - return empty array so sitemap still generates
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('⚠️ Could not fetch projects for sitemap:', error.message || error);
-    }
-    return [];
-  }
-}
+import { fetchSitemapContent, toSitemapEntries } from '@/src/lib/sitemap-content';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://edrishusein.com';
@@ -114,27 +62,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  // Fetch dynamic content
+  // Fetch dynamic content via REST (returns [] on failure so the sitemap still generates)
   const [posts, projects] = await Promise.all([
-    fetchAllPosts(),
-    fetchAllProjects()
+    fetchSitemapContent('/posts?per_page=100&orderby=date&order=desc&_fields=slug,modified,date'),
+    fetchSitemapContent('/project?per_page=100&orderby=date&order=desc&_fields=slug,modified,date'),
   ]);
 
-  // Blog post pages
-  const postPages: MetadataRoute.Sitemap = posts.map((post: any) => ({
-    url: `${baseUrl}/notebook/${post.slug}`,
-    lastModified: new Date(post.modified || post.date),
-    changeFrequency: 'weekly' as const,
-    priority: 0.7,
-  }));
-
-  // Project pages
-  const projectPages: MetadataRoute.Sitemap = projects.map((project: any) => ({
-    url: `${baseUrl}/projects/${project.slug}`,
-    lastModified: new Date(project.modified || project.date),
-    changeFrequency: 'monthly' as const,
-    priority: 0.8,
-  }));
+  const postPages = toSitemapEntries(posts, baseUrl, 'notebook', 'weekly', 0.7);
+  const projectPages = toSitemapEntries(projects, baseUrl, 'projects', 'monthly', 0.8);
 
   return [...staticPages, ...postPages, ...projectPages];
 }

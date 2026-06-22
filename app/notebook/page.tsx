@@ -1,90 +1,25 @@
-import { GraphQLClient } from 'graphql-request';
 import Image from 'next/image';
 import Link from 'next/link';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
 import { rewriteImageUrls } from '@/src/lib/image-utils';
+import { cmsRest } from '@/src/lib/rest-client';
+import { transformPostListItem } from '@/src/lib/transform/transformPost';
 import '@/src/styles/pages/Blog.scss';
-import { PostsApiResponse } from '@/src/types/api';
 
-export const dynamic = 'force-dynamic'; // Always fetch fresh blog data
-
-const client = new GraphQLClient(process.env.NEXT_PUBLIC_WORDPRESS_API_URL || '');
-
-const GET_POSTS = `
-  query GetPosts {
-    posts(first: 100) {
-      nodes {
-        id
-        title
-        excerpt
-        slug
-        featuredImage {
-          node {
-            sourceUrl
-            altText
-            mediaDetails {
-              height
-              width
-            }
-          }
-        }
-      }
-    }
-  }
-`;
+// ISR — cached render refreshed at most once per 60s (keep in sync with CMS_REVALIDATE = 60).
+export const revalidate = 60;
 
 async function getPostsData() {
     try {
-        console.log('🔍 Fetching all projects for projects page');
-        const data = await client.request(GET_POSTS) as PostsApiResponse;
-        
-        if (data?.posts?.nodes) {
-            console.log(`✅ Found ${data.posts.nodes.length} posts via GraphQL`);
-            return rewriteImageUrls(data.posts.nodes);
+        const posts = await cmsRest<unknown[]>('/posts?_embed&per_page=100&orderby=date&order=desc');
+        if (!Array.isArray(posts)) return [];
+        if (process.env.NODE_ENV === 'development') {
+            console.log(`✅ ${posts.length} posts loaded via REST API`);
         }
-        
-        throw new Error('No posts data received from GraphQL');
-        
+        return rewriteImageUrls(posts.map((p) => transformPostListItem(p as never)));
     } catch (error) {
         console.error('Error fetching posts:', error);
-        
-        // Try WordPress REST API as fallback
-        try {
-            const WORDPRESS_REST_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '') || 'https://cms.edrishusein.com';
-            console.log('🔄 Falling back to WordPress REST API...');
-            
-            const restResponse = await fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/posts?_embed&per_page=100`, {
-                cache: 'no-store'
-            });
-            
-            if (restResponse.ok) {
-                const restPosts = await restResponse.json();
-                console.log(`✅ Found ${restPosts.length} posts via REST API`);
-                
-                // Transform REST API data to match GraphQL structure
-                return rewriteImageUrls(restPosts.map((post: any) => ({
-                    id: post.id.toString(),
-                    title: post.title?.rendered || post.title,
-                    excerpt: post.excerpt?.rendered || post.excerpt || '',
-                    slug: post.slug,
-                    featuredImage: post._embedded?.['wp:featuredmedia']?.[0] ? {
-                        node: {
-                            sourceUrl: post._embedded['wp:featuredmedia'][0].source_url,
-                            altText: post._embedded['wp:featuredmedia'][0].alt_text || post.title?.rendered || '',
-                            mediaDetails: {
-                                width: post._embedded['wp:featuredmedia'][0].media_details?.width || 400,
-                                height: post._embedded['wp:featuredmedia'][0].media_details?.height || 400
-                            }
-                        }
-                    } : null
-                })));
-            }
-        } catch (restError) {
-            console.error('REST API fallback also failed:', restError);
-        }
-        
-        console.log('⚠️ Using empty posts array as final fallback');
         return [];
     }
 }

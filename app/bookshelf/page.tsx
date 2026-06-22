@@ -1,96 +1,35 @@
-import { GraphQLClient } from 'graphql-request';
 import Image from 'next/image';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
 import SectionHeader from '@/src/components/SectionHeader/SectionHeader';
+import { rewriteImageUrls } from '@/src/lib/image-utils';
+import { cmsRest } from '@/src/lib/rest-client';
+import { transformMedia } from '@/src/lib/transform/transformMedia';
+import { rendered } from '@/src/lib/transform/transformProjects';
 import '@/src/styles/pages/Bookshelf.scss';
 
-export const dynamic = 'force-dynamic'; // Always fetch fresh data from WordPress
-
-const client = new GraphQLClient(process.env.NEXT_PUBLIC_WORDPRESS_API_URL || '');
-
-import { rewriteUploadUrl } from '@/src/lib/image-utils';
-
-const GET_BOOKS = `
-  query GetBooks {
-    books(first: 100) {
-      nodes {
-        id
-        title
-        excerpt
-        featuredImage {
-          node {
-            sourceUrl
-            altText
-            mediaDetails {
-              height
-              width
-            }
-          }
-        }
-      }
-    }
-  }
-`;
+// ISR — cached render refreshed at most once per 60s (keep in sync with CMS_REVALIDATE = 60).
+export const revalidate = 60;
 
 async function getBooksData() {
   try {
-    console.log('🔍 Fetching books via GraphQL...');
-    const data = await client.request(GET_BOOKS) as any;
-    
-    if (data?.books?.nodes) {
-      console.log(`✅ Found ${data.books.nodes.length} books via GraphQL`);
-      return data.books.nodes.map((book: any) => ({
-        ...book,
-        featuredImage: book.featuredImage?.node ? {
-          node: {
-            ...book.featuredImage.node,
-            sourceUrl: rewriteUploadUrl(book.featuredImage.node.sourceUrl),
-          }
-        } : book.featuredImage,
-      }));
+    const books = await cmsRest<Array<{ id: number | string; title?: unknown; excerpt?: unknown; _embedded?: { 'wp:featuredmedia'?: unknown[] } }>>(
+      '/book?_embed&per_page=100'
+    );
+    if (!Array.isArray(books)) return [];
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`✅ ${books.length} books loaded via REST API`);
     }
-    
-    throw new Error('No books data received from GraphQL');
-    
+    return rewriteImageUrls(
+      books.map((book) => ({
+        id: String(book.id),
+        title: rendered(book.title as never),
+        excerpt: rendered(book.excerpt as never),
+        featuredImage: transformMedia(book._embedded?.['wp:featuredmedia']?.[0] as never),
+      }))
+    );
   } catch (error) {
-    console.error('❌ GraphQL books fetch failed:', error);
-    
-    // Try WordPress REST API as fallback
-    try {
-      const WORDPRESS_REST_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '') || 'https://cms.edrishusein.com';
-      console.log('🔄 Falling back to WordPress REST API for books...');
-      
-      const restResponse = await fetch(`${WORDPRESS_REST_URL}/wp-json/wp/v2/book?_embed&per_page=100`, {
-        cache: 'no-store'
-      });
-      
-      if (restResponse.ok) {
-        const restBooks = await restResponse.json();
-        console.log(`✅ Found ${restBooks.length} books via REST API`);
-        
-        // Transform REST API data to match GraphQL structure
-        return restBooks.map((book: any) => ({
-          id: book.id.toString(),
-          title: book.title?.rendered || book.title,
-          excerpt: book.excerpt?.rendered || book.excerpt || '',
-          featuredImage: book._embedded?.['wp:featuredmedia']?.[0] ? {
-            node: {
-              sourceUrl: rewriteUploadUrl(book._embedded['wp:featuredmedia'][0].source_url),
-              altText: book._embedded['wp:featuredmedia'][0].alt_text || book.title?.rendered || '',
-              mediaDetails: {
-                width: book._embedded['wp:featuredmedia'][0].media_details?.width || 300,
-                height: book._embedded['wp:featuredmedia'][0].media_details?.height || 400
-              }
-            }
-          } : null
-        }));
-      }
-    } catch (restError) {
-      console.error('❌ REST API fallback also failed:', restError);
-    }
-    
-    console.log('⚠️ Using empty books array as final fallback');
+    console.error('Error fetching books:', error);
     return [];
   }
 }
