@@ -1,7 +1,20 @@
 import type { NextConfig } from "next";
 
 const isDev = process.env.NODE_ENV === 'development';
-const cmsHostname = isDev ? 'cmsedrishuseincom.local' : 'cms.edrishusein.com';
+// Derive the CMS host from the configured API URL so images, CSP and the upload
+// proxy always follow whatever CMS the env points at (a single source of truth).
+// Falls back to the conventional local/prod hosts when the env var is unset.
+const cmsHostname = (() => {
+  const apiUrl = process.env.NEXT_PUBLIC_WORDPRESS_API_URL;
+  if (apiUrl) {
+    try {
+      return new URL(apiUrl).hostname;
+    } catch {
+      // fall through to defaults
+    }
+  }
+  return isDev ? 'cmsedrishuseincom.local' : 'cms.edrishusein.com';
+})();
 const cmsOrigin = `https://${cmsHostname}`;
 
 const nextConfig: NextConfig = {

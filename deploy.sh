@@ -14,7 +14,7 @@ echo "🔧 Checking environment configuration..."
 if [ ! -f ".env.production" ]; then
     echo "⚠️ Warning: .env.production not found"
     echo "💡 Make sure to create .env.production with required variables:"
-    echo "   NEXT_PUBLIC_WORDPRESS_API_URL=https://cms.edrishusein.com/graphql"
+    echo "   NEXT_PUBLIC_WORDPRESS_API_URL=https://cms.edrishusein.com  # REST; /graphql suffix also tolerated"
     echo "   NEXT_PUBLIC_SITE_URL=https://edrishusein.com"
     echo "   NODE_ENV=production"
 else

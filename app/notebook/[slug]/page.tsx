@@ -8,24 +8,24 @@ import Footer from '@/src/components/Footer/Footer';
 import InfoCards from '@/src/components/InfoCards/InfoCards';
 import '@/src/styles/pages/BlogPost.scss';
 import '@/src/styles/pages/CaseStudy.scss';
-import { WordPressPost } from '@/src/types/api';
+import { rewriteImageUrls } from '@/src/lib/image-utils';
+import { cmsRest } from '@/src/lib/rest-client';
+import {
+  transformPostDetail,
+  transformPostListItem,
+  type PostDetail,
+  type PostListItem,
+} from '@/src/lib/transform/transformPost';
 
-// Generate static params for all blog posts
+// Generate static params for all blog posts (direct REST — no self-HTTP)
 export async function generateStaticParams() {
   try {
-    const response = await fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : process.env.NEXT_PUBLIC_SITE_URL}/api/post?limit=50`);
-    if (!response.ok) return [];
-    
-    const data = await response.json();
-    if (data.success && data.posts) {
-      return data.posts.map((post: WordPressPost) => ({
-        slug: post.slug,
-      }));
-    }
+    const posts = await cmsRest<Array<{ slug: string }>>('/posts?per_page=50&_fields=slug');
+    return posts.map((post) => ({ slug: post.slug }));
   } catch (error) {
     console.error('Error generating static params for blog posts:', error);
   }
-  
+
   return [];
 }
 
@@ -62,46 +62,29 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 }
 
-// Server-side data fetching
-async function getPost(slug: string): Promise<WordPressPost> {
-  const response = await fetch(
-    `${process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : process.env.NEXT_PUBLIC_SITE_URL}/api/post?slug=${slug}`,
-    { cache: 'no-store' } // Always fetch fresh data
-  );
-  
-  if (!response.ok) {
-    throw new Error('Failed to fetch post');
-  }
-  
-  const data = await response.json();
-  if (!data.success || !data.post) {
+// Server-side data fetching (direct REST + transform)
+async function getPost(slug: string): Promise<PostDetail> {
+  const posts = await cmsRest<unknown[]>(`/posts?slug=${slug}&_embed&acf_format=standard`);
+  if (!Array.isArray(posts) || posts.length === 0) {
     throw new Error('Post not found');
   }
-  
-  return data.post;
+  return rewriteImageUrls(transformPostDetail(posts[0] as never));
 }
 
-async function getMoreArticles(excludeSlug: string): Promise<WordPressPost[]> {
+async function getMoreArticles(excludeSlug: string): Promise<PostListItem[]> {
   try {
-    const response = await fetch(
-      `${process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : process.env.NEXT_PUBLIC_SITE_URL}/api/post?limit=4`,
-      { cache: 'no-store' }
+    const posts = await cmsRest<unknown[]>('/posts?_embed&per_page=4&orderby=date&order=desc');
+    if (!Array.isArray(posts)) return [];
+    return rewriteImageUrls(
+      posts
+        .map((p) => transformPostListItem(p as never))
+        .filter((p) => p.slug !== excludeSlug)
+        .slice(0, 3)
     );
-    
-    if (!response.ok) return [];
-    
-    const data = await response.json();
-    if (data.success && data.posts) {
-      // Filter out current post and limit to 3
-      return data.posts
-        .filter((p: WordPressPost) => p.slug !== excludeSlug)
-        .slice(0, 3);
-    }
   } catch (error) {
     console.error('Error fetching more articles:', error);
+    return [];
   }
-  
-  return [];
 }
 
 // Loading component for Suspense
@@ -260,7 +243,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 variant="light"
                 sectionTitle="More Articles"
                 columns={3}
-                cards={moreArticles.map((article: WordPressPost) => ({
+                cards={moreArticles.map((article) => ({
                   title: article.title || 'Untitled',
                   description: article.excerpt?.replace(/<[^>]*>/g, '').substring(0, 120) + '...' || '',
                   image: article.featuredImage?.node?.sourceUrl || "/images/Blog-sample-img.png",
@@ -280,5 +263,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   }
 }
 
-// Enable ISR (Incremental Static Regeneration)
-export const dynamic = 'force-dynamic'; // Always fetch fresh blog data
+// Enable ISR (Incremental Static Regeneration) — static literal required by Next
+// (keep in sync with CMS_REVALIDATE = 60).
+export const revalidate = 60;
