@@ -42,6 +42,11 @@ describe('transformPostDetail', () => {
     expect(detail.readingTime).toBe(`${post.acf.reading_time} min read`);
   });
 
+  it('exposes the WP modified timestamp (falls back to date)', () => {
+    expect(detail.modified).toBe(post.modified);
+    expect(detail.date).toBe(post.date);
+  });
+
   it('maps conclusion_section to camelCase shape', () => {
     expect(detail.conclusionSection?.conclusionTitle).toBe('Key Takeaways');
     expect(detail.conclusionSection?.conclusionPoints[0].pointText).toBe('dasdadas');

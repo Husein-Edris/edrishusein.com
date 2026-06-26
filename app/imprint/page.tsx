@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 // Generate metadata for the imprint page
 export async function generateMetadata(): Promise<Metadata> {
   const data = await getLegalPageData('imprint', 'imprint');
-  return generateLegalMetadata(data);
+  return generateLegalMetadata(data, '/imprint');
 }
 
 // Imprint page component

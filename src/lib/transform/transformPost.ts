@@ -20,6 +20,7 @@ export interface RestPost {
   id: number | string;
   slug: string;
   date?: string;
+  modified?: string;
   title?: { rendered?: string } | string;
   excerpt?: { rendered?: string } | string;
   content?: { rendered?: string } | string;
@@ -37,6 +38,7 @@ export interface PostListItem {
   excerpt: string;
   slug: string;
   date: string;
+  modified: string;
   featuredImage: WordPressImage | null;
   readingTime: string;
 }
@@ -75,6 +77,7 @@ export function transformPostListItem(post: RestPost): PostListItem {
     excerpt: rendered(post.excerpt),
     slug: post.slug,
     date: post.date ?? '',
+    modified: post.modified ?? post.date ?? '',
     featuredImage: transformMedia(featured as never),
     readingTime: readingTimeFrom(post.acf, rendered(post.excerpt)),
   };

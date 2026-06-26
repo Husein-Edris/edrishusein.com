@@ -6,6 +6,7 @@ import Contact from '@/src/components/Contact/Contact';
 export const metadata: Metadata = {
   title: 'Contact - Edris Husein',
   description: 'Get in touch with Edris Husein, full-stack developer. Reach out about projects, collaborations, or opportunities.',
+  alternates: { canonical: '/contact' },
 };
 
 export default function ContactPage() {

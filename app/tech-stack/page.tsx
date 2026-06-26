@@ -14,6 +14,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Tech Stack - Edris Husein',
   description: 'The tools, languages, and frameworks Edris Husein uses to build modern web applications.',
+  alternates: { canonical: '/tech-stack' },
 };
 
 // Fisher-Yates shuffle algorithm for random array ordering

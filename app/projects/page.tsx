@@ -10,6 +10,7 @@ export const dynamic = 'force-dynamic'; // Always fetch fresh project data
 export const metadata: Metadata = {
   title: 'Projects - Edris Husein',
   description: 'A selection of case studies and projects by Edris Husein, full-stack developer working with React, Next.js, and WordPress.',
+  alternates: { canonical: '/projects' },
 };
 
 async function getAllProjects() {

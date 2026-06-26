@@ -3,6 +3,8 @@ import CookieBanner from "@/src/components/CookieBanner/CookieBanner";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://edrishusein.com"),
+  alternates: { canonical: "/" },
   title: "Edris Husein - Full-stack Developer",
   description: "Full-stack developer and digital creative specializing in modern web applications, UI/UX design, and WordPress development.",
   keywords: "Full-stack developer, React, Next.js, WordPress, UI/UX design, web development",

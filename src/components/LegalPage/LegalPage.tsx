@@ -160,10 +160,11 @@ async function getLegalPageData(slug: string, fallbackType: 'imprint' | 'privacy
 }
 
 // Generate metadata for legal pages
-function generateLegalMetadata(data: LegalPageData): Metadata {
+function generateLegalMetadata(data: LegalPageData, canonicalPath?: string): Metadata {
   return {
     title: data.page.seo?.title || data.page.title,
     description: data.page.seo?.metaDesc || `${data.page.title} - Edris Husein`,
+    ...(canonicalPath ? { alternates: { canonical: canonicalPath } } : {}),
     robots: {
       index: true,
       follow: true,
