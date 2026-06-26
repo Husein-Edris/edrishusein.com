@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import CookieBanner from "@/src/components/CookieBanner/CookieBanner";
+import Analytics from "@/src/components/Analytics/Analytics";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -61,6 +62,7 @@ export default function RootLayout({
         <a href="#main-content" className="skip-link">Skip to main content</a>
         {children}
         <CookieBanner />
+        <Analytics />
       </body>
     </html>
   );

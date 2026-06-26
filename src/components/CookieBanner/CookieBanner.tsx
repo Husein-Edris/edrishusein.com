@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { notifyConsentChange } from '@/src/lib/consent';
 import './CookieBanner.scss';
 
 interface CookieConsent {
@@ -89,11 +90,8 @@ const CookieBanner = () => {
       }));
       setIsVisible(false);
 
-      // Trigger analytics initialization if consented
-      if (consentData.analytics) {
-        // Initialize Google Analytics or other analytics here
-        console.log('Analytics consent given - initialize tracking');
-      }
+      // Let the consent-gated analytics loader react without a page reload.
+      notifyConsentChange();
     } catch (error) {
       console.error('Error saving consent to localStorage:', error);
       // Even if saving fails, hide the banner to prevent it from being stuck

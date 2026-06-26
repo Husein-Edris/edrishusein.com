@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { cookieDatabase, getCookiesByCategory, getActiveCookies, type CookieInfo } from '@/src/data/cookies';
 import CookieList from '@/src/components/CookieList/CookieList';
+import { notifyConsentChange } from '@/src/lib/consent';
 import './CookiePreferences.scss';
 
 interface CookieConsent {
@@ -115,11 +116,8 @@ const CookiePreferences: React.FC<CookiePreferencesProps> = ({
         }));
       }
 
-      // Trigger analytics initialization if consented
-      if (consentData.analytics) {
-        // Initialize Google Analytics or other analytics here
-        console.log('Analytics consent given - initialize tracking');
-      }
+      // Let the consent-gated analytics loader react without a page reload.
+      notifyConsentChange();
 
       if (onSave) {
         onSave();
