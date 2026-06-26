@@ -39,6 +39,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     return {
       title: `${post.title} | Notebook - Edris Husein`,
       description: post.excerpt?.replace(/<[^>]*>/g, '').substring(0, 160) || 'Read more on Edris Husein\'s notebook',
+      alternates: { canonical: `/notebook/${slug}` },
       openGraph: {
         title: post.title,
         description: post.excerpt?.replace(/<[^>]*>/g, '').substring(0, 160),
@@ -125,8 +126,37 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       getMoreArticles(slug),
     ]);
 
+    const jsonLd = {
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      headline: post.title,
+      description: post.excerpt?.replace(/<[^>]*>/g, '').trim() || undefined,
+      image: post.featuredImage?.node?.sourceUrl || undefined,
+      datePublished: post.date || undefined,
+      dateModified: post.modified || post.date || undefined,
+      author: {
+        '@type': 'Person',
+        name: 'Edris Husein',
+        url: 'https://edrishusein.com/about',
+      },
+      publisher: {
+        '@type': 'Person',
+        name: 'Edris Husein',
+      },
+      mainEntityOfPage: {
+        '@type': 'WebPage',
+        '@id': `https://edrishusein.com/notebook/${slug}`,
+      },
+    };
+
     return (
       <>
+        <script
+          type="application/ld+json"
+          // JSON.stringify of a controlled object; escape "<" so CMS text
+          // (title/excerpt) can never break out of the script tag (XSS guard).
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
+        />
         <Header />
         <main id="main-content" className="case-study blog-post">
           {/* Hero Section */}

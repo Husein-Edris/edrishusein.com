@@ -16,6 +16,7 @@ export const revalidate = 60;
 export const metadata: Metadata = {
   title: 'Bookshelf - Edris Husein',
   description: 'Books and pieces of wisdom Edris Husein has enjoyed reading, spanning software craft, design, and personal growth.',
+  alternates: { canonical: '/bookshelf' },
 };
 
 async function getBooksData() {

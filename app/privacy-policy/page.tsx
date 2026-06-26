@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 // Generate metadata for the privacy policy page
 export async function generateMetadata(): Promise<Metadata> {
   const data = await getLegalPageData('privacy-policy', 'privacy');
-  return generateLegalMetadata(data);
+  return generateLegalMetadata(data, '/privacy-policy');
 }
 
 // Privacy Policy page component

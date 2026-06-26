@@ -14,6 +14,7 @@ export const revalidate = 60;
 export const metadata: Metadata = {
   title: 'Notebook - Edris Husein',
   description: 'Thoughts, insights, and reflections on web development, technology, and the craft of building software by Edris Husein.',
+  alternates: { canonical: '/notebook' },
 };
 
 async function getPostsData() {
