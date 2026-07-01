@@ -20,6 +20,21 @@ export async function fetchSitemapContent(restPath: string): Promise<SitemapCont
   }
 }
 
+/**
+ * Newest `modified` (falling back to `date`) across content items, or undefined
+ * when none carry a usable date. Lets listing/index pages report an honest
+ * lastmod derived from their freshest child instead of the build timestamp.
+ */
+export function latestModified(items: SitemapContentItem[]): Date | undefined {
+  const times = items
+    .map((item) => item.modified || item.date)
+    .filter((value): value is string => Boolean(value))
+    .map((value) => new Date(value).getTime())
+    .filter((time) => !Number.isNaN(time));
+
+  return times.length ? new Date(Math.max(...times)) : undefined;
+}
+
 /** Map CMS content items into sitemap entries under `${baseUrl}/${segment}/${slug}`. */
 export function toSitemapEntries(
   items: SitemapContentItem[],

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { toSitemapEntries, fetchSitemapContent } from './sitemap-content';
+import { toSitemapEntries, fetchSitemapContent, latestModified } from './sitemap-content';
 
 describe('toSitemapEntries', () => {
   const items = [
@@ -25,6 +25,38 @@ describe('toSitemapEntries', () => {
     const entries = toSitemapEntries([{ slug: '' }, { slug: 'ok' }], 'https://x.com', 'notebook', 'weekly', 0.7);
     expect(entries).toHaveLength(1);
     expect(entries[0].url).toBe('https://x.com/notebook/ok');
+  });
+});
+
+describe('latestModified', () => {
+  it('returns the newest modified date across items', () => {
+    const items = [
+      { slug: 'a', modified: '2025-01-10T00:00:00Z' },
+      { slug: 'b', modified: '2025-06-30T00:00:00Z' },
+      { slug: 'c', modified: '2025-03-15T00:00:00Z' },
+    ];
+    expect(latestModified(items)).toEqual(new Date('2025-06-30T00:00:00Z'));
+  });
+
+  it('falls back to date when modified is absent', () => {
+    const items = [
+      { slug: 'a', date: '2025-02-01T00:00:00Z' },
+      { slug: 'b', modified: '2025-05-01T00:00:00Z', date: '2025-01-01T00:00:00Z' },
+    ];
+    expect(latestModified(items)).toEqual(new Date('2025-05-01T00:00:00Z'));
+  });
+
+  it('returns undefined when no item carries a usable date', () => {
+    expect(latestModified([{ slug: 'a' }, { slug: 'b' }])).toBeUndefined();
+    expect(latestModified([])).toBeUndefined();
+  });
+
+  it('ignores unparseable dates', () => {
+    const items = [
+      { slug: 'a', modified: 'not-a-date' },
+      { slug: 'b', modified: '2025-04-04T00:00:00Z' },
+    ];
+    expect(latestModified(items)).toEqual(new Date('2025-04-04T00:00:00Z'));
   });
 });
 
