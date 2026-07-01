@@ -10,6 +10,7 @@ import { cmsRest } from '@/src/lib/rest-client';
 import { transformProject, extractTechIds } from '@/src/lib/transform/transformProject';
 import { transformProjects } from '@/src/lib/transform/transformProjects';
 import { transformMedia } from '@/src/lib/transform/transformMedia';
+import { generateStructuredData, generateBreadcrumbStructuredData } from '@/src/lib/seo-utils';
 import type { WordPressImage } from '@/src/types/wordpress';
 import '@/src/styles/pages/CaseStudy.scss';
 
@@ -136,6 +137,22 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   if (!project) {
     notFound();
   }
+
+  // Structured data: mark the case study as a CreativeWork and expose a
+  // Home > Projects > Title breadcrumb trail (project pages previously had none).
+  const canonical = `https://edrishusein.com/projects/${slug}`;
+  const structuredData = generateStructuredData('CreativeWork', {
+    title: project.title,
+    description: project.excerpt?.replace(/<[^>]*>/g, '').substring(0, 160),
+    canonical,
+    date: project.date,
+    featuredImage: project.featuredImage,
+  });
+  const breadcrumbData = generateBreadcrumbStructuredData([
+    { text: 'Home', url: 'https://edrishusein.com' },
+    { text: 'Projects', url: 'https://edrishusein.com/projects' },
+    { text: project.title, url: canonical },
+  ]);
 
   return (
     <>
@@ -306,6 +323,16 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         <MoreProjects currentProjectSlug={slug} allProjects={allProjects} />
       </main>
       <Footer />
+
+      {/* Structured Data for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbData) }}
+      />
     </>
   );
 }
