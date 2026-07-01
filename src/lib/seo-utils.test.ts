@@ -4,6 +4,7 @@ import {
   generateStructuredData,
   generateBreadcrumbStructuredData,
   generateHomepageStructuredData,
+  safeJsonLd,
   type RankMathSEO,
 } from './seo-utils';
 import { mockRankMathSEO, mockPartialSEO } from '../__mocks__/fixtures/wordpress-data';
@@ -437,6 +438,32 @@ describe('generateStructuredData', () => {
       expect(result).not.toHaveProperty('title');
       expect(result).not.toHaveProperty('extra');
     });
+  });
+});
+
+describe('safeJsonLd', () => {
+  it('produces valid JSON that round-trips', () => {
+    const obj = { '@type': 'Thing', name: 'Plain Title' };
+    expect(JSON.parse(safeJsonLd(obj))).toEqual(obj);
+  });
+
+  it('escapes a </script> breakout attempt in a string value', () => {
+    const obj = { name: 'Evil</script><script>alert(1)</script>' };
+    const out = safeJsonLd(obj);
+    expect(out).not.toContain('</script>');
+    expect(out).not.toContain('<');
+    expect(out).not.toContain('>');
+    // still parses back to the original string
+    expect(JSON.parse(out).name).toBe('Evil</script><script>alert(1)</script>');
+  });
+
+  it('escapes ampersands and the U+2028/U+2029 line separators', () => {
+    const obj = { name: 'A & B C D' };
+    const out = safeJsonLd(obj);
+    expect(out).toContain('\\u0026');
+    expect(out).toContain('\\u2028');
+    expect(out).toContain('\\u2029');
+    expect(JSON.parse(out).name).toBe('A & B C D');
   });
 });
 

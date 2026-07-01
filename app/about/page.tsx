@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
 import { Metadata } from 'next';
-import { generateEnhancedMetadata, generateStructuredData } from '@/src/lib/seo-utils';
+import { generateEnhancedMetadata, generateStructuredData, safeJsonLd } from '@/src/lib/seo-utils';
 import { rewriteImageUrls } from '@/src/lib/image-utils';
 import { cmsRest } from '@/src/lib/rest-client';
 import { transformAbout } from '@/src/lib/transform/transformAbout';
@@ -439,7 +439,7 @@ async function getAboutPageData(): Promise<AboutPageData> {
           <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{
-              __html: JSON.stringify(structuredData),
+              __html: safeJsonLd(structuredData),
             }}
           />
         </>

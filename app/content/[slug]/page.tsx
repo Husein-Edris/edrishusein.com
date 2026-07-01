@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
 import { Metadata } from 'next';
-import { generateEnhancedMetadata, generateStructuredData } from '@/src/lib/seo-utils';
+import { generateEnhancedMetadata, generateStructuredData, safeJsonLd } from '@/src/lib/seo-utils';
 import { rewriteImageUrls } from '@/src/lib/image-utils';
 import { cmsRest } from '@/src/lib/rest-client';
 import { transformMedia } from '@/src/lib/transform/transformMedia';
@@ -181,7 +181,7 @@ export default async function WordPressPage({ params }: { params: { slug: string
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(structuredData),
+          __html: safeJsonLd(structuredData),
         }}
       />
     </>

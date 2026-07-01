@@ -10,6 +10,7 @@ import '@/src/styles/pages/BlogPost.scss';
 import '@/src/styles/pages/CaseStudy.scss';
 import { rewriteImageUrls } from '@/src/lib/image-utils';
 import { cmsRest } from '@/src/lib/rest-client';
+import { safeJsonLd } from '@/src/lib/seo-utils';
 import {
   transformPostDetail,
   transformPostListItem,
@@ -153,9 +154,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       <>
         <script
           type="application/ld+json"
-          // JSON.stringify of a controlled object; escape "<" so CMS text
+          // safeJsonLd escapes <, >, &, U+2028/9 so CMS-sourced text
           // (title/excerpt) can never break out of the script tag (XSS guard).
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
+          dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}
         />
         <Header />
         <main id="main-content" className="case-study blog-post">
