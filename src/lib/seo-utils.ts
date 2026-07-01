@@ -148,6 +148,41 @@ export function generateStructuredData(type: string, data: any): object {
   }
 }
 
+// Generate homepage structured data: a Person entity (the site owner) plus a
+// WebSite entity, emitted together as a schema.org @graph. This gives Google the
+// entity signals a personal-brand homepage needs (name, role, canonical URL,
+// verified social profiles) which the inner pages' page-level schema does not cover.
+const SITE_URL = 'https://edrishusein.com';
+
+export function generateHomepageStructuredData(): object {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Person",
+        "@id": `${SITE_URL}/#person`,
+        name: "Edris Husein",
+        jobTitle: "Full-stack Developer",
+        url: SITE_URL,
+        image: `${SITE_URL}/images/Edris-Husein-Hero.png`,
+        description: "Full-stack developer and digital creative specializing in modern web applications, UI/UX design, and WordPress development.",
+        knowsAbout: ["Web Development", "React", "Next.js", "TypeScript", "WordPress", "UI/UX Design"],
+        sameAs: [
+          "https://github.com/Husein-Edris",
+          "https://www.linkedin.com/in/edris-husein/"
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${SITE_URL}/#website`,
+        name: "Edris Husein",
+        url: SITE_URL,
+        publisher: { "@id": `${SITE_URL}/#person` }
+      }
+    ]
+  };
+}
+
 // Generate breadcrumb structured data
 export function generateBreadcrumbStructuredData(breadcrumbs: { text: string; url: string }[]): object {
   return {

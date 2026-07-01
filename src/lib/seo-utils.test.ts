@@ -3,6 +3,7 @@ import {
   generateEnhancedMetadata,
   generateStructuredData,
   generateBreadcrumbStructuredData,
+  generateHomepageStructuredData,
   type RankMathSEO,
 } from './seo-utils';
 import { mockRankMathSEO, mockPartialSEO } from '../__mocks__/fixtures/wordpress-data';
@@ -436,6 +437,46 @@ describe('generateStructuredData', () => {
       expect(result).not.toHaveProperty('title');
       expect(result).not.toHaveProperty('extra');
     });
+  });
+});
+
+describe('generateHomepageStructuredData', () => {
+  it('should include correct @context and a @graph array', () => {
+    const result = generateHomepageStructuredData() as any;
+
+    expect(result['@context']).toBe('https://schema.org');
+    expect(Array.isArray(result['@graph'])).toBe(true);
+    expect(result['@graph']).toHaveLength(2);
+  });
+
+  it('should include a Person entity with role, url and image', () => {
+    const result = generateHomepageStructuredData() as any;
+    const person = result['@graph'].find((n: any) => n['@type'] === 'Person');
+
+    expect(person).toBeDefined();
+    expect(person.name).toBe('Edris Husein');
+    expect(person.jobTitle).toBe('Full-stack Developer');
+    expect(person.url).toBe('https://edrishusein.com');
+    expect(person.image).toBe('https://edrishusein.com/images/Edris-Husein-Hero.png');
+  });
+
+  it('should list only the real verified social profiles in sameAs', () => {
+    const result = generateHomepageStructuredData() as any;
+    const person = result['@graph'].find((n: any) => n['@type'] === 'Person');
+
+    expect(person.sameAs).toEqual([
+      'https://github.com/Husein-Edris',
+      'https://www.linkedin.com/in/edris-husein/',
+    ]);
+  });
+
+  it('should include a WebSite entity published by the Person', () => {
+    const result = generateHomepageStructuredData() as any;
+    const website = result['@graph'].find((n: any) => n['@type'] === 'WebSite');
+
+    expect(website).toBeDefined();
+    expect(website.url).toBe('https://edrishusein.com');
+    expect(website.publisher).toEqual({ '@id': 'https://edrishusein.com/#person' });
   });
 });
 
