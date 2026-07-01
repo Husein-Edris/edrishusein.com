@@ -71,14 +71,15 @@ const nextConfig: NextConfig = {
           { key: 'Referrer-Policy', value: 'origin-when-cross-origin' },
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
 
-          // Tech Stack Showcase Headers
+          // Tech Stack Showcase Headers (kept accurate: REST migration retired the
+          // GraphQL/WPGraphQL stack, and deploy runs a nohup/PID standalone server, not PM2)
           { key: 'X-Powered-By', value: 'WordPress (Headless CMS) + Next.js 16' },
           { key: 'X-Framework', value: 'Next.js' },
           { key: 'X-CMS', value: 'WordPress' },
           { key: 'X-Architecture', value: 'Headless' },
           { key: 'X-Frontend-Stack', value: 'React 19, Next.js 16, TypeScript, SCSS' },
-          { key: 'X-Backend-Stack', value: 'WordPress, GraphQL, WPGraphQL, Advanced Custom Fields' },
-          { key: 'X-Deployment', value: 'PM2, Node.js, Custom Server' },
+          { key: 'X-Backend-Stack', value: 'WordPress REST API, Advanced Custom Fields Pro' },
+          { key: 'X-Deployment', value: 'Node.js standalone server' },
         ],
       },
     ]
