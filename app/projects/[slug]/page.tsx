@@ -10,7 +10,7 @@ import { cmsRest } from '@/src/lib/rest-client';
 import { transformProject, extractTechIds } from '@/src/lib/transform/transformProject';
 import { transformProjects } from '@/src/lib/transform/transformProjects';
 import { transformMedia } from '@/src/lib/transform/transformMedia';
-import { generateStructuredData, generateBreadcrumbStructuredData } from '@/src/lib/seo-utils';
+import { generateStructuredData, generateBreadcrumbStructuredData, safeJsonLd } from '@/src/lib/seo-utils';
 import type { WordPressImage } from '@/src/types/wordpress';
 import '@/src/styles/pages/CaseStudy.scss';
 
@@ -327,11 +327,11 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
       {/* Structured Data for SEO */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(structuredData) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbData) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbData) }}
       />
     </>
   );

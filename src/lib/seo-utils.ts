@@ -81,6 +81,19 @@ export function generateEnhancedMetadata(
   };
 }
 
+// Serialize a JSON-LD object for safe embedding inside a <script> tag.
+// JSON.stringify alone does not escape `<`, `>`, `&`, or the JS line separators
+// U+2028/U+2029, so a value containing `</script>` (e.g. a malicious CMS title)
+// could break out of the script element. Escaping these closes that XSS vector.
+export function safeJsonLd(data: object): string {
+  return JSON.stringify(data)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029');
+}
+
 // Generate structured data for better SEO
 export function generateStructuredData(type: string, data: any): object {
   const baseData = {

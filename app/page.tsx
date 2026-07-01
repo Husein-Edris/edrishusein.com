@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import Header from '@/src/components/Header/Header';
 import SectionRenderer from '@/src/components/SectionRenderer/SectionRenderer';
 import Footer from '@/src/components/Footer/Footer';
-import { generateHomepageStructuredData } from '@/src/lib/seo-utils';
+import { generateHomepageStructuredData, safeJsonLd } from '@/src/lib/seo-utils';
 
 // ISR: serve a cached homepage render and refresh it at most once per window
 // (see CMS_REVALIDATE in src/lib/client.ts) instead of re-fetching WordPress on
@@ -61,7 +61,7 @@ export default async function HomePage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(generateHomepageStructuredData()),
+          __html: safeJsonLd(generateHomepageStructuredData()),
         }}
       />
     </main>
