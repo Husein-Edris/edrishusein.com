@@ -15,11 +15,22 @@ export const metadata: Metadata = {
     description: "Full-stack developer specializing in modern web applications and UI/UX design.",
     type: "website",
     locale: "en_US",
+    // Default share image so links to any page without its own image (homepage,
+    // about, tech-stack, etc.) render a preview card instead of a bare text link.
+    images: [
+      {
+        url: "/images/Edris-Husein-Hero.png",
+        width: 450,
+        height: 450,
+        alt: "Edris Husein - Full-stack Developer",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Edris Husein - Full-stack Developer",
     description: "Full-stack developer specializing in modern web applications and UI/UX design.",
+    images: ["/images/Edris-Husein-Hero.png"],
   },
 };
 
@@ -43,14 +54,14 @@ export default function RootLayout({
         <meta name="theme-color" content="#ffffff" />
         <meta name="description" content="Full-stack developer and digital creative specializing in modern web applications, UI/UX design, and WordPress development." />
         
-        {/* Tech Stack Showcase - Headless Architecture */}
-        <meta name="generator" content="WordPress (Headless CMS), Next.js 15, React 19" />
+        {/* Tech Stack Showcase - Headless Architecture (kept accurate post REST migration) */}
+        <meta name="generator" content="WordPress (Headless CMS), Next.js 16, React 19" />
         <meta name="framework" content="Next.js" />
         <meta name="cms" content="WordPress" />
         <meta name="architecture" content="Headless" />
         <meta name="frontend" content="React, Next.js, TypeScript, SCSS" />
-        <meta name="backend" content="WordPress, GraphQL, WPGraphQL" />
-        <meta name="deployment" content="PM2, Node.js" />
+        <meta name="backend" content="WordPress REST API, Advanced Custom Fields Pro" />
+        <meta name="deployment" content="Node.js standalone server" />
         
         {/* WordPress Headless CMS Indicators */}
         <link rel="alternate" type="application/json" href="https://cms.edrishusein.com/wp-json/" />
