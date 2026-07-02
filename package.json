@@ -7,7 +7,7 @@
     "build:prod": "next build",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "refresh-content": "node refresh-content.js",
     "clear-cache": "rm -rf .next/cache",
     "test": "vitest run",
