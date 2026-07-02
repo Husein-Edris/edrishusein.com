@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const isDev = process.env.NODE_ENV === 'development';
 // Derive the CMS host from the configured API URL so images, CSP and the upload
@@ -86,4 +87,14 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// Sentry wraps the config to enable error monitoring. It stays inert until
+// NEXT_PUBLIC_SENTRY_DSN is set; source maps upload only when SENTRY_AUTH_TOKEN
+// (+ org/project) are present. Events tunnel through the same-origin /monitoring
+// route, so the CSP needs no Sentry domains and ad-blockers can't drop them.
+export default withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  tunnelRoute: "/monitoring",
+  silent: true,
+});

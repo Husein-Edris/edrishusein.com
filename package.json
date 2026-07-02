@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@next/third-parties": "^16.2.9",
+    "@sentry/nextjs": "^10.63.0",
     "critters": "^0.0.25",
     "next": "^16.1.1",
     "react": "^19.0.0",
