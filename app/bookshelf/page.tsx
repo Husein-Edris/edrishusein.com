@@ -48,7 +48,7 @@ export default async function BookshelfPage() {
   return (
     <>
       <Header />
-      <main id="main-content" className="bookshelf-page">
+      <main id="main-content" tabIndex={-1} className="bookshelf-page">
         {/* Hero Section */}
         <div className="hero-section">
           <div className="container">

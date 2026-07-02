@@ -111,7 +111,7 @@ export default async function WordPressPage({ params }: { params: { slug: string
     return (
       <>
         <Header />
-        <main id="main-content" className="wordpress-page error-page">
+        <main id="main-content" tabIndex={-1} className="wordpress-page error-page">
           <div className="container">
             <div className="error-content">
               <h1>Page Not Found</h1>
@@ -137,7 +137,7 @@ export default async function WordPressPage({ params }: { params: { slug: string
   return (
     <>
       <Header />
-      <main id="main-content" className="wordpress-page">
+      <main id="main-content" tabIndex={-1} className="wordpress-page">
         {/* Hero Section */}
         <section className="page-hero">
           <div className="container">

@@ -1,12 +1,14 @@
 'use client';
 
-import { FC, useState, useEffect } from 'react';
+import { FC, useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import './Header.scss';
 
 const Header: FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -16,20 +18,36 @@ const Header: FC = () => {
     setIsMenuOpen(false);
   };
 
-  // Handle body scroll locking and cleanup
+  // Handle body scroll locking + make the page behind the overlay inert
+  // (removes the 30+ background elements from the tab order and the a11y tree
+  // while the full-screen menu is open). See WCAG 2.4.3 Focus Order.
   useEffect(() => {
+    const background = [
+      document.getElementById('main-content'),
+      document.querySelector('footer'),
+    ];
+    const setInert = (on: boolean) => {
+      background.forEach((el) => {
+        if (!el) return;
+        if (on) el.setAttribute('inert', '');
+        else el.removeAttribute('inert');
+      });
+    };
+
     if (isMenuOpen) {
       // Prevent scrolling on body and html
       document.body.style.overflow = 'hidden';
       document.body.style.position = 'fixed';
       document.body.style.width = '100%';
       document.documentElement.style.overflow = 'hidden';
+      setInert(true);
     } else {
       // Restore scrolling
       document.body.style.overflow = '';
       document.body.style.position = '';
       document.body.style.width = '';
       document.documentElement.style.overflow = '';
+      setInert(false);
     }
 
     // Cleanup function to reset scroll on unmount
@@ -38,7 +56,21 @@ const Header: FC = () => {
       document.body.style.position = '';
       document.body.style.width = '';
       document.documentElement.style.overflow = '';
+      setInert(false);
     };
+  }, [isMenuOpen]);
+
+  // Move focus into the menu on open, and back to the toggle on close, so
+  // keyboard and screen-reader users are placed in (and returned from) the overlay.
+  useEffect(() => {
+    if (isMenuOpen) {
+      const firstLink = menuRef.current?.querySelector<HTMLElement>('.navLink');
+      firstLink?.focus();
+    } else if (menuRef.current?.contains(document.activeElement)) {
+      // Closing while focus was still inside the overlay (e.g. via Escape):
+      // return focus to the toggle. Skips the initial mount, where focus is elsewhere.
+      toggleRef.current?.focus();
+    }
   }, [isMenuOpen]);
 
   // Handle escape key to close menu
@@ -73,13 +105,15 @@ const Header: FC = () => {
         </Link>
 
         <div
+          ref={menuRef}
           id="mobile-menu"
           className={`mobile-menu ${isMenuOpen ? 'active' : ''}`}
           onClick={closeMenu}
           onTouchMove={(e) => e.preventDefault()} // Prevent touch scrolling
         >
-          <nav 
-            className="main-nav" 
+          <nav
+            className="main-nav"
+            aria-label="Primary"
             onClick={(e) => e.stopPropagation()}
             onTouchMove={(e) => e.stopPropagation()} // Allow navigation area to be touchable
           >
@@ -119,6 +153,7 @@ const Header: FC = () => {
         </div>
 
         <button
+          ref={toggleRef}
           className="menu-toggle"
           onClick={toggleMenu}
           aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}

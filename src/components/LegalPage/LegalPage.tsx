@@ -204,7 +204,7 @@ export default function LegalPage({ title, content, lastUpdated, breadcrumb, sho
   return (
     <>
       <Header />
-      <main id="main-content" className="legal-page">
+      <main id="main-content" tabIndex={-1} className="legal-page">
         {/* Breadcrumb */}
         {breadcrumb && (
           <nav className="breadcrumb" aria-label="Breadcrumb">

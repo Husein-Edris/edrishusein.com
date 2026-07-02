@@ -19,7 +19,7 @@ export default function CookieSettingsPage() {
   return (
     <>
       <Header />
-      <main id="main-content" className="cookie-settings-page">
+      <main id="main-content" tabIndex={-1} className="cookie-settings-page">
         <div className="container">
           <div className="page-header">
             <h1 className="page-title">Cookie Settings</h1>

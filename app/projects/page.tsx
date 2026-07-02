@@ -48,7 +48,7 @@ export default async function ProjectsPage() {
   return (
     <>
       <Header />
-      <main id="main-content">
+      <main id="main-content" tabIndex={-1}>
         <h1 className="sr-only">Projects</h1>
         <InfoCards
           skin="projects"
