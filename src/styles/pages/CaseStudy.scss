@@ -654,7 +654,9 @@
     }
 
     .separator {
-      color: rgba($text-light-gray, 0.6);
+      // Full opacity so the decorative "/" still clears WCAG 1.4.3 for low-vision
+      // users (also aria-hidden in markup so it is skipped by assistive tech).
+      color: $text-light-gray;
     }
 
     .current {

@@ -116,7 +116,7 @@ const CookieBanner = () => {
   if (!isVisible) return null;
 
   return (
-    <div className="cookie-banner">
+    <div className="cookie-banner" role="region" aria-label="Cookie consent">
       <div className="cookie-banner-content">
         <div className="cookie-banner-main">
           <h3 className="cookie-title">We use cookies</h3>

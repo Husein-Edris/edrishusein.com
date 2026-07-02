@@ -50,11 +50,15 @@ export default async function HomePage() {
   }
 
   return (
-    <main id="main-content">
+    <>
       <Header />
-      <Suspense fallback={<div className="loading-skeleton">Loading content...</div>}>
-        <SectionRenderer sections={sections} />
-      </Suspense>
+      {/* Header/Footer are siblings of <main> (as on every other page), so the
+          mobile menu can mark <main> inert while open without disabling itself. */}
+      <main id="main-content" tabIndex={-1}>
+        <Suspense fallback={<div className="loading-skeleton">Loading content...</div>}>
+          <SectionRenderer sections={sections} />
+        </Suspense>
+      </main>
       <Footer />
 
       {/* Structured data: Person + WebSite entity for search engines */}
@@ -64,6 +68,6 @@ export default async function HomePage() {
           __html: safeJsonLd(generateHomepageStructuredData()),
         }}
       />
-    </main>
+    </>
   );
 }

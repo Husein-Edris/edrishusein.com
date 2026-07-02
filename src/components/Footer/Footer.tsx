@@ -38,7 +38,7 @@ const Footer = () => {
                         <p className="copyright">©{currentYear} Edris Husein</p>
                     </div>
 
-                    <nav className="footer-nav">
+                    <nav className="footer-nav" aria-label="Footer">
                         <ul className="nav-list main-links">
                             {mainLinks.map((link) => (
                                 <li key={link.href}>

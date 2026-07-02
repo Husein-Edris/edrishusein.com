@@ -157,7 +157,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   return (
     <>
       <Header />
-      <main id="main-content" className="case-study">
+      <main id="main-content" tabIndex={-1} className="case-study">
         {/* Hero Section */}
         <div className="hero-section">
           <div className="container">

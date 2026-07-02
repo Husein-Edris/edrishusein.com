@@ -159,15 +159,15 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}
         />
         <Header />
-        <main id="main-content" className="case-study blog-post">
+        <main id="main-content" tabIndex={-1} className="case-study blog-post">
           {/* Hero Section */}
           <div className="hero-section">
             <div className="container">
-              <nav className="breadcrumbs">
+              <nav className="breadcrumbs" aria-label="Breadcrumb">
                 <Link href="/">Home</Link>
-                <span className="separator">/</span>
+                <span className="separator" aria-hidden="true">/</span>
                 <Link href="/notebook">Notebook</Link>
-                <span className="separator">/</span>
+                <span className="separator" aria-hidden="true">/</span>
                 <span className="current">{post.title || 'Post'}</span>
               </nav>
               <h1 className="title">{post.title}</h1>

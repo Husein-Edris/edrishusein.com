@@ -37,7 +37,7 @@ export default async function BlogArchivePage() {
     return (
         <>
             <Header />
-            <main id="main-content" className="blog-archive">
+            <main id="main-content" tabIndex={-1} className="blog-archive">
                 <div className="hero-section">
                     <h1 className="title">NOTEBOOK</h1>
                     <p className="description">
@@ -62,7 +62,8 @@ export default async function BlogArchivePage() {
                                             </div>
                                         )}
                                         <div className="card-info">
-                                            <h3 className="card-title">{post.title}</h3>
+                                            {/* h2: sits directly under the page h1, no h2 in between (WCAG 1.3.1) */}
+                                            <h2 className="card-title">{post.title}</h2>
                                             {post.excerpt && (
                                                 <div
                                                     className="card-description"
