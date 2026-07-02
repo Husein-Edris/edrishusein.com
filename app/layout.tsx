@@ -1,7 +1,22 @@
 import type { Metadata } from "next";
+import { Inter, Syncopate } from "next/font/google";
 import CookieBanner from "@/src/components/CookieBanner/CookieBanner";
 import Analytics from "@/src/components/Analytics/Analytics";
 import "./globals.css";
+
+// Self-hosted at build time (next/font) so there is no render-blocking request to
+// fonts.googleapis.com. Exposed as CSS variables consumed in src/styles/variables.scss.
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
+const syncopate = Syncopate({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  display: "swap",
+  variable: "--font-syncopate",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://edrishusein.com"),
@@ -40,16 +55,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning={true}>
+    <html lang="en" className={`${inter.variable} ${syncopate.variable}`} suppressHydrationWarning={true}>
       <head>
         <link rel="preconnect" href="https://cms.edrishusein.com" />
         <link rel="dns-prefetch" href="https://cms.edrishusein.com" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Syncopate:wght@400;700&display=swap"
-          rel="stylesheet"
-        />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="theme-color" content="#ffffff" />
         <meta name="description" content="Full-stack developer and digital creative specializing in modern web applications, UI/UX design, and WordPress development." />
