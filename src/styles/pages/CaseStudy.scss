@@ -550,6 +550,42 @@
           color: $white;
         }
       }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: calc($spacing-unit * 3) 0;
+        border-radius: 8px;
+        overflow: hidden;
+
+        th,
+        td {
+          padding: calc($spacing-unit * 1.25) calc($spacing-unit * 1.5);
+          text-align: left;
+          border-bottom: 1px solid rgba($text-light-gray, 0.2);
+        }
+
+        th {
+          background: $color-beige;
+          color: $primary-dark;
+          font-weight: 600;
+        }
+
+        td {
+          color: $text-light-gray;
+          line-height: 1.6;
+        }
+
+        tbody tr:hover {
+          background: rgba($white, 0.05);
+        }
+
+        @include mobile {
+          display: block;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+        }
+      }
     }
   }
 
