@@ -4,6 +4,8 @@ import {
   generateStructuredData,
   generateBreadcrumbStructuredData,
   generateHomepageStructuredData,
+  generateCollectionPageStructuredData,
+  metaDescriptionFrom,
   safeJsonLd,
   type RankMathSEO,
 } from './seo-utils';
@@ -570,5 +572,105 @@ describe('generateBreadcrumbStructuredData', () => {
       name: 'Home',
       item: 'https://edrishusein.com',
     });
+  });
+});
+
+describe('generateCollectionPageStructuredData', () => {
+  const listing = {
+    name: 'Notebook',
+    description: 'Thoughts on web development.',
+    path: '/notebook',
+    items: [
+      { title: 'First Post', path: '/notebook/first-post' },
+      { title: 'Second Post', path: '/notebook/second-post' },
+    ],
+  };
+
+  it('describes the page as a CollectionPage with an absolute url', () => {
+    const result = generateCollectionPageStructuredData(listing);
+
+    expect(result['@context']).toBe('https://schema.org');
+    expect(result['@type']).toBe('CollectionPage');
+    expect(result.url).toBe('https://edrishusein.com/notebook');
+    expect(result.name).toBe('Notebook');
+    expect(result.description).toBe('Thoughts on web development.');
+  });
+
+  it('wraps the children in an ItemList with 1-based positions', () => {
+    const result = generateCollectionPageStructuredData(listing);
+
+    expect(result.mainEntity['@type']).toBe('ItemList');
+    expect(result.mainEntity.numberOfItems).toBe(2);
+    expect(result.mainEntity.itemListElement).toEqual([
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'First Post',
+        url: 'https://edrishusein.com/notebook/first-post',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Second Post',
+        url: 'https://edrishusein.com/notebook/second-post',
+      },
+    ]);
+  });
+
+  it('attributes the collection to the site Person entity', () => {
+    const result = generateCollectionPageStructuredData(listing);
+
+    expect(result.isPartOf['@id']).toBe('https://edrishusein.com/#website');
+  });
+
+  it('handles an empty listing without emitting a broken ItemList', () => {
+    const result = generateCollectionPageStructuredData({ ...listing, items: [] });
+
+    expect(result.mainEntity.numberOfItems).toBe(0);
+    expect(result.mainEntity.itemListElement).toEqual([]);
+  });
+
+  it('passes absolute item urls through unchanged', () => {
+    const result = generateCollectionPageStructuredData({
+      ...listing,
+      items: [{ title: 'Absolute', path: 'https://edrishusein.com/notebook/abs' }],
+    });
+
+    expect(result.mainEntity.itemListElement[0].url).toBe('https://edrishusein.com/notebook/abs');
+  });
+});
+
+describe('metaDescriptionFrom', () => {
+  it('strips html tags', () => {
+    expect(metaDescriptionFrom('<p>Hello <strong>world</strong></p>')).toBe('Hello world');
+  });
+
+  it('trims the trailing newline WordPress appends to rendered excerpts', () => {
+    expect(metaDescriptionFrom('<p>A short excerpt </p>\n')).toBe('A short excerpt');
+  });
+
+  it('collapses internal whitespace runs', () => {
+    expect(metaDescriptionFrom('<p>one</p>\n<p>two</p>')).toBe('one two');
+  });
+
+  it('does not glue words together across adjacent tags', () => {
+    expect(metaDescriptionFrom('<p>alpha</p><p>beta</p>')).toBe('alpha beta');
+  });
+
+  it('truncates to the max length without leaving trailing space', () => {
+    const result = metaDescriptionFrom(`<p>${'a b '.repeat(80)}</p>`, 20);
+
+    expect(result.length).toBeLessThanOrEqual(20);
+    expect(result).toBe(result.trimEnd());
+  });
+
+  it('returns an empty string for empty, null or undefined input', () => {
+    expect(metaDescriptionFrom('')).toBe('');
+    expect(metaDescriptionFrom(null)).toBe('');
+    expect(metaDescriptionFrom(undefined)).toBe('');
+  });
+
+  it('returns an empty string for markup with no text', () => {
+    expect(metaDescriptionFrom('<p> </p>\n')).toBe('');
   });
 });

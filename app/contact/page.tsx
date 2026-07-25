@@ -15,7 +15,7 @@ export default function ContactPage() {
       <Header />
       <main id="main-content" tabIndex={-1}>
         <h1 className="sr-only">Contact</h1>
-        <Contact intro="Open to freelance projects, collaborations, or just a chat about web development. I usually reply within a day." />
+        <Contact intro="Open to freelance projects, collaborations, or just a chat about web development. I build WordPress sites, headless setups, and React or Next.js applications, mostly for agencies and small teams in Austria and Germany, though remote work anywhere is fine. If you are writing about a project, a rough scope and timeline helps me give you a useful answer instead of a vague one. I usually reply within a day." />
       </main>
       <Footer />
     </>

@@ -10,7 +10,8 @@ import '@/src/styles/pages/BlogPost.scss';
 import '@/src/styles/pages/CaseStudy.scss';
 import { rewriteImageUrls } from '@/src/lib/image-utils';
 import { cmsRest } from '@/src/lib/rest-client';
-import { safeJsonLd } from '@/src/lib/seo-utils';
+import { safeJsonLd, metaDescriptionFrom } from '@/src/lib/seo-utils';
+import { selectRelatedByRotation } from '@/src/lib/related-content';
 import {
   transformPostDetail,
   transformPostListItem,
@@ -39,11 +40,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     
     return {
       title: `${post.title} | Notebook - Edris Husein`,
-      description: post.excerpt?.replace(/<[^>]*>/g, '').substring(0, 160) || 'Read more on Edris Husein\'s notebook',
+      description: metaDescriptionFrom(post.excerpt) || 'Read more on Edris Husein\'s notebook',
       alternates: { canonical: `/notebook/${slug}` },
       openGraph: {
         title: post.title,
-        description: post.excerpt?.replace(/<[^>]*>/g, '').substring(0, 160),
+        description: metaDescriptionFrom(post.excerpt),
         images: post.featuredImage?.node?.sourceUrl ? [post.featuredImage.node.sourceUrl] : [],
         type: 'article',
         publishedTime: post.date,
@@ -52,7 +53,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       twitter: {
         card: 'summary_large_image',
         title: post.title,
-        description: post.excerpt?.replace(/<[^>]*>/g, '').substring(0, 160),
+        description: metaDescriptionFrom(post.excerpt),
         images: post.featuredImage?.node?.sourceUrl ? [post.featuredImage.node.sourceUrl] : [],
       },
     };
@@ -75,14 +76,13 @@ async function getPost(slug: string): Promise<PostDetail> {
 
 async function getMoreArticles(excludeSlug: string): Promise<PostListItem[]> {
   try {
-    const posts = await cmsRest<unknown[]>('/posts?_embed&per_page=4&orderby=date&order=desc');
+    // Fetch the whole archive, not just the newest 4. Slicing the 3 most recent
+    // meant every post linked to the same 3 slugs, orphaning older posts from the
+    // sibling link graph (measured inbound links: 8, 8, 8, 4, 1, 1, 1).
+    const posts = await cmsRest<unknown[]>('/posts?_embed&per_page=100&orderby=date&order=desc');
     if (!Array.isArray(posts)) return [];
-    return rewriteImageUrls(
-      posts
-        .map((p) => transformPostListItem(p as never))
-        .filter((p) => p.slug !== excludeSlug)
-        .slice(0, 3)
-    );
+    const all = posts.map((p) => transformPostListItem(p as never));
+    return rewriteImageUrls(selectRelatedByRotation(all, excludeSlug, 3));
   } catch (error) {
     console.error('Error fetching more articles:', error);
     return [];

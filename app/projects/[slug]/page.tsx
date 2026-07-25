@@ -10,7 +10,7 @@ import { cmsRest } from '@/src/lib/rest-client';
 import { transformProject, extractTechIds } from '@/src/lib/transform/transformProject';
 import { transformProjects } from '@/src/lib/transform/transformProjects';
 import { transformMedia } from '@/src/lib/transform/transformMedia';
-import { generateStructuredData, generateBreadcrumbStructuredData, safeJsonLd } from '@/src/lib/seo-utils';
+import { generateStructuredData, generateBreadcrumbStructuredData, safeJsonLd, metaDescriptionFrom } from '@/src/lib/seo-utils';
 import type { WordPressImage } from '@/src/types/wordpress';
 import '@/src/styles/pages/CaseStudy.scss';
 
@@ -49,18 +49,18 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
     return {
       title: `${project.title} | Projects - Edris Husein`,
-      description: project.excerpt?.replace(/<[^>]*>/g, '').substring(0, 160) || `${project.title} - A project by Edris Husein`,
+      description: metaDescriptionFrom(project.excerpt) || `${project.title} - A project by Edris Husein`,
       alternates: { canonical: `/projects/${slug}` },
       openGraph: {
         title: project.title,
-        description: project.excerpt?.replace(/<[^>]*>/g, '').substring(0, 160),
+        description: metaDescriptionFrom(project.excerpt),
         images: project.featuredImage?.node?.sourceUrl ? [project.featuredImage.node.sourceUrl] : [],
         type: 'website',
       },
       twitter: {
         card: 'summary_large_image',
         title: project.title,
-        description: project.excerpt?.replace(/<[^>]*>/g, '').substring(0, 160),
+        description: metaDescriptionFrom(project.excerpt),
         images: project.featuredImage?.node?.sourceUrl ? [project.featuredImage.node.sourceUrl] : [],
       },
     };
@@ -76,7 +76,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 async function getAllProjectsForMoreProjects() {
   try {
     const projects = await cmsRest<unknown[]>(
-      '/project?_embed&per_page=10&orderby=menu_order&order=asc&acf_format=standard'
+      // per_page=100, not 10: there are 11 projects, so the last one was never
+      // fetched and could never appear as a related link anywhere on the site.
+      '/project?_embed&per_page=100&orderby=menu_order&order=asc&acf_format=standard'
     );
     if (!Array.isArray(projects)) return null;
     return rewriteImageUrls(transformProjects(projects as never));
@@ -143,7 +145,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   const canonical = `https://edrishusein.com/projects/${slug}`;
   const structuredData = generateStructuredData('CreativeWork', {
     title: project.title,
-    description: project.excerpt?.replace(/<[^>]*>/g, '').substring(0, 160),
+    description: metaDescriptionFrom(project.excerpt),
     canonical,
     date: project.date,
     featuredImage: project.featuredImage,

@@ -4,6 +4,7 @@ import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
 import InfoCards from '@/src/components/InfoCards/InfoCards';
 import { DataFetcher } from '@/src/lib/data-fetcher';
+import { generateCollectionPageStructuredData, safeJsonLd } from '@/src/lib/seo-utils';
 
 export const dynamic = 'force-dynamic'; // Always fetch fresh project data
 
@@ -45,8 +46,24 @@ export default async function ProjectsPage() {
     caseStudyLink: `/projects/${project.slug}`
   })) || [];
 
+  const collectionJsonLd = generateCollectionPageStructuredData({
+    name: 'Projects',
+    description: 'A selection of case studies and projects by Edris Husein, full-stack developer working with React, Next.js, and WordPress.',
+    path: '/projects',
+    items: transformedProjects.map((project) => ({
+      title: project.title,
+      path: project.caseStudyLink,
+    })),
+  });
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        // safeJsonLd escapes <, >, &, U+2028/9 so CMS-sourced project titles
+        // can never break out of the script tag (XSS guard).
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(collectionJsonLd) }}
+      />
       <Header />
       <main id="main-content" tabIndex={-1}>
         <h1 className="sr-only">Projects</h1>
