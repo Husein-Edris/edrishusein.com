@@ -44,6 +44,13 @@ const nextConfig: NextConfig = {
   generateEtags: true,
   experimental: {
     optimizeCss: true,
+    // The CMS is a shared WordPress host that returns HTTP 500 "Database Error"
+    // once a burst of REST calls exhausts its database connections. Prerendering
+    // every project and post page at full parallelism reliably triggered that,
+    // so cap how many pages a worker renders at once and retry a page whose
+    // data fetch still failed.
+    staticGenerationMaxConcurrency: 4,
+    staticGenerationRetryCount: 2,
   },
   async rewrites() {
     if (!isDev) return [];

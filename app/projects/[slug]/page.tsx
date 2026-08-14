@@ -38,38 +38,32 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
 
-  try {
-    const project = await getProject(slug);
-    if (!project) {
-      return {
-        title: 'Project | Projects - Edris Husein',
-        description: 'View this project by Edris Husein',
-      };
-    }
+  const project = await getProject(slug);
 
-    return {
-      title: `${project.title} | Projects - Edris Husein`,
-      description: metaDescriptionFrom(project.excerpt) || `${project.title} - A project by Edris Husein`,
-      alternates: { canonical: `/projects/${slug}` },
-      openGraph: {
-        title: project.title,
-        description: metaDescriptionFrom(project.excerpt),
-        images: project.featuredImage?.node?.sourceUrl ? [project.featuredImage.node.sourceUrl] : [],
-        type: 'website',
-      },
-      twitter: {
-        card: 'summary_large_image',
-        title: project.title,
-        description: metaDescriptionFrom(project.excerpt),
-        images: project.featuredImage?.node?.sourceUrl ? [project.featuredImage.node.sourceUrl] : [],
-      },
-    };
-  } catch (error) {
+  if (!project) {
     return {
       title: 'Project | Projects - Edris Husein',
       description: 'View this project by Edris Husein',
     };
   }
+
+  return {
+    title: `${project.title} | Projects - Edris Husein`,
+    description: metaDescriptionFrom(project.excerpt) || `${project.title} - A project by Edris Husein`,
+    alternates: { canonical: `/projects/${slug}` },
+    openGraph: {
+      title: project.title,
+      description: metaDescriptionFrom(project.excerpt),
+      images: project.featuredImage?.node?.sourceUrl ? [project.featuredImage.node.sourceUrl] : [],
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: project.title,
+      description: metaDescriptionFrom(project.excerpt),
+      images: project.featuredImage?.node?.sourceUrl ? [project.featuredImage.node.sourceUrl] : [],
+    },
+  };
 }
 
 // Fetch all projects for "More Projects" section
@@ -106,22 +100,22 @@ async function resolveTechImages(ids: number[]): Promise<Map<number, WordPressIm
   return map;
 }
 
-// Server-side data fetching
+// Server-side data fetching.
+//
+// Returns null only when the CMS answers "no such project". A CmsRequestError is
+// deliberately left to propagate: it means the CMS could not answer at all, and
+// treating that as a 404 is what let a transient database error get baked into
+// the static build as a permanently empty page.
 async function getProject(slug: string) {
-  try {
-    const projects = await cmsRest<unknown[]>(
-      `/project?slug=${slug}&_embed&acf_format=standard`
-    );
-    if (!Array.isArray(projects) || projects.length === 0) return null;
+  const projects = await cmsRest<unknown[]>(
+    `/project?slug=${slug}&_embed&acf_format=standard`
+  );
+  if (!Array.isArray(projects) || projects.length === 0) return null;
 
-    const project = projects[0] as never;
-    const techImages = await resolveTechImages(extractTechIds(project));
+  const project = projects[0] as never;
+  const techImages = await resolveTechImages(extractTechIds(project));
 
-    return rewriteImageUrls(transformProject(project, techImages));
-  } catch (error) {
-    console.error('Error fetching project:', error);
-    return null;
-  }
+  return rewriteImageUrls(transformProject(project, techImages));
 }
 
 // Server Component
