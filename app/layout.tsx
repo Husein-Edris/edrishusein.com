@@ -61,8 +61,12 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://cms.edrishusein.com" />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="theme-color" content="#ffffff" />
-        <meta name="description" content="Full-stack developer and digital creative specializing in modern web applications, UI/UX design, and WordPress development." />
-        
+        {/* No hardcoded <meta name="description"> here. It emitted before Next's
+            metadata API output and shadowed every page's own description, so all
+            27 URLs advertised the same generic text. The description now comes
+            solely from `metadata.description` above (inherited by the homepage)
+            and each page's own `generateMetadata`. */}
+
         {/* Tech Stack Showcase - Headless Architecture (kept accurate post REST migration) */}
         <meta name="generator" content="WordPress (Headless CMS), Next.js 16, React 19" />
         <meta name="framework" content="Next.js" />

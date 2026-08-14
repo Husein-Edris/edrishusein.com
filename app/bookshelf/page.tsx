@@ -55,6 +55,15 @@ export default async function BookshelfPage() {
             <h1 className="title">BOOKSHELF</h1>
             <div className="overview">
               <p>Books and pieces of wisdom I've enjoyed reading</p>
+              <p>
+                Most of what I know about building software came from the work itself, but
+                these shaped how I think about it: how to structure a system, and how to
+                write something a colleague can still read six months later.
+              </p>
+              <p>
+                The list covers software and design, plus a few books with nothing to do
+                with either. I add to it when something earns a place.
+              </p>
             </div>
           </div>
         </div>

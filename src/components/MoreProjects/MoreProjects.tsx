@@ -1,4 +1,5 @@
 import InfoCards from '../InfoCards/InfoCards';
+import { selectRelatedByRotation } from '@/src/lib/related-content';
 
 interface MoreProjectsProps {
   currentProjectSlug: string;
@@ -33,10 +34,10 @@ function truncateExcerpt(html: string, maxLength = 120): string {
 }
 
 export default function MoreProjects({ currentProjectSlug, allProjects = [] }: MoreProjectsProps) {
-  // Filter out current project and limit to 3
-  const otherProjects = allProjects
-    .filter(project => project.slug !== currentProjectSlug)
-    .slice(0, 3);
+  // Rotate rather than always taking the first 3 in menu_order. The old slice
+  // funnelled every sibling link into the same 3 projects, so the rest of the
+  // case studies sat on a single inbound link from the archive page.
+  const otherProjects = selectRelatedByRotation(allProjects, currentProjectSlug, 3);
 
   const projectCards: InfoCardProps[] = otherProjects.map((project: any) => ({
     title: project.title,

@@ -143,8 +143,14 @@ const Header: FC = () => {
                 </Link>
               </li>
               <li className="navItem">
-                <Link href="/contact" className="navLink" onClick={closeMenu}>
+                <Link href="/tech-stack" className="navLink" onClick={closeMenu}>
                   <span className="navNumber">05</span>
+                  <span className="navText">TECH STACK</span>
+                </Link>
+              </li>
+              <li className="navItem">
+                <Link href="/contact" className="navLink" onClick={closeMenu}>
+                  <span className="navNumber">06</span>
                   <span className="navText">CONTACT</span>
                 </Link>
               </li>

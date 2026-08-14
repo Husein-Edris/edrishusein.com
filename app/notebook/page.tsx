@@ -6,6 +6,7 @@ import Footer from '@/src/components/Footer/Footer';
 import { rewriteImageUrls } from '@/src/lib/image-utils';
 import { cmsRest } from '@/src/lib/rest-client';
 import { transformPostListItem } from '@/src/lib/transform/transformPost';
+import { generateCollectionPageStructuredData, safeJsonLd } from '@/src/lib/seo-utils';
 import '@/src/styles/pages/Blog.scss';
 
 // ISR — cached render refreshed at most once per 60s (keep in sync with CMS_REVALIDATE = 60).
@@ -34,8 +35,21 @@ async function getPostsData() {
 export default async function BlogArchivePage() {
     const posts = await getPostsData();
 
+    const collectionJsonLd = generateCollectionPageStructuredData({
+        name: 'Notebook',
+        description: 'Thoughts, insights, and reflections on web development, technology, and the craft of building software by Edris Husein.',
+        path: '/notebook',
+        items: posts.map((post) => ({ title: post.title, path: `/notebook/${post.slug}` })),
+    });
+
     return (
         <>
+            <script
+                type="application/ld+json"
+                // safeJsonLd escapes <, >, &, U+2028/9 so CMS-sourced post titles
+                // can never break out of the script tag (XSS guard).
+                dangerouslySetInnerHTML={{ __html: safeJsonLd(collectionJsonLd) }}
+            />
             <Header />
             <main id="main-content" tabIndex={-1} className="blog-archive">
                 <div className="hero-section">

@@ -196,6 +196,86 @@ export function generateHomepageStructuredData(): object {
   };
 }
 
+export interface CollectionListingItem {
+  title: string;
+  /** Site-relative ("/notebook/slug") or already-absolute URL. */
+  path: string;
+}
+
+export interface CollectionListing {
+  name: string;
+  description: string;
+  /** Site-relative path of the listing page itself, e.g. "/notebook". */
+  path: string;
+  items: CollectionListingItem[];
+}
+
+// Build a meta description from CMS-rendered HTML (post/project excerpts).
+// WordPress returns excerpts as `<p>text </p>\n`, so naively stripping tags left
+// a trailing newline inside the content attribute of every short excerpt.
+// Tags collapse to a space so adjacent blocks don't glue words together.
+export function metaDescriptionFrom(html: string | null | undefined, maxLength = 160): string {
+  if (!html) return '';
+
+  const text = html
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  return text.length <= maxLength ? text : text.slice(0, maxLength).trimEnd();
+}
+
+export interface CollectionListItemLd {
+  "@type": "ListItem";
+  position: number;
+  name: string;
+  url: string;
+}
+
+export interface CollectionPageLd {
+  "@context": "https://schema.org";
+  "@type": "CollectionPage";
+  name: string;
+  description: string;
+  url: string;
+  isPartOf: { "@id": string };
+  mainEntity: {
+    "@type": "ItemList";
+    numberOfItems: number;
+    itemListElement: CollectionListItemLd[];
+  };
+}
+
+function absoluteUrl(path: string): string {
+  return path.startsWith('http') ? path : `${SITE_URL}${path}`;
+}
+
+// Structured data for the two hub/listing pages (/notebook, /projects). Their
+// children were previously reachable only as bare <a> tags, so nothing told
+// Google the page IS a collection or which entries belong to it. CollectionPage
+// + ItemList states the membership explicitly and ties it back to the WebSite
+// entity declared on the homepage.
+export function generateCollectionPageStructuredData(listing: CollectionListing): CollectionPageLd {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: listing.name,
+    description: listing.description,
+    url: absoluteUrl(listing.path),
+    isPartOf: { "@id": `${SITE_URL}/#website` },
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: listing.items.length,
+      itemListElement: listing.items.map((item, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: item.title,
+        url: absoluteUrl(item.path),
+      })),
+    },
+  };
+}
+
 // Generate breadcrumb structured data
 export function generateBreadcrumbStructuredData(breadcrumbs: { text: string; url: string }[]): object {
   return {
