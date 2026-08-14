@@ -313,12 +313,16 @@ describe('DataFetcher', () => {
 
   describe('Error handling', () => {
     it('should handle non-Error exceptions', async () => {
-      mockFetch.mockRejectedValueOnce('String REST error');
+      // Rejects on every attempt: cmsRest retries transient faults, so a single
+      // mockRejectedValueOnce would leave the retry with an empty mock.
+      mockFetch.mockRejectedValue('String REST error');
 
       const result = await DataFetcher.getHomepageData();
 
+      // cmsRest wraps a non-Error rejection into a CmsRequestError, so the
+      // fallback carries a descriptive message instead of 'Unknown error'.
       expect(result.source).toBe('fallback');
-      expect(result.error).toBe('Unknown error');
+      expect(result.error).toContain('String REST error');
     });
 
     it('should handle REST returning undefined', async () => {
