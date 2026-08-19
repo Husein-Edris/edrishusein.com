@@ -4,14 +4,20 @@ import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
 import InfoCards from '@/src/components/InfoCards/InfoCards';
 import { DataFetcher } from '@/src/lib/data-fetcher';
-import { generateCollectionPageStructuredData, safeJsonLd } from '@/src/lib/seo-utils';
+import { generateCollectionPageStructuredData, pageOpenGraph, safeJsonLd } from '@/src/lib/seo-utils';
+import '@/src/styles/pages/Projects.scss';
 
 export const dynamic = 'force-dynamic'; // Always fetch fresh project data
 
 export const metadata: Metadata = {
-  title: 'Projects - Edris Husein',
-  description: 'A selection of case studies and projects by Edris Husein, full-stack developer working with React, Next.js, and WordPress.',
+  title: 'Web Development Projects & Case Studies - Edris Husein',
+  description: 'Web development projects and case studies by Edris Husein: client websites and web apps built with Next.js, React and WordPress in Austria and Germany.',
   alternates: { canonical: '/projects' },
+  openGraph: pageOpenGraph({
+    title: 'Web Development Projects & Case Studies - Edris Husein',
+    description: 'Web development projects and case studies by Edris Husein: client websites and web apps built with Next.js, React and WordPress in Austria and Germany.',
+    path: '/projects',
+  }),
 };
 
 async function getAllProjects() {
@@ -48,7 +54,7 @@ export default async function ProjectsPage() {
 
   const collectionJsonLd = generateCollectionPageStructuredData({
     name: 'Projects',
-    description: 'A selection of case studies and projects by Edris Husein, full-stack developer working with React, Next.js, and WordPress.',
+    description: 'Web development projects and case studies by Edris Husein: client websites and web apps built with Next.js, React and WordPress in Austria and Germany.',
     path: '/projects',
     items: transformedProjects.map((project) => ({
       title: project.title,
@@ -66,7 +72,14 @@ export default async function ProjectsPage() {
       />
       <Header />
       <main id="main-content" tabIndex={-1}>
-        <h1 className="sr-only">Projects</h1>
+        <div className="projects-hero">
+          <h1 className="title">
+            PROJECTS
+            <span className="subtitle">
+              Web development case studies: Next.js, WordPress and more
+            </span>
+          </h1>
+        </div>
         <InfoCards
           skin="projects"
           variant="dark"

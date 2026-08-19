@@ -1,6 +1,49 @@
 @use '../../styles/variables' as *;
 @use '../../styles/mixins' as *;
 
+// Lean hero for the live /projects page (the .projects-archive block below is a
+// full-page layout that nothing imports; this hero matches the Notebook page's
+// hero pattern without pulling in its min-height/background page framing).
+.projects-hero {
+    background-color: $primary-color;
+    text-align: center;
+    padding: $container-padding $container-padding 0;
+
+    @include mobile {
+        padding: calc($spacing-unit * 4) calc($spacing-unit * 2) 0;
+    }
+
+    .title {
+        font-family: $font-family-syncopate;
+        font-size: calc($font-size-base * 3);
+        color: $white;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: $spacing-unit;
+
+        @include mobile {
+            font-size: calc($font-size-base * 2);
+        }
+
+        // Keyword subline inside the h1, styled like the archive description text.
+        .subtitle {
+            display: block;
+            font-family: $font-family-base;
+            font-size: calc($font-size-base * 1.2);
+            font-weight: 400;
+            color: $text-light-gray;
+            text-transform: none;
+            letter-spacing: normal;
+            max-width: 600px;
+            margin: $spacing-unit auto 0;
+
+            @include mobile {
+                font-size: $font-size-base;
+            }
+        }
+    }
+}
+
 .projects-archive {
     background-color: $primary-color;
     min-height: 100vh;

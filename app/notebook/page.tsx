@@ -6,16 +6,21 @@ import Footer from '@/src/components/Footer/Footer';
 import { rewriteImageUrls } from '@/src/lib/image-utils';
 import { cmsRest } from '@/src/lib/rest-client';
 import { transformPostListItem } from '@/src/lib/transform/transformPost';
-import { generateCollectionPageStructuredData, safeJsonLd } from '@/src/lib/seo-utils';
+import { generateCollectionPageStructuredData, pageOpenGraph, safeJsonLd } from '@/src/lib/seo-utils';
 import '@/src/styles/pages/Blog.scss';
 
 // ISR — cached render refreshed at most once per 60s (keep in sync with CMS_REVALIDATE = 60).
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: 'Notebook - Edris Husein',
-  description: 'Thoughts, insights, and reflections on web development, technology, and the craft of building software by Edris Husein.',
+  title: 'Notebook: Web Development Articles - Edris Husein',
+  description: 'Web development articles and notes by Edris Husein: Next.js, React, WordPress and SEO, written from real client projects in Austria and Germany.',
   alternates: { canonical: '/notebook' },
+  openGraph: pageOpenGraph({
+    title: 'Notebook: Web Development Articles - Edris Husein',
+    description: 'Web development articles and notes by Edris Husein: Next.js, React, WordPress and SEO, written from real client projects in Austria and Germany.',
+    path: '/notebook',
+  }),
 };
 
 async function getPostsData() {
@@ -53,10 +58,12 @@ export default async function BlogArchivePage() {
             <Header />
             <main id="main-content" tabIndex={-1} className="blog-archive">
                 <div className="hero-section">
-                    <h1 className="title">NOTEBOOK</h1>
-                    <p className="description">
-                        My thoughts, insights, and reflections
-                    </p>
+                    <h1 className="title">
+                        NOTEBOOK
+                        <span className="subtitle">
+                            Articles and notes on Next.js, WordPress and the web
+                        </span>
+                    </h1>
                 </div>
 
                 <div className="container">

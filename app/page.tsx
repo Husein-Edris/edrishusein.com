@@ -1,4 +1,5 @@
 // app/page.tsx
+import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import Header from '@/src/components/Header/Header';
 import SectionRenderer from '@/src/components/SectionRenderer/SectionRenderer';
@@ -9,6 +10,12 @@ import { generateHomepageStructuredData, safeJsonLd } from '@/src/lib/seo-utils'
 // (see CMS_REVALIDATE in src/lib/client.ts) instead of re-fetching WordPress on
 // every visit. This is the main fix for the slow loading screen.
 export const revalidate = 60;
+
+// Self-canonical for the homepage; the root layout deliberately sets no global
+// canonical (it would leak "/" onto pages that don't override alternates).
+export const metadata: Metadata = {
+  alternates: { canonical: '/' },
+};
 
 // Simple fallback sections to avoid build issues
 const getFallbackSections = () => [

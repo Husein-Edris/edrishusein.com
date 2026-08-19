@@ -20,14 +20,16 @@ const syncopate = Syncopate({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://edrishusein.com"),
-  alternates: { canonical: "/" },
-  title: "Edris Husein - Full-stack Developer",
-  description: "Full-stack developer and digital creative specializing in modern web applications, UI/UX design, and WordPress development.",
-  keywords: "Full-stack developer, React, Next.js, WordPress, UI/UX design, web development",
+  // No global canonical here: it would leak "/" onto every page that does not
+  // override alternates. Each page declares its own self-canonical instead.
+  title: "Edris Husein - Full-Stack Web Developer, Austria",
+  description: "Edris Husein is a full-stack web developer in Dornbirn, Austria, building fast websites and web apps with Next.js, React, TypeScript and WordPress.",
+  keywords: "Edris Husein, full-stack developer, web developer Austria, React, Next.js, WordPress, TypeScript",
   robots: "index, follow",
   openGraph: {
-    title: "Edris Husein - Full-stack Developer",
-    description: "Full-stack developer specializing in modern web applications and UI/UX design.",
+    title: "Edris Husein - Full-Stack Web Developer, Austria",
+    description: "Full-stack web developer in Austria building fast websites and web apps with Next.js, React and WordPress.",
+    url: "/",
     type: "website",
     locale: "en_US",
     // Default share image so links to any page without its own image (homepage,
@@ -37,14 +39,14 @@ export const metadata: Metadata = {
         url: "/images/Edris-Husein-Hero.png",
         width: 450,
         height: 450,
-        alt: "Edris Husein - Full-stack Developer",
+        alt: "Edris Husein - Full-Stack Web Developer",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Edris Husein - Full-stack Developer",
-    description: "Full-stack developer specializing in modern web applications and UI/UX design.",
+    title: "Edris Husein - Full-Stack Web Developer, Austria",
+    description: "Full-stack web developer in Austria building fast websites and web apps with Next.js, React and WordPress.",
     images: ["/images/Edris-Husein-Hero.png"],
   },
 };

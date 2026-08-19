@@ -48,12 +48,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 
   return {
-    title: `${project.title} | Projects - Edris Husein`,
+    title: `${project.title} - Edris Husein`,
     description: metaDescriptionFrom(project.excerpt) || `${project.title} - A project by Edris Husein`,
     alternates: { canonical: `/projects/${slug}` },
     openGraph: {
       title: project.title,
       description: metaDescriptionFrom(project.excerpt),
+      url: `/projects/${slug}`,
       images: project.featuredImage?.node?.sourceUrl ? [project.featuredImage.node.sourceUrl] : [],
       type: 'website',
     },

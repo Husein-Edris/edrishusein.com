@@ -4,6 +4,7 @@ import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
 import BackToTopButton from './BackToTopButton';
 import CookieSettingsLink from '@/src/components/CookieSettingsLink/CookieSettingsLink';
+import { detectContentLanguage } from '@/src/lib/detect-language';
 import './LegalPage.scss';
 
 interface LegalPageProps {
@@ -172,8 +173,17 @@ function generateLegalMetadata(data: LegalPageData, canonicalPath?: string): Met
     openGraph: {
       title: data.page.seo?.title || data.page.title,
       description: data.page.seo?.metaDesc || `${data.page.title} - Edris Husein`,
+      ...(canonicalPath ? { url: canonicalPath } : {}),
       type: 'article',
       locale: 'en_US',
+      images: [
+        {
+          url: '/images/Edris-Husein-Hero.png',
+          width: 450,
+          height: 450,
+          alt: 'Edris Husein - Full-Stack Web Developer',
+        },
+      ],
     },
     twitter: {
       card: 'summary',
@@ -239,8 +249,11 @@ export default function LegalPage({ title, content, lastUpdated, breadcrumb, sho
         <section className="legal-content">
           <div className="container">
             <div className="content-wrapper">
-              <article 
+              <article
                 className="legal-article"
+                // Legal texts come from the CMS in German; mark the subtree so
+                // it is not announced/indexed as English (site default lang).
+                lang={detectContentLanguage(content) === 'de' ? 'de' : undefined}
                 dangerouslySetInnerHTML={{ __html: content }}
               />
               

@@ -367,8 +367,8 @@ describe('generateStructuredData', () => {
 
       expect(result.mainEntity).toEqual({
         '@type': 'Person',
+        '@id': 'https://edrishusein.com/#person',
         name: 'Edris Husein',
-        jobTitle: 'Full-stack Developer',
         url: 'https://edrishusein.com',
       });
     });
@@ -484,7 +484,7 @@ describe('generateHomepageStructuredData', () => {
 
     expect(person).toBeDefined();
     expect(person.name).toBe('Edris Husein');
-    expect(person.jobTitle).toBe('Full-stack Developer');
+    expect(person.jobTitle).toBe('Full-Stack Web Developer');
     expect(person.url).toBe('https://edrishusein.com');
     expect(person.image).toBe('https://edrishusein.com/images/Edris-Husein-Hero.png');
   });

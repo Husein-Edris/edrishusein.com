@@ -29,6 +29,24 @@
       @include mobile {
         font-size: calc($font-size-base * 2);
       }
+
+      // Keyword subline inside the h1; visually identical to the old
+      // standalone .description paragraph it replaces.
+      .subtitle {
+        display: block;
+        font-family: $font-family-base;
+        font-size: calc($font-size-base * 1.2);
+        font-weight: 400;
+        color: $text-light-gray;
+        text-transform: none;
+        letter-spacing: normal;
+        max-width: 600px;
+        margin: $spacing-unit auto 0;
+
+        @include mobile {
+          font-size: $font-size-base;
+        }
+      }
     }
 
     .description {

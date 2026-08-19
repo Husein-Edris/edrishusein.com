@@ -10,7 +10,8 @@ import '@/src/styles/pages/BlogPost.scss';
 import '@/src/styles/pages/CaseStudy.scss';
 import { rewriteImageUrls } from '@/src/lib/image-utils';
 import { cmsRest } from '@/src/lib/rest-client';
-import { safeJsonLd, metaDescriptionFrom } from '@/src/lib/seo-utils';
+import { safeJsonLd, metaDescriptionFrom, generateBreadcrumbStructuredData } from '@/src/lib/seo-utils';
+import { detectContentLanguage } from '@/src/lib/detect-language';
 import { selectRelatedByRotation } from '@/src/lib/related-content';
 import {
   transformPostDetail,
@@ -45,12 +46,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 
   return {
-    title: `${post.title} | Notebook - Edris Husein`,
+    title: `${post.title} - Edris Husein`,
     description: metaDescriptionFrom(post.excerpt) || 'Read more on Edris Husein\'s notebook',
     alternates: { canonical: `/notebook/${slug}` },
     openGraph: {
       title: post.title,
       description: metaDescriptionFrom(post.excerpt),
+      url: `/notebook/${slug}`,
       images: post.featuredImage?.node?.sourceUrl ? [post.featuredImage.node.sourceUrl] : [],
       type: 'article',
       publishedTime: post.date,
@@ -136,6 +138,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     notFound();
   }
 
+  // German articles must not claim inLanguage "en" (or render under a bare
+  // lang="en" subtree); detection is a stopword heuristic over the CMS text.
+  const articleLanguage = detectContentLanguage(
+    `${post.title} ${post.excerpt || ''} ${(post.content || '').slice(0, 1000)}`
+  );
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
@@ -144,13 +152,16 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     image: post.featuredImage?.node?.sourceUrl || undefined,
     datePublished: post.date || undefined,
     dateModified: post.modified || post.date || undefined,
+    inLanguage: articleLanguage,
     author: {
       '@type': 'Person',
+      '@id': 'https://edrishusein.com/#person',
       name: 'Edris Husein',
       url: 'https://edrishusein.com/about',
     },
     publisher: {
       '@type': 'Person',
+      '@id': 'https://edrishusein.com/#person',
       name: 'Edris Husein',
     },
     mainEntityOfPage: {
@@ -159,6 +170,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     },
   };
 
+  const breadcrumbJsonLd = generateBreadcrumbStructuredData([
+    { text: 'Home', url: 'https://edrishusein.com' },
+    { text: 'Notebook', url: 'https://edrishusein.com/notebook' },
+    { text: post.title, url: `https://edrishusein.com/notebook/${slug}` },
+  ]);
+
   return (
     <>
       <script
@@ -166,6 +183,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         // safeJsonLd escapes <, >, &, U+2028/9 so CMS-sourced text
         // (title/excerpt) can never break out of the script tag (XSS guard).
         dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbJsonLd) }}
       />
       <Header />
       <main id="main-content" tabIndex={-1} className="case-study blog-post">
@@ -179,10 +200,13 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               <span className="separator" aria-hidden="true">/</span>
               <span className="current">{post.title || 'Post'}</span>
             </nav>
-            <h1 className="title">{post.title}</h1>
+            <h1 className="title" lang={articleLanguage === 'de' ? 'de' : undefined}>
+              {post.title}
+            </h1>
             {post.excerpt && (
               <div
                 className="overview"
+                lang={articleLanguage === 'de' ? 'de' : undefined}
                 dangerouslySetInnerHTML={{ __html: post.excerpt }}
               />
             )}
@@ -238,7 +262,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
         <div className="container">
           {/* Article Content */}
-          <section className="article-content">
+          <section
+            className="article-content"
+            lang={articleLanguage === 'de' ? 'de' : undefined}
+          >
             <div
               className="content"
               dangerouslySetInnerHTML={{ __html: post.content || '' }}
