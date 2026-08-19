@@ -8,15 +8,21 @@ import { cmsRest } from '@/src/lib/rest-client';
 import { transformMedia } from '@/src/lib/transform/transformMedia';
 import { rendered } from '@/src/lib/transform/transformProjects';
 import { decodeEntities } from '@/src/lib/transform/decodeEntities';
+import { generateStructuredData, pageOpenGraph, safeJsonLd } from '@/src/lib/seo-utils';
 import '@/src/styles/pages/Bookshelf.scss';
 
 // ISR — cached render refreshed at most once per 60s (keep in sync with CMS_REVALIDATE = 60).
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: 'Bookshelf - Edris Husein',
-  description: 'Books and pieces of wisdom Edris Husein has enjoyed reading, spanning software craft, design, and personal growth.',
+  title: 'Bookshelf: Books That Shaped How I Build - Edris Husein',
+  description: 'The bookshelf of Edris Husein: books on software craft, design and thinking that shaped how he structures systems and writes readable code.',
   alternates: { canonical: '/bookshelf' },
+  openGraph: pageOpenGraph({
+    title: 'Bookshelf: Books That Shaped How I Build - Edris Husein',
+    description: 'The bookshelf of Edris Husein: books on software craft, design and thinking that shaped how he structures systems and writes readable code.',
+    path: '/bookshelf',
+  }),
 };
 
 async function getBooksData() {
@@ -45,8 +51,18 @@ async function getBooksData() {
 export default async function BookshelfPage() {
   const books = await getBooksData();
 
+  const webPageJsonLd = generateStructuredData('WebPage', {
+    title: 'Bookshelf: Books That Shaped How I Build - Edris Husein',
+    description: 'Books on software craft, design and thinking that shaped how Edris Husein structures systems and writes readable code.',
+    canonical: 'https://edrishusein.com/bookshelf',
+  });
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(webPageJsonLd) }}
+      />
       <Header />
       <main id="main-content" tabIndex={-1} className="bookshelf-page">
         {/* Hero Section */}

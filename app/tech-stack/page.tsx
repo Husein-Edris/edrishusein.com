@@ -6,15 +6,21 @@ import { rewriteImageUrls } from '@/src/lib/image-utils';
 import { cmsRest } from '@/src/lib/rest-client';
 import { transformMedia } from '@/src/lib/transform/transformMedia';
 import { rendered } from '@/src/lib/transform/transformProjects';
+import { generateStructuredData, pageOpenGraph, safeJsonLd } from '@/src/lib/seo-utils';
 import '@/src/styles/pages/CaseStudy.scss';
 
 // Kept dynamic on purpose: the tech grid is shuffled per request (below).
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Tech Stack - Edris Husein',
-  description: 'The tools, languages, and frameworks Edris Husein uses to build modern web applications.',
+  title: 'Tech Stack: Next.js, React & WordPress - Edris Husein',
+  description: 'The tech stack Edris Husein builds with: Next.js, React, TypeScript and WordPress, plus the tools, apps and devices behind his web development work.',
   alternates: { canonical: '/tech-stack' },
+  openGraph: pageOpenGraph({
+    title: 'Tech Stack: Next.js, React & WordPress - Edris Husein',
+    description: 'The tech stack Edris Husein builds with: Next.js, React, TypeScript and WordPress, plus the tools, apps and devices behind his web development work.',
+    path: '/tech-stack',
+  }),
 };
 
 // Fisher-Yates shuffle algorithm for random array ordering
@@ -56,8 +62,18 @@ export default async function TechStackPage() {
   // Randomize the order of tech items on each page load
   const randomizedTechItems = shuffleArray(techItems);
 
+  const webPageJsonLd = generateStructuredData('WebPage', {
+    title: 'Tech Stack: Next.js, React & WordPress - Edris Husein',
+    description: 'The tech stack Edris Husein builds with: Next.js, React, TypeScript and WordPress.',
+    canonical: 'https://edrishusein.com/tech-stack',
+  });
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(webPageJsonLd) }}
+      />
       <Header />
       <main id="main-content" tabIndex={-1} className="case-study">
         {/* Hero Section */}

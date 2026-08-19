@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
 import { Metadata } from 'next';
-import { generateEnhancedMetadata, generateStructuredData, safeJsonLd } from '@/src/lib/seo-utils';
+import { generateEnhancedMetadata, generateProfilePageStructuredData, safeJsonLd } from '@/src/lib/seo-utils';
 import { rewriteImageUrls } from '@/src/lib/image-utils';
 import { cmsRest } from '@/src/lib/rest-client';
 import { transformAbout } from '@/src/lib/transform/transformAbout';
@@ -277,8 +277,8 @@ async function getAboutPageData(): Promise<AboutPageData> {
         return generateEnhancedMetadata(
         page.seo,
         {
-          title: 'About - Edris Husein',
-        description: 'Learn more about Edris Husein, full-stack developer passionate about creating exceptional digital experiences.',
+          title: 'About Edris Husein - Full-Stack Developer, Austria',
+        description: 'About Edris Husein, a full-stack web developer from Dornbirn, Austria, building websites and web apps with Next.js, React, TypeScript and WordPress.',
         path: '/about',
         type: 'website'
     }
@@ -290,11 +290,10 @@ async function getAboutPageData(): Promise<AboutPageData> {
         const page = data.page;
         const fields = page.aboutPageFields;
 
-        // Generate structured data
-        const structuredData = generateStructuredData('WebPage', {
+        // ProfilePage schema: /about is the page about the site's Person entity.
+        const structuredData = generateProfilePageStructuredData({
           title: page.title,
-        description: page.seo?.metaDesc || 'Learn more about Edris Husein',
-        canonical: page.seo?.canonical || 'https://edrishusein.com/about'
+        description: page.seo?.metaDesc || 'About Edris Husein, full-stack web developer in Dornbirn, Austria.',
   });
 
         return (
