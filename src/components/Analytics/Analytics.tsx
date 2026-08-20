@@ -11,6 +11,9 @@ declare global {
 }
 
 const GA_SCRIPT_ID = 'ga-gtag';
+const AHREFS_SCRIPT_ID = 'ahrefs-analytics';
+// Public site key (appears in page source by design, like a verification token).
+const AHREFS_DATA_KEY = 'riKo5GmVfBk6v/7arEwMBw';
 
 /**
  * Bootstraps Google Analytics 4 imperatively (the same steps the gtag snippet
@@ -41,20 +44,37 @@ function loadGoogleAnalytics(gaId: string): void {
 }
 
 /**
- * Consent-gated GA4 loader. Renders nothing; GA is loaded imperatively and only
- * once the visitor has explicitly granted analytics consent via the cookie
- * banner / preferences. No Google request is made before opt-in, which keeps the
- * site GDPR-compliant for the EU audience. When NEXT_PUBLIC_GA_ID is unset,
- * nothing ever loads.
+ * Ahrefs Web Analytics (cookieless), behind the same consent gate as GA4 so the
+ * no-third-party-request-before-opt-in posture holds. Consequence: Ahrefs'
+ * "Verify installation" checker never consents, so it may report the snippet
+ * as missing; that is expected and fine.
+ */
+function loadAhrefsAnalytics(): void {
+  if (document.getElementById(AHREFS_SCRIPT_ID)) return; // already initialized
+
+  const script = document.createElement('script');
+  script.id = AHREFS_SCRIPT_ID;
+  script.async = true;
+  script.src = 'https://analytics.ahrefs.com/analytics.js';
+  script.setAttribute('data-key', AHREFS_DATA_KEY);
+  document.head.appendChild(script);
+}
+
+/**
+ * Consent-gated analytics loader (GA4 + Ahrefs Web Analytics). Renders nothing;
+ * scripts are loaded imperatively and only once the visitor has explicitly
+ * granted analytics consent via the cookie banner / preferences. No third-party
+ * request is made before opt-in, which keeps the site GDPR-compliant for the EU
+ * audience. When NEXT_PUBLIC_GA_ID is unset, only Ahrefs loads.
  */
 const Analytics = () => {
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
 
   useEffect(() => {
-    if (!gaId) return;
-
     const maybeLoad = () => {
-      if (hasAnalyticsConsent()) loadGoogleAnalytics(gaId);
+      if (!hasAnalyticsConsent()) return;
+      if (gaId) loadGoogleAnalytics(gaId);
+      loadAhrefsAnalytics();
     };
 
     maybeLoad(); // visitors who already consented in a previous session

@@ -40,8 +40,10 @@
         font-family: $font-family-base;
         font-size: $font-size-lg;
         line-height: 1.6;
-        max-width: 38ch;
+        max-width: 65ch;
         margin-top: -$spacing-sm;
+        margin-left: auto;
+        margin-right: auto;
     }
 
     .title {
