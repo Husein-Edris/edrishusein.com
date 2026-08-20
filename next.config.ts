@@ -69,7 +69,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Content-Security-Policy',
-            value: `default-src 'self'; script-src 'self' 'unsafe-inline' https://*.googletagmanager.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: ${cmsOrigin} https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' ${cmsOrigin} https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-ancestors 'none';`
+            value: `default-src 'self'; script-src 'self' 'unsafe-inline' https://*.googletagmanager.com https://analytics.ahrefs.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: ${cmsOrigin} https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' ${cmsOrigin} https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://analytics.ahrefs.com; frame-ancestors 'none';`
           },
           { key: 'X-DNS-Prefetch-Control', value: 'on' },
           { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
