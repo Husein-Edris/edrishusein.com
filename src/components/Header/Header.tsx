@@ -100,7 +100,7 @@ const Header: FC = () => {
             width={80}
             height={40}
             priority
-            style={{ width: 'auto', height: '90px' }}
+            style={{ width: 'auto' }}
           />
         </Link>
 
@@ -120,37 +120,31 @@ const Header: FC = () => {
             <ul className="navList">
               <li className="navItem">
                 <Link href="/projects" className="navLink" onClick={closeMenu}>
-                  <span className="navNumber">01</span>
                   <span className="navText">PROJECTS</span>
                 </Link>
               </li>
               <li className="navItem">
                 <Link href="/about" className="navLink" onClick={closeMenu}>
-                  <span className="navNumber">02</span>
                   <span className="navText">ABOUT</span>
                 </Link>
               </li>
               <li className="navItem">
                 <Link href="/bookshelf" className="navLink" onClick={closeMenu}>
-                  <span className="navNumber">03</span>
                   <span className="navText">BOOKSHELF</span>
                 </Link>
               </li>
               <li className="navItem">
                 <Link href="/notebook" className="navLink" onClick={closeMenu}>
-                  <span className="navNumber">04</span>
                   <span className="navText">NOTEBOOK</span>
                 </Link>
               </li>
               <li className="navItem">
                 <Link href="/tech-stack" className="navLink" onClick={closeMenu}>
-                  <span className="navNumber">05</span>
                   <span className="navText">TECH STACK</span>
                 </Link>
               </li>
-              <li className="navItem">
-                <Link href="/contact" className="navLink" onClick={closeMenu}>
-                  <span className="navNumber">06</span>
+              <li className="navItem navItem--cta">
+                <Link href="/contact" className="navLink navLink--cta" onClick={closeMenu}>
                   <span className="navText">CONTACT</span>
                 </Link>
               </li>

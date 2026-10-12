@@ -30,9 +30,11 @@
     .subtitle {
         color: $white;
         font-family: $font-family-syncopate;
-        font-size: $font-size-lg;
-        font-weight: $font-weight-normal;
-        letter-spacing: 0.1em;
+        font-size: $font-size-sm;
+        font-weight: $font-weight-bold;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: $color-beige;
     }
 
     .contact-intro {

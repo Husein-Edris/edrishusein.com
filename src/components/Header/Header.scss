@@ -27,11 +27,15 @@
     position: relative;
 
     img {
-      height: 90px;
+      height: 72px;
       pointer-events: auto;
 
       @include tablet {
         height: 64px;
+      }
+
+      @include mobile {
+        height: 56px;
       }
     }
 
@@ -179,9 +183,7 @@
         color: $white;
         text-decoration: none;
         transition: color $transition-base;
-        display: grid;
-        grid-template-columns: 3rem 1fr;
-        align-items: baseline;
+        display: block;
 
         @media (max-height: 600px) {
           font-size: $font-size-2xl;
@@ -195,14 +197,16 @@
           display: none;
         }
 
-        .navNumber {
-          font-size: $font-size-2xl;
-          color: $text-light-gray;
-        }
-
         .navText {
           display: block;
         }
+      }
+
+      .navLink--cta {
+        @include button-secondary;
+        @include button-size('md');
+        font-size: $font-size-lg;
+        margin-top: $spacing-sm;
       }
     }
   }
@@ -229,9 +233,7 @@
           position: relative;
 
           &:hover,
-          &:focus,
-          &:active {
-            .navNumber,
+          &:focus-within {
             .navText {
               color: $color-beige;
             }
@@ -243,10 +245,10 @@
             color: $white;
             font-weight: $font-weight-bold;
             font-size: $font-size-base;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: $spacing-xs;
+            display: inline-flex;
+            align-items: center;
+            min-height: 44px;
+            position: relative;
 
             @media (max-width: $tablet) {
               font-size: $font-size-sm;
@@ -255,27 +257,44 @@
             &::after {
               content: "";
               position: absolute;
-              bottom: 0;
-              top: 45%;
               left: 0;
               right: 0;
+              bottom: 8px;
               height: 2px;
-              background-color: $white;
-              opacity: 0.3;
-              transform-origin: center;
-              transition: all 0.3s ease;
+              background-color: $color-beige;
+              transform: scaleX(0);
+              transform-origin: left center;
+              transition: transform $transition-base;
             }
 
-            .navNumber {
-              font-size: $font-size-sm;
-              color: $text-light-gray;
-              margin-bottom: $spacing-xs;
+            &:hover::after,
+            &:focus-visible::after {
+              transform: scaleX(1);
             }
 
             .navText {
               position: relative;
             }
           }
+
+          .navLink--cta {
+            @include button-secondary;
+            @include button-size('sm');
+            padding: $spacing-sm $spacing-lg;
+
+            &::after {
+              display: none;
+            }
+
+            &:hover .navText,
+            &:focus-visible .navText {
+              color: $primary-color;
+            }
+          }
+        }
+
+        .navItem--cta {
+          margin-left: $spacing-sm;
         }
       }
     }

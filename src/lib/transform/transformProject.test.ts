@@ -73,3 +73,21 @@ describe('transformProject', () => {
     expect(extractTechIds(emptyAcf)).toEqual([]);
   });
 });
+
+describe('transformProject facts', () => {
+  it('maps the Project facts fields, keeping a numeric year as text', () => {
+    const result = transformProject({
+      ...detail,
+      acf_fields: { ...detail.acf_fields, client: ' illwerke vkw ', role: 'Developer', year: 2025, built_at: 'Freelance' },
+    });
+    expect(result.facts).toEqual({ client: 'illwerke vkw', role: 'Developer', year: '2025', builtAt: 'Freelance' });
+  });
+
+  it('leaves every fact empty when the fields are missing, null or not text', () => {
+    const result = transformProject({
+      ...detail,
+      acf_fields: { ...detail.acf_fields, client: null, role: false, year: '', built_at: undefined },
+    });
+    expect(result.facts).toEqual({ client: '', role: '', year: '', builtAt: '' });
+  });
+});

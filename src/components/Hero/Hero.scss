@@ -1,198 +1,338 @@
 @use '../../styles/variables' as *;
 @use '../../styles/mixins' as *;
 
+// Hero H9: centred intro over a strip of three browser-window frames showing
+// real project work. The dot terrain (HeroScene) stays behind both.
+$strip-single: 640px; // under this only the lead frame shows
+$frame-gap: $spacing-md;
+$frame-radius: $border-radius-md;
+$frame-bg: #151515;
+$frame-line: rgba($white, 0.12);
+$frame-line-strong: rgba($white, 0.22);
+
 .hero {
+  position: relative;
+  isolation: isolate;
   background-color: $primary-color;
-  // min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: $container-padding;
+  padding: $spacing-xl $container-padding $spacing-4xl;
 
   @include tablet {
-    padding: $spacing-2xl;
+    padding: $spacing-xl $spacing-2xl $spacing-3xl;
   }
 
   @include mobile {
-    padding: $spacing-xl $container-padding-mobile;
-    min-height: 60vh;
+    padding: $spacing-lg $spacing-md $spacing-2xl;
   }
 
-  .container {
-    max-width: $desktop;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: $spacing-3xl;
-
-    @include tablet {
-      gap: $spacing-2xl;
-    }
-
-    @include mobile {
-      flex-direction: column-reverse;
-      gap: $spacing-xl;
-    }
-  }
-
-  .profile-wrapper {
-    flex-shrink: 0;
-    width: 450px;
-    height: 450px;
-    background: transparent;
-    border-radius: 50%;
-    overflow: hidden;
+  &__inner {
     position: relative;
-
-    @include tablet {
-      width: 320px;
-      height: 320px;
-    }
-
-    @include mobile {
-      width: 250px;
-      height: 250px;
-      margin-top: $spacing-xl;
-    }
-
-    .profile-image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform $transition-smooth;
-      @include hover-glow($color-beige, 30px);
-
-      &:hover {
-        transform: scale(1.05) rotate(2deg);
-        filter: brightness(1.1);
-      }
-    }
+    z-index: 1;
+    max-width: $desktop;
+    margin: 0 auto;
   }
 
-  .content {
-    flex: 1;
-    max-width: 600px;
-
-    @include mobile {
-      text-align: center;
-    }
-  }
-
-  .title {
-    color: $white;
-    font-family: $font-family-syncopate;
-    font-size: $font-size-h1;
-    font-weight: $font-weight-bold;
-    margin-bottom: $spacing-lg;
+  &__intro {
+    position: relative;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: $spacing-sm;
+    align-items: center;
+    text-align: center;
 
-    @include tablet {
-      font-size: $font-size-5xl;
+    // Soft scrim between the WebGL dots and the copy, so text contrast stays
+    // above 4.5:1 wherever the terrain swells behind it.
+    &::before {
+      content: '';
+      position: absolute;
+      inset: -$spacing-2xl;
+      z-index: -1;
+      background: radial-gradient(closest-side, rgba($primary-color, 0.9) 60%, rgba($primary-color, 0) 100%);
+      pointer-events: none;
+    }
+  }
+
+  &__eyebrow {
+    font-family: $font-family-syncopate;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: $color-beige;
+    margin: 0 0 $spacing-md;
+
+    @include mobile {
+      font-size: $font-size-xs;
+    }
+  }
+
+  &__title {
+    color: $white;
+    font-family: $font-family-base;
+    font-weight: $font-weight-semibold;
+    font-size: clamp(2.125rem, 1.4rem + 2.6vw, 3.375rem);
+    line-height: 1.06;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+    max-width: 20ch;
+    margin: 0 0 $spacing-lg;
+
+    @include mobile {
+      margin-bottom: $spacing-md;
+    }
+  }
+
+  &__sub {
+    color: $text-lighter-gray;
+    font-family: $font-family-base;
+    font-size: clamp(1rem, 0.95rem + 0.2vw, 1.0625rem);
+    line-height: $line-height-base;
+    max-width: 70ch;
+    text-wrap: pretty;
+    margin: 0 0 $spacing-lg;
+
+    a {
+      color: $white;
+      text-decoration: underline;
+      text-decoration-color: $color-beige;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 0.2em;
+      transition: text-decoration-color $transition-fast, color $transition-fast;
+
+      &:hover {
+        color: $color-beige;
+      }
+
+      &:focus-visible {
+        outline: 2px solid $color-beige;
+        outline-offset: 2px;
+        border-radius: 2px;
+      }
     }
 
     @include mobile {
-      font-size: $font-size-5xl;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: $spacing-xs;
+      // On phones the buttons follow the headline, so the first-visit cookie
+      // bar (fixed to the bottom) never covers them.
+      order: 2;
+      margin: 0;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: $spacing-md;
+
+    @include mobile {
+      order: 1;
+      align-self: stretch;
+      gap: $spacing-sm;
+      margin: 0 0 $spacing-lg;
+    }
+  }
+
+  &__cta {
+    @include button-base;
+    @include button-size('md');
+    font-size: $font-size-sm;
+    min-height: 48px;
+    padding: $spacing-md $spacing-xl;
+
+    @include mobile {
+      flex: 1 1 140px;
+      padding: $spacing-md;
     }
 
-    // First line: "Hi" + wave
-    .first-line {
-      display: block;
+    &:focus-visible {
+      outline: 2px solid $color-beige;
+      outline-offset: 3px;
+    }
 
-      @include mobile {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: $spacing-sm;
+    &--primary {
+      background-color: $white;
+      color: $primary-color;
+      border: 2px solid $white;
+
+      &:hover {
+        background-color: $color-beige;
+        border-color: $color-beige;
       }
     }
 
-    // Second line: "I'm EDRIS"
-    .second-line {
-      display: block;
+    &--secondary {
+      background-color: rgba($primary-color, 0.6);
+      color: $white;
+      border: 2px solid rgba($white, 0.6);
 
-      @include mobile {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: $spacing-sm;
-      }
-    }
-
-    .subTitle {
-      color: $text-light-gray;
-    }
-
-    .wave {
-      animation: wave 2s infinite;
-      display: inline-block;
-      transform-origin: 70% 70%;
-      font-size: inherit;
-      margin-right: 7px;
-
-      @include mobile {
-        font-size: inherit;
+      &:hover {
+        border-color: $white;
+        background-color: rgba($white, 0.08);
       }
     }
   }
 
-  .description {
-    color: $text-light-gray;
-    font-family: $font-family-base;
-    font-size: $font-size-2xl;
-    line-height: $line-height-base;
-    max-width: 600px;
-    opacity: 0.8;
+  &__strip {
+    list-style: none;
+    margin: clamp(#{$spacing-xl}, 3vw, #{$spacing-2xl}) 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1.4fr 1fr;
+    gap: $frame-gap;
+    align-items: end;
 
     @include tablet {
-      font-size: $font-size-lg;
+      grid-template-columns: 1fr 1.4fr;
+
+      // Two columns: the frame after the lead drops out.
+      .hero-frame--lead ~ .hero-frame {
+        display: none;
+      }
     }
 
-    @include mobile {
-      font-size: $font-size-base;
-      margin: 0 auto;
-      max-width: 100%;
+    @media (max-width: $strip-single) {
+      grid-template-columns: 1fr;
+
+      .hero-frame:not(.hero-frame--lead) {
+        display: none;
+      }
     }
   }
 }
 
-@keyframes wave {
-  0% {
-    transform: rotate(0deg);
+.hero-frame {
+  min-width: 0;
+  animation: hero-frame-rise 700ms $ease-out-quart both;
+
+  // Sides follow the lead by a beat. Transform only: the frames are visible
+  // from the first paint.
+  &:not(.hero-frame--lead) {
+    animation-delay: 120ms;
   }
 
-  10% {
-    transform: rotate(14deg);
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
   }
 
-  20% {
-    transform: rotate(-8deg);
+  &__link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    border-radius: $frame-radius;
+
+    &:focus-visible {
+      outline: 2px solid $color-beige;
+      outline-offset: 4px;
+    }
   }
 
-  30% {
-    transform: rotate(14deg);
+  &__window {
+    display: block;
+    border: 1px solid $frame-line-strong;
+    border-radius: $frame-radius;
+    overflow: hidden;
+    background: $frame-bg;
+    box-shadow: 0 24px 60px rgba($black, 0.55);
+    transition:
+      transform $transition-base,
+      border-color $transition-base;
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: border-color $transition-base;
+    }
   }
 
-  40% {
-    transform: rotate(-4deg);
+  &__link:hover &__window,
+  &__link:focus-visible &__window {
+    transform: translateY(-4px);
+    border-color: rgba($color-beige, 0.7);
+
+    @media (prefers-reduced-motion: reduce) {
+      transform: none;
+    }
   }
 
-  50% {
-    transform: rotate(10deg);
+  &__bar {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    height: 28px;
+    padding: 0 $spacing-sm + 2px;
+    border-bottom: 1px solid $frame-line;
+
+    i {
+      flex-shrink: 0;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: $frame-line-strong;
+    }
   }
 
-  60% {
-    transform: rotate(0deg);
+  &__domain {
+    flex: 1;
+    min-width: 0;
+    margin-left: $spacing-sm;
+    font-family: $font-family-base;
+    font-size: 11px;
+    color: $text-light-gray;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    // Keeps the domain optically centred against the three dots on the left.
+    padding-right: 26px;
   }
 
-  100% {
-    transform: rotate(0deg);
+  &__media {
+    position: relative;
+    display: block;
+    aspect-ratio: 16 / 10;
+  }
+
+  &--lead &__media {
+    aspect-ratio: 16 / 9.4;
+  }
+
+  &__image,
+  &__video {
+    object-fit: cover;
+    object-position: top;
+  }
+
+  &__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  &__caption {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    column-gap: $spacing-sm;
+    row-gap: 2px;
+    min-height: 44px;
+    padding-top: $spacing-sm + 2px;
+    text-align: center;
+  }
+
+  &__title {
+    font-family: $font-family-base;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $white;
+  }
+
+  &__meta {
+    font-family: $font-family-base;
+    font-size: $font-size-xs;
+    color: $text-light-gray;
+  }
+}
+
+@keyframes hero-frame-rise {
+  from {
+    transform: translateY(16px);
   }
 }

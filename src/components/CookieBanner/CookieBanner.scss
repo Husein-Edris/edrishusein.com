@@ -1,6 +1,9 @@
 @use '../../styles/variables' as *;
 @use '../../styles/mixins' as *;
 
+// Compact consent bar: one line of copy, Reject and Accept with equal weight,
+// Settings as a text link. On phones: copy and privacy link flow as one
+// line, buttons share one row; stays under ~120px tall at 375px.
 .cookie-banner {
   position: fixed;
   bottom: 0;
@@ -8,13 +11,9 @@
   right: 0;
   z-index: $z-modal;
   background: rgba($primary-color, 0.98);
-  border-top: 1px solid rgba($white, 0.1);
+  border-top: 1px solid rgba($white, 0.15);
   box-shadow: $shadow-2xl;
   animation: slideUp 0.4s ease-out;
-
-  @include mobile {
-    padding: $spacing-sm;
-  }
 }
 
 @keyframes slideUp {
@@ -30,51 +29,139 @@
 
 .cookie-banner-content {
   @include container;
-  
+
   & {
-    padding-top: $spacing-lg;
-    padding-bottom: $spacing-lg;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-lg;
+    padding-top: $spacing-md;
+    padding-bottom: $spacing-md;
   }
-}
-
-.cookie-banner-main {
-  .cookie-title {
-    font-family: $font-family-syncopate;
-    font-size: $font-size-xl;
-    font-weight: $font-weight-semibold;
-    color: $white;
-    margin: 0 0 $spacing-md 0;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-
-    @include mobile {
-      font-size: $font-size-lg;
-    }
-  }
-
-  .cookie-description {
-    color: $text-light-gray;
-    font-size: $font-size-base;
-    line-height: $line-height-base;
-    margin: 0 0 $spacing-lg 0;
-    max-width: 600px;
-
-    @include mobile {
-      font-size: $font-size-sm;
-      margin-bottom: $spacing-md;
-    }
-  }
-}
-
-.cookie-buttons {
-  display: flex;
-  gap: $spacing-md;
-  margin-bottom: $spacing-md;
-  flex-wrap: wrap;
 
   @include mobile {
+    & {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+      padding: 10px $spacing-sm + 4px;
+    }
+  }
+}
+
+.cookie-banner {
+  .cookie-description {
+    color: $text-lighter-gray;
+    font-family: $font-family-base;
+    font-size: $font-size-sm;
+    line-height: $line-height-base;
+    margin: 0;
+
+    @include mobile {
+      font-size: 12.5px;
+      line-height: 1.4;
+    }
+  }
+
+  .cookie-link {
+    color: $white;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    white-space: nowrap;
+    // 44px tap target without changing the line it sits in.
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 $spacing-xs;
+    margin: -12px 0;
+
+    @include mobile {
+      // Plain inline so the link flows with the sentence instead of
+      // breaking onto its own line; the padding keeps a ~44px tap area.
+      display: inline;
+      padding: 15px 2px; // 15+15 plus the ~15px line box = 45px tap area
+      margin: 0;
+    }
+
+    &:hover,
+    &:focus-visible {
+      color: $color-beige;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $color-beige;
+      outline-offset: 2px;
+    }
+  }
+
+  .cookie-buttons {
+    display: flex;
+    align-items: center;
     gap: $spacing-sm;
-    flex-direction: column;
+    flex-shrink: 0;
+
+    @include mobile {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: $spacing-sm;
+    }
+  }
+
+  // Accept and Reject share one style on purpose: equal weight.
+  .cookie-btn.cookie-btn-accept,
+  .cookie-btn.cookie-btn-reject {
+    min-height: 44px;
+    min-width: 120px;
+    padding: $spacing-sm $spacing-md;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    background-color: transparent;
+    color: $white;
+    border: 2px solid $white;
+
+    @include mobile {
+      min-width: 0;
+      padding: 0 $spacing-sm;
+      font-size: 11px;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+
+    &:hover,
+    &:focus-visible {
+      background-color: $white;
+      color: $primary-color;
+      transform: none;
+    }
+  }
+
+  .cookie-settings-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 $spacing-sm;
+    color: $text-lighter-gray;
+    font-family: $font-family-base;
+    font-size: $font-size-sm;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    white-space: nowrap;
+
+    @include mobile {
+      justify-content: center;
+      padding: 0 $spacing-xs;
+      font-size: 13px;
+    }
+
+    &:hover,
+    &:focus-visible {
+      color: $color-beige;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $color-beige;
+      outline-offset: 2px;
+    }
   }
 }
 
@@ -118,51 +205,12 @@
     }
   }
 
-  &.cookie-btn-settings {
-    background-color: $white;
-    color: $primary-dark;
-    border: 2px solid $white;
-    font-weight: $font-weight-semibold;
-    letter-spacing: 0.025em;
-
-    &:hover {
-      background-color: rgba($white, 0.88);
-      box-shadow: 0 6px 20px rgba($white, 0.2);
-      transform: translateY(-2px);
-    }
-  }
-
   &.cookie-btn-save {
     @extend .cookie-btn-accept;
   }
 
   &.cookie-btn-cancel {
     @extend .cookie-btn-reject;
-  }
-}
-
-.cookie-links {
-  display: flex;
-  gap: $spacing-lg;
-  
-  @include mobile {
-    flex-direction: column;
-    gap: $spacing-xs;
-  }
-
-  .cookie-link {
-    color: rgba($text-light-gray, 0.8);
-    text-decoration: underline;
-    font-size: $font-size-xs;
-    transition: color $transition-base;
-    // Ensure a >=44px touch target (WCAG 2.5.5 / 2.5.8) without changing layout.
-    display: inline-flex;
-    align-items: center;
-    min-height: 44px;
-
-    &:hover {
-      color: $color-beige;
-    }
   }
 }
 
@@ -328,15 +376,5 @@
   @include mobile {
     flex-direction: column;
     gap: $spacing-sm;
-  }
-}
-
-// Responsive adjustments
-@include mobile {
-  .cookie-banner {
-    .cookie-banner-content {
-      padding-top: $spacing-md;
-      padding-bottom: $spacing-md;
-    }
   }
 }

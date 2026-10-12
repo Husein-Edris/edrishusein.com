@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Syncopate } from "next/font/google";
 import CookieBanner from "@/src/components/CookieBanner/CookieBanner";
 import Analytics from "@/src/components/Analytics/Analytics";
+import { getSiteContentOrDefaults } from "@/src/lib/site-content";
 import "./globals.css";
 
 // Self-hosted at build time (next/font) so there is no render-blocking request to
@@ -51,11 +52,19 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Cookie banner text (Site Content > Cookie banner). The banner is a client
+  // component, so the text is fetched here and passed down as props. This uses
+  // the never-throwing variant on purpose: the layout wraps every route, so a
+  // rethrown transient CMS error would break every page (and every route of a
+  // build) for five labels. On error the banner shows its code defaults. The
+  // fetch is ISR-cached (revalidate 60) and deduped with page-level calls.
+  const siteContent = await getSiteContentOrDefaults();
+
   return (
     <html lang="en" className={`${inter.variable} ${syncopate.variable}`} suppressHydrationWarning={true}>
       <head>
@@ -87,7 +96,7 @@ export default function RootLayout({
       <body suppressHydrationWarning={true}>
         <a href="#main-content" className="skip-link">Skip to main content</a>
         {children}
-        <CookieBanner />
+        <CookieBanner copy={siteContent.cookieBanner} />
         <Analytics />
       </body>
     </html>

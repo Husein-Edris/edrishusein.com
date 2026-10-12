@@ -44,6 +44,15 @@ export class CmsRequestError extends Error {
   }
 }
 
+/**
+ * True when a caught error means "the CMS could not answer" rather than "the CMS
+ * said no". ISR pages rethrow these so Next keeps serving the last good render
+ * instead of caching an empty or placeholder page for the next window.
+ */
+export function isTransientCmsError(error: unknown): boolean {
+  return error instanceof CmsRequestError && error.isTransient;
+}
+
 function isTransientStatus(status: number): boolean {
   return status >= 500 || status === 429;
 }

@@ -27,6 +27,21 @@ describe('transformProjects', () => {
     }
   });
 
+  it('maps the Project facts built_at and showcase_video fields', () => {
+    const filled = transformProjectListItem({
+      id: 1,
+      slug: 'x',
+      acf_fields: { built_at: '  Freelance ', showcase_video: 'https://cms.example/clip.mp4' },
+    });
+    expect(filled.builtAt).toBe('Freelance');
+    expect(filled.showcaseVideo).toBe('https://cms.example/clip.mp4');
+
+    // ACF serializes an empty file field as false.
+    const empty = transformProjectListItem({ id: 2, slug: 'y', acf_fields: { built_at: null, showcase_video: false } });
+    expect(empty.builtAt).toBe('');
+    expect(empty.showcaseVideo).toBe('');
+  });
+
   it('handles an empty array', () => {
     expect(transformProjects([]).projects.nodes).toEqual([]);
   });

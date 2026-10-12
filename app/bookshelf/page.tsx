@@ -2,16 +2,17 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
-import SectionHeader from '@/src/components/SectionHeader/SectionHeader';
 import { rewriteImageUrls } from '@/src/lib/image-utils';
-import { cmsRest } from '@/src/lib/rest-client';
+import { cmsRest, isTransientCmsError } from '@/src/lib/rest-client';
 import { transformMedia } from '@/src/lib/transform/transformMedia';
 import { rendered } from '@/src/lib/transform/transformProjects';
 import { decodeEntities } from '@/src/lib/transform/decodeEntities';
+import { getSiteContent } from '@/src/lib/site-content';
+import { toParagraphs } from '@/src/lib/transform/transformSiteContent';
 import { generateStructuredData, pageOpenGraph, safeJsonLd } from '@/src/lib/seo-utils';
 import '@/src/styles/pages/Bookshelf.scss';
 
-// ISR — cached render refreshed at most once per 60s (keep in sync with CMS_REVALIDATE = 60).
+// ISR: cached render refreshed at most once per 60s (keep in sync with CMS_REVALIDATE = 60).
 export const revalidate = 60;
 
 export const metadata: Metadata = {
@@ -31,9 +32,6 @@ async function getBooksData() {
       '/book?_embed&per_page=100'
     );
     if (!Array.isArray(books)) return [];
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`✅ ${books.length} books loaded via REST API`);
-    }
     return rewriteImageUrls(
       books.map((book) => ({
         id: String(book.id),
@@ -43,13 +41,17 @@ async function getBooksData() {
       }))
     );
   } catch (error) {
+    // Transient: rethrow so ISR keeps the last good shelf instead of caching an
+    // empty one. A permanent 4xx still renders the empty-state message.
+    if (isTransientCmsError(error)) throw error;
     console.error('Error fetching books:', error);
     return [];
   }
 }
 
 export default async function BookshelfPage() {
-  const books = await getBooksData();
+  const [books, siteContent] = await Promise.all([getBooksData(), getSiteContent()]);
+  const copy = siteContent.bookshelfPage;
 
   const webPageJsonLd = generateStructuredData('WebPage', {
     title: 'Bookshelf: Books That Shaped How I Build - Edris Husein',
@@ -68,18 +70,12 @@ export default async function BookshelfPage() {
         {/* Hero Section */}
         <div className="hero-section">
           <div className="container">
-            <h1 className="title">BOOKSHELF</h1>
+            <h1 className="title">{copy.title}</h1>
             <div className="overview">
-              <p>Books and pieces of wisdom I've enjoyed reading</p>
-              <p>
-                Most of what I know about building software came from the work itself, but
-                these shaped how I think about it: how to structure a system, and how to
-                write something a colleague can still read six months later.
-              </p>
-              <p>
-                The list covers software and design, plus a few books with nothing to do
-                with either. I add to it when something earns a place.
-              </p>
+              <p>{copy.lead}</p>
+              {toParagraphs(copy.intro).map((paragraph, index) => (
+                <p key={index}>{paragraph}</p>
+              ))}
             </div>
           </div>
         </div>
@@ -113,7 +109,7 @@ export default async function BookshelfPage() {
                 ))
               ) : (
                 <div className="no-books-message" style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
-                  <p>Bookshelf is currently being updated. Please check back later.</p>
+                  <p>{copy.emptyMessage}</p>
                 </div>
               )}
             </div>

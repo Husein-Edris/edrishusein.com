@@ -15,15 +15,6 @@
     width: 100%;
   }
 
-  // Animation classes
-  .animated-header {
-    @include fade-in-up;
-  }
-
-  .animated-cards-grid {
-    @include fade-in-up;
-  }
-
   .section-header-wrapper {
     display: flex;
     justify-content: space-between;
@@ -286,13 +277,16 @@
   }
 
   // Projects skin styles
+  // Image-led cards: the screenshot is the proof, so it gets the space. One
+  // accent ($color-beige) marks index, kicker, hover border and the arrow.
   &.projects {
     background-color: $primary-color;
-    overflow-x: hidden;
+    overflow-x: clip;
 
     .cards-grid {
-      column-gap: $spacing-md;
+      column-gap: $spacing-lg;
       row-gap: $spacing-xl;
+      margin-top: 0;
 
       @include tablet {
         margin: 0;
@@ -300,32 +294,44 @@
       }
     }
 
-    .card {
-      border-radius: $border-radius-lg;
-      overflow: hidden;
-      background-color: rgba($text-light-gray, 0.1);
-      border: 1px solid $white;
-      position: relative;
-      width: 100%;
-      filter: grayscale(100%);
-      transition: all $transition-base;
-
-      .card-title {
-        word-wrap: break-word;
-        hyphens: none;
-        overflow-wrap: break-word;
-      }
+    .rest-title {
+      font-family: $font-family-syncopate;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-bold;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: $color-beige;
+      margin: $spacing-4xl 0 $spacing-lg;
+      padding-top: $spacing-lg;
+      border-top: 1px solid rgba($white, 0.15);
 
       @include mobile {
-        filter: grayscale(0%);
+        margin-top: $spacing-2xl;
+      }
+    }
+
+    // Shared card shell (grid + featured)
+    .card {
+      --tilt-x: 0deg;
+      --tilt-y: 0deg;
+      position: relative;
+      width: 100%;
+      border-radius: $border-radius-lg;
+      overflow: hidden;
+      background-color: rgba($white, 0.04);
+      border: 1px solid rgba($white, 0.14);
+      transition: border-color $transition-base, background-color $transition-base;
+
+      &:hover,
+      &:focus-within {
+        transform: none;
+        border-color: rgba($color-beige, 0.8);
+        background-color: rgba($white, 0.06);
       }
 
-      @media (min-width: $mobile) {
-        @include card-hover-effect;
-
-        &:hover {
-          box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
-        }
+      &:focus-within {
+        outline: 2px solid $color-beige;
+        outline-offset: 3px;
       }
 
       &.light {
@@ -345,95 +351,285 @@
 
         .project-link {
           color: $primary-color;
-          border-color: $primary-color;
-
-          &:hover {
-            background-color: $primary-color;
-            color: $white;
-          }
         }
       }
     }
 
-    .card-image {
-      width: 100% !important;
-      height: 240px !important; // Fixed consistent height
-      color: transparent;
-      background-size: cover;
-      background-position: 50% 50%;
-      background-repeat: no-repeat;
-      display: block;
-      text-decoration: none;
+    .card .card-image {
       position: relative;
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      height: auto;
       overflow: hidden;
+      background-color: rgba($white, 0.06);
+      perspective: 900px;
 
-      @include tablet {
-        margin: 0;
-        height: 240px !important; // Same height on tablet
+      img {
+        object-fit: cover;
+        object-position: top center;
+        border-radius: 0;
+        transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) scale(1);
+        transition: transform $transition-smooth;
       }
 
-      @include mobile {
-        height: 200px !important; // Slightly smaller on mobile
+      // Soft light that follows the cursor across the screenshot (desktop hover only).
+      &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at var(--glare-x, 50%) var(--glare-y, 0%), rgba($white, 0.14), transparent 55%);
+        opacity: 0;
+        transition: opacity $transition-base;
+        pointer-events: none;
       }
     }
 
-    .card-info {
-      padding: $spacing-lg !important;
-      background-color: rgba($text-light-gray, 0.1);
-      transition: all $transition-base;
+    @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+      .card:hover .card-image {
+        img {
+          transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) scale(1.05);
+          transition: transform 200ms $ease-out-quart;
+        }
+
+        &::after {
+          opacity: 1;
+        }
+      }
+    }
+
+    .card .card-info {
+      padding: $spacing-lg;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      min-height: 160px;
+      gap: $spacing-sm;
+      flex: 1;
 
       @include mobile {
-        min-height: 120px;
-        padding: $spacing-md !important;
+        padding: $spacing-md;
       }
     }
 
-    .card-title {
-      color: rgba($white, 0.7);
+    .card .card-title {
+      color: $white;
+      font-family: $font-family-base;
+      font-weight: $font-weight-semibold;
+      font-size: $font-size-xl;
+      line-height: $line-height-tight;
+      letter-spacing: -0.01em;
+      text-transform: none;
+      width: auto;
+      margin: 0;
     }
 
-    .card-description {
-      color: $white;
-      opacity: 0.6;
+    // Stretched link: the title link's ::after covers the whole card, so the
+    // card is one click target without nesting interactive elements.
+    .card-link {
+      color: inherit;
+      text-decoration: none;
+
+      &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+      }
+
+      &:focus-visible {
+        outline: none;
+      }
+    }
+
+    .card .card-description {
+      color: $text-lighter-gray;
+      font-size: $font-size-base;
       margin-bottom: 0;
       flex: 1;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
+      overflow: hidden;
+
+      p {
+        margin: 0;
+      }
     }
 
     .project-links {
       display: flex;
-      justify-content: flex-start;
-      gap: $spacing-sm;
-      opacity: 0.7;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: $spacing-sm $spacing-md;
       width: 100%;
-      transform: translateY(10px);
-      transition: all $transition-base;
-      margin-top: $spacing-md;
-      position: relative;
-      z-index: 10;
-
-      @include mobile {
-        transform: translateY(0);
-        opacity: 1;
-        flex-wrap: wrap;
-      }
+      min-height: 44px;
+      margin-top: $spacing-sm;
     }
 
     .project-link {
-      @include button-secondary;
-      @include button-size('sm');
-      font-size: $font-size-xs;
-      letter-spacing: 0.03em;
-      min-width: 100px;
+      font-family: $font-family-base;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      color: $white;
+      text-decoration: none;
+    }
 
-      @include mobile {
-        font-size: $font-size-xs;
-        padding: $spacing-xs $spacing-sm;
-        min-width: 90px;
+    .case-study-link {
+      display: inline-flex;
+      align-items: center;
+      gap: $spacing-sm;
+
+      &::after {
+        content: '→';
+        color: $color-beige;
+        transition: transform $transition-base;
       }
+    }
+
+    .card:hover .case-study-link::after {
+      transform: translateX(4px);
+    }
+
+    // Sits above the stretched link so it stays its own target.
+    .visit-site-link {
+      position: relative;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      font-weight: $font-weight-medium;
+      color: $text-lighter-gray;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+
+      &:hover,
+      &:focus-visible {
+        color: $color-beige;
+      }
+    }
+
+    // Featured: two large, image-led rows for the lead client projects.
+    .featured-grid {
+      display: grid;
+      gap: $spacing-xl;
+      margin-bottom: $spacing-md;
+    }
+
+    .card--featured {
+      display: grid;
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      align-items: stretch;
+
+      &.card--flip {
+        grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+
+        .card-image {
+          order: 2;
+        }
+      }
+
+      @include tablet {
+        &,
+        &.card--flip {
+          grid-template-columns: 1fr;
+
+          .card-image {
+            order: 0;
+          }
+        }
+      }
+
+      .card-image {
+        aspect-ratio: auto;
+        height: auto;
+        min-height: 400px;
+
+        @include tablet {
+          aspect-ratio: 16 / 10;
+          min-height: 0;
+        }
+      }
+
+      .card-info {
+        padding: $spacing-2xl;
+        justify-content: center;
+        gap: $spacing-md;
+
+        @include tablet {
+          padding: $spacing-xl;
+        }
+
+        @include mobile {
+          padding: $spacing-lg $spacing-md;
+        }
+      }
+
+      .card-title {
+        font-size: clamp(1.5rem, 1.1rem + 1.4vw, 2.25rem);
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        text-wrap: balance;
+      }
+
+      .card-description {
+        flex: 0 0 auto;
+        font-size: $font-size-lg;
+        max-width: 48ch;
+        -webkit-line-clamp: 5;
+        line-clamp: 5;
+
+        @include mobile {
+          font-size: $font-size-base;
+        }
+      }
+    }
+
+    .card-kicker {
+      display: flex;
+      align-items: center;
+      gap: $spacing-md;
+      margin: 0;
+      font-family: $font-family-syncopate;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-bold;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: $color-beige;
+    }
+
+    .card-index {
+      color: $white;
+
+      &::after {
+        content: '';
+        display: inline-block;
+        width: $spacing-xl;
+        height: 1px;
+        margin-left: $spacing-md;
+        vertical-align: middle;
+        background-color: rgba($color-beige, 0.6);
+      }
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: $spacing-sm;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .card-tag {
+      font-family: $font-family-base;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-medium;
+      color: $white;
+      padding: $spacing-xs $spacing-sm;
+      border: 1px solid rgba($white, 0.2);
+      border-radius: $border-radius-full;
     }
 
     .view-more {
@@ -467,6 +663,16 @@
 
   // Blog skin styles
   &.blog {
+
+    // Post titles are long and mixed case: Inter, sentence case, not Syncopate.
+    .card .card-title {
+      font-family: $font-family-base;
+      font-weight: $font-weight-semibold;
+      font-size: $font-size-xl;
+      line-height: $line-height-tight;
+      letter-spacing: -0.01em;
+      text-transform: none;
+    }
 
     // Hide images for blog cards
     .card-image {
@@ -553,9 +759,7 @@
     overflow: hidden;
     text-decoration: none;
     height: 100%;
-    @include scale-in;
     @include magnetic-hover(6px);
-    transition: all $transition-smooth;
 
     .card-content {
       height: 100%;

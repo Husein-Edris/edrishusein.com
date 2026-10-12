@@ -1,21 +1,28 @@
-// Modified InfoCards client component with improved styling
-'use client';
-
+// Card grid used for projects, notebook posts, and the bookshelf / tech stack teasers.
+// Cards render visible in the server HTML: no scroll-reveal on proof content.
 import Image from 'next/image';
 import Link from 'next/link';
 import './InfoCards.scss';
 import SectionHeader from '../SectionHeader/SectionHeader';
-import { useScrollAnimation, useStaggeredAnimation } from '../../hooks/useScrollAnimation';
+import { truncateExcerpt } from './truncateExcerpt';
+import TiltMedia from './TiltMedia';
+import { PROJECT_CARD_LABEL_DEFAULTS, type ProjectCardLabels } from '@/src/lib/transform/transformSiteContent';
 
-// Types
+type CardVariant = 'dark' | 'light';
+type CardSkin = 'projects' | 'blog' | 'default' | 'bookshelf' | 'techstack';
+
 interface InfoCardProps {
   title: string;
   description: string;
   image?: string;
   link?: string;
-  variant?: 'dark' | 'light';
-  visitLink?: string;
+  variant?: CardVariant;
+  visitLink?: string | null;
   caseStudyLink?: string;
+  /** Short label above a featured card's title, e.g. "Client project". */
+  kicker?: string;
+  /** Technology names shown as chips on featured cards. */
+  tags?: string[];
 }
 
 interface InfoCardsProps {
@@ -23,32 +30,179 @@ interface InfoCardsProps {
   columns?: 1 | 2 | 3;
   sectionNumber?: string;
   sectionTitle?: string;
-  skin?: 'projects' | 'blog' | 'default' | 'bookshelf' | 'techstack';
+  skin?: CardSkin;
   className?: string;
-  variant?: 'dark' | 'light';
+  variant?: CardVariant;
   viewMoreLink?: string;
   viewMoreText?: string;
+  /** Projects skin: render the first N cards as large, image-led features. */
+  featuredCount?: number;
+  /** Heading between the featured cards and the remaining grid. */
+  restTitle?: string;
+  /** Projects skin: CMS-editable card labels (Site Content options page). */
+  labels?: ProjectCardLabels;
 }
 
-// Helper function to truncate text and strip HTML
-function truncateExcerpt(html: string, maxLength = 120): string {
-  if (!html) return '';
-
-  // Strip HTML tags
-  const text = html.replace(/<\/?[^>]+(>|$)/g, "");
-
-  if (text.length <= maxLength) return html;
-
-  // Find the last space before maxLength to avoid cutting words
-  const truncated = text.substring(0, maxLength);
-  const lastSpace = truncated.lastIndexOf(' ');
-  const truncatedText = truncated.substring(0, lastSpace > 0 ? lastSpace : maxLength);
-
-  return truncatedText + '...';
+interface CardProps {
+  card: InfoCardProps;
+  skin: CardSkin;
+  variant: CardVariant;
+  labels: ProjectCardLabels;
 }
 
+function hasLiveSite(card: InfoCardProps): boolean {
+  return Boolean(card.visitLink && card.visitLink !== '#');
+}
 
-// Modified InfoCards component
+function LiveSiteLink({ href, label }: { href: string; label: string }) {
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer" className="project-link visit-site-link">
+      {label}
+      <span className="sr-only"> (opens in a new tab)</span>
+    </a>
+  );
+}
+
+function FeaturedProjectCard({
+  card,
+  index,
+  labels,
+}: {
+  card: InfoCardProps;
+  index: number;
+  labels: ProjectCardLabels;
+}) {
+  const href = card.caseStudyLink || card.link || '#';
+
+  return (
+    <TiltMedia className={`card card--featured ${index % 2 === 1 ? 'card--flip' : ''}`}>
+      <div className="card-image">
+        {card.image && (
+          <Image
+            src={card.image}
+            alt=""
+            fill
+            quality={85}
+            priority={index === 0}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 60vw, 720px"
+          />
+        )}
+      </div>
+      <div className="card-info">
+        <p className="card-kicker">
+          <span className="card-index">{String(index + 1).padStart(2, '0')}</span>
+          {card.kicker || labels.featuredLabel}
+        </p>
+        <h3 className="card-title">
+          <Link href={href} className="card-link">
+            {card.title}
+          </Link>
+        </h3>
+        <div className="card-description" dangerouslySetInnerHTML={{ __html: card.description }} />
+        {card.tags && card.tags.length > 0 && (
+          <ul className="card-tags" aria-label="Technologies">
+            {card.tags.map((tag) => (
+              <li key={tag} className="card-tag">
+                {tag}
+              </li>
+            ))}
+          </ul>
+        )}
+        <div className="project-links">
+          <span className="project-link case-study-link" aria-hidden="true">
+            {labels.readCaseStudyLabel}
+          </span>
+          {hasLiveSite(card) && <LiveSiteLink href={card.visitLink as string} label={labels.visitLiveSiteLabel} />}
+        </div>
+      </div>
+    </TiltMedia>
+  );
+}
+
+function ProjectCard({ card, variant, labels }: Omit<CardProps, 'skin'>) {
+  const href = card.caseStudyLink || card.link || '#';
+
+  return (
+    <TiltMedia className={`card ${card.variant || variant}`}>
+      <div className="card-content">
+        {card.image && (
+          <div className="card-image">
+            <Image
+              src={card.image}
+              alt=""
+              fill
+              quality={85}
+              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 400px"
+            />
+          </div>
+        )}
+        <div className="card-info">
+          <h3 className="card-title">
+            {/* Stretched link: its ::after covers the whole card. */}
+            <Link href={href} className="card-link">
+              {card.title}
+            </Link>
+          </h3>
+          <div className="card-description" dangerouslySetInnerHTML={{ __html: card.description }} />
+          <div className="project-links">
+            <span className="project-link case-study-link" aria-hidden="true">
+              {labels.readCaseStudyLabel}
+            </span>
+            {hasLiveSite(card) && <LiveSiteLink href={card.visitLink as string} label={labels.visitLiveSiteLabel} />}
+          </div>
+        </div>
+      </div>
+    </TiltMedia>
+  );
+}
+
+function LinkCard({ card, skin, variant }: Omit<CardProps, 'labels'>) {
+  return (
+    <Link href={card.link || '#'} className={`card ${card.variant || variant}`}>
+      <div className="card-content">
+        {card.image && (
+          <div className="card-image">
+            <Image
+              src={card.image}
+              alt=""
+              width={400}
+              height={300}
+              quality={85}
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              style={{ height: 'auto' }}
+            />
+          </div>
+        )}
+        <div className="card-info">
+          <h3 className="card-title">{card.title}</h3>
+          {skin === 'default' && (
+            <div className="card-arrow">
+              <Image src="/icons/arrow-active.svg" alt="" width={40} height={40} className="arrow-simple" />
+            </div>
+          )}
+          <div className="card-description" dangerouslySetInnerHTML={{ __html: card.description }} />
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+function Card({ card, skin, variant, labels }: CardProps) {
+  if (skin === 'projects') return <ProjectCard card={card} variant={variant} labels={labels} />;
+  if (!card.link) return null;
+  return <LinkCard card={card} skin={skin} variant={variant} />;
+}
+
+function ViewMore({ href, text, className }: { href: string; text?: string; className: string }) {
+  return (
+    <div className={`view-more-inline ${className}`}>
+      <Link href={href} className="view-more-link">
+        {text || 'VIEW MORE'}
+      </Link>
+    </div>
+  );
+}
+
 function InfoCards({
   cards,
   columns = 1,
@@ -58,176 +212,56 @@ function InfoCards({
   className = '',
   variant = 'dark',
   viewMoreLink,
-  viewMoreText
+  viewMoreText,
+  featuredCount = 0,
+  restTitle,
+  labels = PROJECT_CARD_LABEL_DEFAULTS,
 }: InfoCardsProps) {
-  // For client component, we expect cards to be passed as props
-  const displayCards = cards ? cards.map(card => ({
+  const allCards = cards ?? [];
+  const featureLimit = skin === 'projects' ? featuredCount : 0;
+  const featuredCards = allCards.slice(0, featureLimit).map((card) => ({
     ...card,
-    description: truncateExcerpt(card.description, 120)
-  })) : [];
-  
-  const displayTitle = sectionTitle;
-
-  const sectionClass = `info-cards ${skin} ${skin}-${variant} ${className}`;
-
-  // Animation hooks
-  const headerAnimation = useScrollAnimation({ threshold: 0.2 });
-  const gridAnimation = useScrollAnimation({ threshold: 0.1, delay: 200 });
+    description: truncateExcerpt(card.description, 220),
+  }));
+  const displayCards = allCards.slice(featureLimit).map((card) => ({
+    ...card,
+    description: truncateExcerpt(card.description, 120),
+  }));
 
   return (
-    <section className={sectionClass}>
+    <section className={`info-cards ${skin} ${skin}-${variant} ${className}`}>
       <div className="container">
-        {(sectionNumber || displayTitle) && (
-          <div 
-            ref={headerAnimation.ref}
-            className={`section-header-wrapper animated-header ${headerAnimation.className}`}
-          >
-            <SectionHeader
-              number={sectionNumber || ''}
-              title={displayTitle || ''}
+        {(sectionNumber || sectionTitle) && (
+          <div className="section-header-wrapper">
+            <SectionHeader number={sectionNumber || ''} title={sectionTitle || ''} variant={variant} hideNumber />
+            {viewMoreLink && <ViewMore href={viewMoreLink} text={viewMoreText} className="view-more-desktop" />}
+          </div>
+        )}
+        {featuredCards.length > 0 && (
+          <div className="featured-grid">
+            {featuredCards.map((card, index) => (
+              <FeaturedProjectCard
+                key={card.caseStudyLink || card.link || index}
+                card={card}
+                index={index}
+                labels={labels}
+              />
+            ))}
+          </div>
+        )}
+        {restTitle && displayCards.length > 0 && <h2 className="rest-title">{restTitle}</h2>}
+        <div className={`cards-grid columns-${columns}`}>
+          {displayCards.map((card, index) => (
+            <Card
+              key={card.caseStudyLink || card.link || index}
+              card={card}
+              skin={skin}
               variant={variant}
-              hideNumber={true}
+              labels={labels}
             />
-            {viewMoreLink && (
-              <div className="view-more-inline view-more-desktop">
-                <Link href={viewMoreLink} className="view-more-link">
-                  {viewMoreText || 'VIEW MORE'}
-                </Link>
-              </div>
-            )}
-          </div>
-        )}
-        <div 
-          ref={gridAnimation.ref}
-          className={`cards-grid columns-${columns} animated-cards-grid ${gridAnimation.className}`}
-        >
-          {displayCards?.map((card, index) => {
-            const cardAnimation = useStaggeredAnimation(index, 120);
-            if (skin !== 'projects' && !card.link) {
-              return null; // Skip cards without links for non-project skins
-            }
-
-            // For non-project cards, wrap entire card in Link
-            if (skin !== 'projects') {
-              return (
-                <Link 
-                  key={index} 
-                  ref={cardAnimation.ref}
-                  href={card.link || '#'} 
-                  className={`card ${card.variant || variant} ${cardAnimation.className}`}
-                >
-                  <div className="card-content">
-                    {card.image && (
-                      <div className="card-image">
-                        <Image
-                          src={card.image}
-                          alt={card.title}
-                          width={400}
-                          height={300}
-                          quality={85}
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                          style={{ height: 'auto' }}
-                        />
-                      </div>
-                    )}
-                    <div className="card-info">
-                      <h3 className="card-title">{card.title}</h3>
-                      {skin === 'default' && (
-                        <div className="card-arrow">
-                          <Image
-                            src="/icons/arrow-active.svg"
-                            alt=""
-                            width={40}
-                            height={40}
-                            className="arrow-simple"
-                          />
-                        </div>
-                      )}
-                      <div
-                        className="card-description"
-                        dangerouslySetInnerHTML={{ __html: card.description }}
-                      />
-                    </div>
-                  </div>
-                </Link>
-              );
-            }
-
-            // For project cards, don't wrap entire card - only specific elements link to case study
-            return (
-              <div 
-                key={index} 
-                ref={cardAnimation.ref}
-                className={`card ${card.variant || variant} ${cardAnimation.className}`}
-              >
-                <div className="card-content">
-                  {card.image && (
-                    <Link 
-                      href={card.caseStudyLink || '#'} 
-                      className="card-image"
-                      style={{
-                        backgroundImage: `url(${card.image})`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: '50% 50%',
-                        backgroundRepeat: 'no-repeat',
-                        color: 'transparent',
-                        height: '300px'
-                      }}
-                      aria-label={card.title}
-                    >
-                      {/* Hidden text for screen readers */}
-                      <span style={{ position: 'absolute', left: '-9999px' }}>{card.title}</span>
-                    </Link>
-                  )}
-                  <div className="card-info">
-                    <Link href={card.caseStudyLink || '#'}>
-                      <h3 className="card-title">{card.title}</h3>
-                    </Link>
-                    <div
-                      className="card-description"
-                      dangerouslySetInnerHTML={{ __html: card.description }}
-                    />
-                    {(card.caseStudyLink || card.visitLink) && (
-                      <div className="project-links">
-                        {card.visitLink && card.visitLink !== '#' && (
-                          <button 
-                            type="button"
-                            className="project-link visit-site-link"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              console.log('Visit button clicked, URL:', card.visitLink);
-                              window.open(card.visitLink, '_blank', 'noopener,noreferrer');
-                            }}
-                          >
-                            VISIT LIVE SITE
-                          </button>
-                        )}
-                        {card.caseStudyLink && (
-                          <Link 
-                            href={card.caseStudyLink}
-                            className="project-link case-study-link"
-                          >
-                            CASE STUDY
-                          </Link>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          ))}
         </div>
-        
-        {viewMoreLink && (
-          <div className="view-more-inline view-more-mobile">
-            <Link href={viewMoreLink} className="view-more-link">
-              {viewMoreText || 'VIEW MORE'}
-            </Link>
-          </div>
-        )}
-
+        {viewMoreLink && <ViewMore href={viewMoreLink} text={viewMoreText} className="view-more-mobile" />}
       </div>
     </section>
   );

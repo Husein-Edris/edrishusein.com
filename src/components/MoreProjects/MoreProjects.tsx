@@ -1,9 +1,16 @@
 import InfoCards from '../InfoCards/InfoCards';
+import { truncateExcerpt } from '../InfoCards/truncateExcerpt';
 import { selectRelatedByRotation } from '@/src/lib/related-content';
+import type { WordPressProject } from '@/src/types/wordpress';
+import type { ProjectCardLabels } from '@/src/lib/transform/transformSiteContent';
 
 interface MoreProjectsProps {
   currentProjectSlug: string;
-  allProjects?: any[]; // Pass projects as props instead of fetching
+  allProjects?: WordPressProject[]; // Pass projects as props instead of fetching
+  /** Section heading; CMS Site Content > Case study template. */
+  title?: string;
+  /** Card link labels; CMS Site Content > Project cards. */
+  labels?: ProjectCardLabels;
 }
 
 interface InfoCardProps {
@@ -12,34 +19,22 @@ interface InfoCardProps {
   image?: string;
   link?: string;
   variant?: 'dark' | 'light';
-  visitLink?: string;
+  visitLink?: string | null;
   caseStudyLink?: string;
 }
 
-// Helper function to truncate text and strip HTML
-function truncateExcerpt(html: string, maxLength = 120): string {
-  if (!html) return '';
-
-  // Strip HTML tags
-  const text = html.replace(/<\/?[^>]+(>|$)/g, "");
-
-  if (text.length <= maxLength) return html;
-
-  // Find the last space before maxLength to avoid cutting words
-  const truncated = text.substring(0, maxLength);
-  const lastSpace = truncated.lastIndexOf(' ');
-  const truncatedText = truncated.substring(0, lastSpace > 0 ? lastSpace : maxLength);
-
-  return truncatedText + '...';
-}
-
-export default function MoreProjects({ currentProjectSlug, allProjects = [] }: MoreProjectsProps) {
+export default function MoreProjects({
+  currentProjectSlug,
+  allProjects = [],
+  title = 'More Projects',
+  labels,
+}: MoreProjectsProps) {
   // Rotate rather than always taking the first 3 in menu_order. The old slice
   // funnelled every sibling link into the same 3 projects, so the rest of the
   // case studies sat on a single inbound link from the archive page.
   const otherProjects = selectRelatedByRotation(allProjects, currentProjectSlug, 3);
 
-  const projectCards: InfoCardProps[] = otherProjects.map((project: any) => ({
+  const projectCards: InfoCardProps[] = otherProjects.map((project) => ({
     title: project.title,
     description: truncateExcerpt(project.excerpt, 120),
     image: project.featuredImage?.node?.sourceUrl || '/images/Blog-sample-img.png',
@@ -58,9 +53,10 @@ export default function MoreProjects({ currentProjectSlug, allProjects = [] }: M
     <InfoCards
       skin="projects"
       variant="dark"
-      sectionTitle="More Projects"
+      sectionTitle={title}
       columns={3}
       cards={projectCards}
+      labels={labels}
     />
   );
 }

@@ -4,6 +4,7 @@ import Hero from '@/src/components/Hero/Hero';
 import About from '@/src/components/about/about';
 import InfoCards from '@/src/components/InfoCards/InfoCards';
 import Contact from '@/src/components/Contact/Contact';
+import Testimonials from '@/src/components/Testimonials/Testimonials';
 
 interface SectionRendererProps {
   sections: SectionConfig[];
@@ -20,6 +21,7 @@ const COMPONENT_MAP = {
   projects: InfoCards,
   infocards: InfoCards,
   contact: Contact,
+  testimonials: Testimonials,
 } as const;
 
 // Individual section wrapper

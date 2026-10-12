@@ -16,20 +16,35 @@
       padding: $spacing-lg;
     }
 
+    // Case study (3B): title and intro sit left, above the two-column body.
+    &.hero-section--left {
+      text-align: left;
+
+      .title,
+      .overview {
+        margin-left: 0;
+        padding-left: 0;
+        padding-right: 0;
+      }
+    }
+
+    // Page titles are mixed case and often long: Inter 600, not Syncopate.
     .title {
-      font-family: $font-family-syncopate;
-      font-size: $font-size-4xl;
-      margin-bottom: $spacing-md;
+      font-family: $font-family-base;
+      font-weight: $font-weight-semibold;
+      font-size: clamp(1.75rem, 1.2rem + 2.4vw, 3rem);
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+      text-wrap: balance;
+      margin: 0 auto $spacing-md;
       word-wrap: break-word;
       hyphens: none;
       overflow-wrap: break-word;
-      max-width: 100%;
+      max-width: 28ch;
 
       @include mobile {
-        font-size: $font-size-2xl;
         margin-bottom: $spacing-sm;
-        line-height: 1.2;
-        padding: 0 $spacing-md;
+        padding: 0 $spacing-sm;
       }
     }
 
@@ -44,30 +59,6 @@
         font-size: $font-size-base;
         padding: 0 $spacing-md;
         margin-bottom: $spacing-md;
-      }
-    }
-
-    // Featured Image in Hero Section
-    .featured-image {
-      margin: calc($spacing-unit * 4) auto 0;
-      text-align: center;
-
-      .project-featured-image {
-        max-width: 600px;
-        width: 600px;
-        max-height: 500px;
-        height: auto !important;
-        object-fit: contain !important;
-        border-radius: 12px;
-        background-size: unset !important;
-        background-image: unset !important;
-        background-position: unset !important;
-        background-repeat: unset !important;
-
-        @include mobile {
-          max-width: 100%;
-          max-height: 350px;
-        }
       }
     }
 
@@ -141,55 +132,163 @@
     }
 
     h2 {
-      font-family: $font-family-syncopate;
-      font-size: calc($font-size-base * 2);
+      font-family: $font-family-base;
+      font-weight: $font-weight-semibold;
+      font-size: clamp(1.5rem, 1.25rem + 1vw, 2rem);
+      line-height: $line-height-tight;
+      letter-spacing: -0.01em;
       margin-bottom: calc($spacing-unit * 4);
       position: relative;
       display: inline-block;
 
       @include mobile {
-        font-size: calc($font-size-base * 1.5);
         margin-bottom: calc($spacing-unit * 3);
       }
     }
   }
 
-  // Enhanced Tech Stack section
-  .tech-stack {
-    .tech-grid {
+  // Two-column body (3B): main content left, sticky facts column right.
+  // The facts <aside> comes first in the DOM, so on phones it sits above the
+  // content without any reordering.
+  .case-study__body--with-facts {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 260px;
+    gap: $spacing-2xl;
+    align-items: start;
+
+    @include tablet {
+      grid-template-columns: minmax(0, 1fr) 220px;
+      gap: $spacing-xl;
+    }
+
+    @include mobile {
+      grid-template-columns: minmax(0, 1fr);
+      gap: $spacing-xl;
+    }
+
+    .case-study-facts {
+      grid-column: 2;
+      grid-row: 1;
+      position: sticky;
+      top: $spacing-xl;
+
+      @include mobile {
+        grid-column: 1;
+        position: static;
+      }
+    }
+
+    .case-study__main {
+      grid-column: 1;
+      grid-row: 1;
+      min-width: 0;
+
+      @include mobile {
+        grid-row: 2;
+      }
+    }
+  }
+
+  .case-study-facts {
+    &__list {
+      margin: 0;
+
+      // Phones: compact two-column definition list; stack and links span both.
+      @include mobile {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: $spacing-md;
+        border-top: 1px solid rgba($white, 0.15);
+      }
+    }
+
+    &__row {
+      padding: calc($spacing-unit * 1.5) 0;
+      border-bottom: 1px solid rgba($white, 0.15);
+
+      &:first-child {
+        padding-top: 0;
+
+        @include mobile {
+          padding-top: calc($spacing-unit * 1.5);
+        }
+      }
+
+      @include mobile {
+        &--stack,
+        &--link {
+          grid-column: 1 / -1;
+        }
+      }
+
+      dt {
+        font-family: $font-family-syncopate;
+        font-weight: $font-weight-bold;
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: $text-light-gray;
+      }
+
+      dd {
+        margin: $spacing-xs 0 0;
+        font-size: $font-size-base;
+        line-height: $line-height-base;
+        color: $white;
+        overflow-wrap: anywhere;
+      }
+    }
+
+    &__link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      color: $color-beige;
+      text-decoration: underline;
+      text-decoration-color: rgba($color-beige, 0.4);
+      text-underline-offset: 3px;
+      transition: text-decoration-color $transition-fast;
+
+      &:hover,
+      &:focus-visible {
+        text-decoration-color: $color-beige;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        transition: none;
+      }
+    }
+
+    // Tech chips: 18px logo + label, small enough for the narrow column.
+    &__chips {
       display: flex;
       flex-wrap: wrap;
-      gap: calc($spacing-unit * 2);
+      gap: $spacing-xs;
+      margin: $spacing-xs 0 0;
+      padding: 0;
+      list-style: none;
+    }
 
-      .tech-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: $spacing-unit;
-        padding: calc($spacing-unit * 2);
-        background: rgba($text-light-gray, 0.1);
-        border-radius: 8px;
-        transition: transform 0.3s ease, background-color 0.3s ease;
-        text-align: center;
+    &__chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: $spacing-xs 10px;
+      font-size: $font-size-sm;
+      color: $white;
+      background: rgba($text-light-gray, 0.1);
+      border: 1px solid rgba($white, 0.15);
+      border-radius: $border-radius-full;
 
-        &:hover {
-          transform: translateY(-4px);
-          background-color: rgba($text-light-gray, 0.2);
-        }
-
-        img {
-          width: 210px;
-          height: 210px;
-          object-fit: contain;
-          margin: 0 auto;
-          display: block;
-        }
-
-        span {
-          font-family: $font-family-base;
-          color: $white;
-          font-weight: 500;
-        }
+      // Light backing so dark logos (jQuery, MySQL, Plesk) stay visible on the dark chip.
+      img {
+        width: 20px;
+        height: 20px;
+        padding: 2px;
+        object-fit: contain;
+        flex-shrink: 0;
+        background: rgba($white, 0.92);
+        border-radius: 4px;
       }
     }
   }
@@ -200,9 +299,9 @@
     text-align: center;
 
     .project-featured-image {
-      max-width: 800px;
+      max-width: 100%;
       width: 100%;
-      max-height: 400px;
+      max-height: 560px;
       height: auto !important;
       object-fit: contain !important;
       border-radius: 12px;
@@ -357,11 +456,32 @@
         gap: calc($spacing-unit * 2);
       }
 
+      // A button that opens the lightbox (GalleryLightbox).
       .gallery-item {
+        display: block;
+        width: 100%;
+        padding: 0;
+        border: none;
+        color: inherit;
+        font: inherit;
+        cursor: zoom-in;
         overflow: hidden;
         border-radius: 12px;
         background: rgba($text-light-gray, 0.1);
         transition: transform 0.3s ease;
+
+        &:focus-visible {
+          outline: 2px solid $color-beige;
+          outline-offset: 4px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          transition: none;
+
+          &:hover {
+            transform: none;
+          }
+        }
 
         &:hover {
           transform: translateY(-4px);
@@ -381,79 +501,18 @@
     }
   }
 
-  // Project Action Links section
-  .project-action-links {
-    background: rgba($text-light-gray, 0.1);
-    padding: calc($spacing-unit * 4);
-    border-radius: 12px;
-    margin-bottom: calc($spacing-unit * 6);
-    text-align: center;
-
-    @include mobile {
-      padding: calc($spacing-unit * 3);
-      margin-bottom: calc($spacing-unit * 4);
-    }
-
-    h2 {
-      margin-bottom: calc($spacing-unit * 3);
-      color: $white;
-    }
-
-    .action-links {
-      display: flex;
-      justify-content: center;
-      gap: calc($spacing-unit * 2);
-
-      @include mobile {
-        flex-direction: column;
-        gap: calc($spacing-unit * 2);
-      }
-
-      .action-link {
-        font-family: $font-family-syncopate;
-        font-size: calc($font-size-base * 1.1);
-        text-decoration: none;
-        padding: calc($spacing-unit * 1.5) calc($spacing-unit * 3);
-        border-radius: 6px;
-        transition: all 0.3s ease;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        min-width: 180px;
-
-        &.primary {
-          background-color: $color-beige;
-          color: $primary-color;
-          border: 2px solid $color-beige;
-
-          &:hover {
-            background-color: transparent;
-            color: $color-beige;
-            transform: translateY(-2px);
-          }
-        }
-
-        &.secondary {
-          background-color: transparent;
-          color: $white;
-          border: 2px solid $white;
-
-          &:hover {
-            background-color: $white;
-            color: $primary-color;
-            transform: translateY(-2px);
-          }
-        }
-
-        @include mobile {
-          width: 100%;
-          text-align: center;
-        }
-      }
-    }
+  // Reading measure: body copy never runs past 68 characters.
+  .challenge .content,
+  .solution .content {
+    max-width: 68ch;
   }
 
   // Article Content section (for notebook template)
   .article-content {
+    max-width: 68ch;
+    margin-left: auto;
+    margin-right: auto;
+
     .content {
       p {
         color: $text-light-gray;
@@ -469,7 +528,10 @@
       h5,
       h6 {
         color: $white;
-        font-family: $font-family-syncopate;
+        font-family: $font-family-base;
+        font-weight: $font-weight-semibold;
+        line-height: $line-height-tight;
+        letter-spacing: -0.01em;
         margin-top: calc($spacing-unit * 3);
         margin-bottom: calc($spacing-unit * 2);
       }
@@ -877,96 +939,10 @@
     }
   }
 
-  // Tech Grid Section (for tech-stack page)
-  .tech-section {
-    .tech-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: calc($spacing-unit * 4);
-      margin-bottom: calc($spacing-unit * 6);
-
-      @include mobile {
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: calc($spacing-unit * 3);
-      }
-
-      .tech-card {
-        background: rgba($text-light-gray, 0.1);
-        border-radius: 12px;
-        overflow: hidden;
-        transition: all 0.3s ease;
-        border: 2px solid transparent;
-        text-align: center;
-
-        &:hover {
-          transform: translateY(-8px);
-          border-color: rgba($color-beige, 0.3);
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-
-          .tech-image .featured-image {
-            transform: scale(1.05);
-          }
-
-          .tech-title {
-            color: $color-beige;
-          }
-        }
-
-        .tech-image {
-          height: 200px;
-          overflow: hidden;
-          position: relative;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: $white;
-          padding: calc($spacing-unit * 2);
-
-          @include mobile {
-            height: 180px;
-          }
-
-          .featured-image {
-            margin: 0;
-            max-width: 80%;
-            max-height: 80%;
-            object-fit: contain;
-            transition: transform 0.3s ease;
-          }
-        }
-
-        .tech-content {
-          padding: calc($spacing-unit * 3);
-
-          .tech-title {
-            font-family: $font-family-syncopate;
-            font-size: calc($font-size-base * 1.1);
-            color: $white;
-            margin-bottom: calc($spacing-unit * 1.5);
-            line-height: $line-height-tight;
-            transition: color 0.3s ease;
-          }
-
-          .tech-description {
-            color: $text-light-gray;
-            line-height: 1.6;
-            font-size: calc($font-size-base * 0.9);
-
-            p {
-              margin: 0 0 calc($spacing-unit) 0;
-
-              &:last-child {
-                margin-bottom: 0;
-              }
-            }
-
-            strong {
-              color: $white;
-            }
-          }
-        }
-      }
-    }
+  // Tech stack page: the logo grid itself is styled in TechGrid.scss.
+  .no-tech-message {
+    padding: $spacing-xl 0;
+    color: $text-light-gray;
   }
 
   // Enhanced Links section

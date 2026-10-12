@@ -72,8 +72,14 @@ describe('fetchSitemapContent', () => {
     expect(await fetchSitemapContent('/posts')).toEqual([{ slug: 'a' }]);
   });
 
-  it('returns [] on failure (so the sitemap still generates)', async () => {
-    mockFetch.mockRejectedValueOnce(new Error('CMS down'));
+  it('throws on a transient CMS failure so ISR keeps serving the last good sitemap', async () => {
+    // Every retry fails: a sitemap cached with 0 posts would drop 19 URLs at once.
+    mockFetch.mockResolvedValue({ ok: false, status: 500, json: () => Promise.resolve({}) });
+    await expect(fetchSitemapContent('/posts')).rejects.toThrow(/500/);
+  });
+
+  it('returns [] when the CMS answers with a permanent 4xx', async () => {
+    mockFetch.mockResolvedValue({ ok: false, status: 404, json: () => Promise.resolve({}) });
     expect(await fetchSitemapContent('/posts')).toEqual([]);
   });
 

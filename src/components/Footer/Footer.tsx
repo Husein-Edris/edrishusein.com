@@ -1,9 +1,14 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import CookieSettingsLink from '@/src/components/CookieSettingsLink/CookieSettingsLink';
+import { getSiteContentOrDefaults } from '@/src/lib/site-content';
 import './Footer.scss';
 
-const Footer = () => {
+// Server component. Legal link labels come from Site Content > Global; the
+// fetch never throws (getSiteContentOrDefaults) because every page renders it.
+// Main and secondary link labels are page names and stay in code, like Header.
+const Footer = async () => {
+    const copy = (await getSiteContentOrDefaults()).footer;
     const currentYear = new Date().getFullYear();
     const mainLinks = [
         { href: '/projects', label: 'Projects' },
@@ -17,8 +22,8 @@ const Footer = () => {
     ];
 
     const legalLinks = [
-        { href: '/imprint', label: 'Imprint' },
-        { href: '/privacy-policy', label: 'Privacy Policy' },
+        { href: '/imprint', label: copy.imprintLabel },
+        { href: '/privacy-policy', label: copy.privacyPolicyLabel },
     ];
 
     return (
@@ -60,7 +65,7 @@ const Footer = () => {
                                 </li>
                             ))}
                             <li>
-                                <CookieSettingsLink>Cookie Settings</CookieSettingsLink>
+                                <CookieSettingsLink>{copy.cookieSettingsLabel}</CookieSettingsLink>
                             </li>
                         </ul>
                     </nav>

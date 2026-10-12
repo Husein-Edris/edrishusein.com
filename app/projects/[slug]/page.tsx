@@ -1,11 +1,16 @@
 // Server Component for project pages with SSG
-import { Suspense } from 'react';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
 import MoreProjects from '@/src/components/MoreProjects/MoreProjects';
+import CaseStudyFacts from '@/src/components/CaseStudyFacts/CaseStudyFacts';
+import GalleryLightbox, { type GalleryImage } from '@/src/components/GalleryLightbox/GalleryLightbox';
+import { buildFactRows } from '@/src/lib/case-study-facts';
 import { rewriteImageUrls } from '@/src/lib/image-utils';
+import { getSiteContent } from '@/src/lib/site-content';
+import { galleryLightboxLabels, projectCardLabels } from '@/src/lib/transform/transformSiteContent';
+import { decodeEntities } from '@/src/lib/transform/decodeEntities';
 import { cmsRest } from '@/src/lib/rest-client';
 import { transformProject, extractTechIds } from '@/src/lib/transform/transformProject';
 import { transformProjects } from '@/src/lib/transform/transformProjects';
@@ -14,24 +19,17 @@ import { generateStructuredData, generateBreadcrumbStructuredData, safeJsonLd, m
 import type { WordPressImage } from '@/src/types/wordpress';
 import '@/src/styles/pages/CaseStudy.scss';
 
-// Generate static params for all projects
+// Generate static params for all projects. If the CMS is unreachable at build
+// time, nothing is prerendered and each page renders on its first request.
 export async function generateStaticParams() {
-  // Add known project slugs and try to fetch from API
-  const knownSlugs = [
-    { slug: 'beschutzerbox' },
-    { slug: 'geschaftsbericht-fur-vorarlberger-landeskrankenhauser' }
-  ];
-
   try {
-    const projects = await cmsRest<Array<{ slug: string }>>('/project?per_page=20&_fields=slug');
-    const apiSlugs = projects.map((project) => ({ slug: project.slug }));
-    return [...knownSlugs, ...apiSlugs];
+    const projects = await cmsRest<Array<{ slug: string }>>('/project?per_page=100&_fields=slug');
+    return projects.map((project) => ({ slug: project.slug }));
   } catch (error: unknown) {
-    // Don't fail the build if the CMS is unreachable - use known slugs
     console.error('Error fetching projects for static generation:', error instanceof Error ? error.message : error);
   }
 
-  return knownSlugs;
+  return [];
 }
 
 // Generate metadata for SEO
@@ -65,6 +63,31 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       images: project.featuredImage?.node?.sourceUrl ? [project.featuredImage.node.sourceUrl] : [],
     },
   };
+}
+
+interface RawGalleryImage {
+  url?: string;
+  alt?: string;
+  caption?: string;
+  width?: number;
+  height?: number;
+}
+
+// ACF gallery items -> lightbox images. Items without a URL are dropped; the
+// caption falls back to the editor's alt text, never to the generated one.
+function galleryImages(gallery: readonly RawGalleryImage[], projectTitle: string): GalleryImage[] {
+  return gallery
+    .filter((image) => typeof image.url === 'string' && image.url.trim() !== '')
+    .map((image, index) => {
+      const alt = decodeEntities(image.alt?.trim() ?? '');
+      return {
+        url: image.url as string,
+        alt: alt || `${projectTitle} gallery image ${index + 1}`,
+        caption: decodeEntities(image.caption?.trim() ?? '') || alt,
+        width: image.width || 400,
+        height: image.height || 300,
+      };
+    });
 }
 
 // Fetch all projects for "More Projects" section
@@ -109,7 +132,7 @@ async function resolveTechImages(ids: number[]): Promise<Map<number, WordPressIm
 // the static build as a permanently empty page.
 async function getProject(slug: string) {
   const projects = await cmsRest<unknown[]>(
-    `/project?slug=${slug}&_embed&acf_format=standard`
+    `/project?slug=${encodeURIComponent(slug)}&_embed&acf_format=standard`
   );
   if (!Array.isArray(projects) || projects.length === 0) return null;
 
@@ -124,16 +147,21 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   const { slug } = await params;
 
   // Fetch both current project and all projects for "More Projects" section
-  const [project, allProjectsData] = await Promise.all([
+  // Template headings and labels: CMS "Site Content" options page.
+  const [project, allProjectsData, siteContent] = await Promise.all([
     getProject(slug),
-    getAllProjectsForMoreProjects()
+    getAllProjectsForMoreProjects(),
+    getSiteContent(),
   ]);
+  const copy = siteContent.caseStudy;
 
   const allProjects = allProjectsData?.projects?.nodes || [];
 
   if (!project) {
     notFound();
   }
+
+  const factRows = buildFactRows(project, copy);
 
   // Structured data: mark the case study as a CreativeWork and expose a
   // Home > Projects > Title breadcrumb trail (project pages previously had none).
@@ -156,7 +184,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
       <Header />
       <main id="main-content" tabIndex={-1} className="case-study">
         {/* Hero Section */}
-        <div className="hero-section">
+        <div className="hero-section hero-section--left">
           <div className="container">
             <h1 className="title">{project.title}</h1>
             {project.excerpt && (
@@ -165,8 +193,16 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                 dangerouslySetInnerHTML={{ __html: project.excerpt }}
               />
             )}
+          </div>
+        </div>
 
-            {/* Featured Image in Hero */}
+        {/* Two-column body: main content left, sticky facts column right.
+            The facts come first in the DOM so phones show them above the content. */}
+        <div className={`container case-study__body${factRows.length > 0 ? ' case-study__body--with-facts' : ''}`}>
+          <CaseStudyFacts rows={factRows} heading={copy.factsHeading} />
+
+          <div className="case-study__main">
+            {/* Featured image, first in the main column */}
             {project.featuredImage?.node && (
               <div className="featured-image">
                 <Image
@@ -181,143 +217,77 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                 />
               </div>
             )}
-          </div>
-        </div>
 
-        <div className="container">
+            {/* The Challenge */}
+            {project.caseStudy?.projectContent?.challenge && (
+              <section className="challenge">
+                <h2>{copy.challengeHeading}</h2>
+                <div
+                  className="content"
+                  dangerouslySetInnerHTML={{ __html: project.caseStudy.projectContent.challenge }}
+                />
+              </section>
+            )}
 
-          {/* The Challenge */}
-          {project.caseStudy?.projectContent?.challenge && (
-            <section className="challenge">
-              <h2>The Challenge</h2>
-              <div
-                className="content"
-                dangerouslySetInnerHTML={{ __html: project.caseStudy.projectContent.challenge }}
-              />
-            </section>
-          )}
+            {/* The Solution */}
+            {project.caseStudy?.projectContent?.solution && (
+              <section className="solution">
+                <h2>{copy.solutionHeading}</h2>
+                <div
+                  className="content"
+                  dangerouslySetInnerHTML={{ __html: project.caseStudy.projectContent.solution }}
+                />
+              </section>
+            )}
 
-          {/* The Solution */}
-          {project.caseStudy?.projectContent?.solution && (
-            <section className="solution">
-              <h2>The Solution</h2>
-              <div
-                className="content"
-                dangerouslySetInnerHTML={{ __html: project.caseStudy.projectContent.solution }}
-              />
-            </section>
-          )}
-
-          {/* Technologies */}
-          {(() => {
-            const technologies = project.caseStudy?.projectOverview?.technologies || [];
-
-            return technologies.length > 0 ? (
-              <section className="tech-stack">
-                <h2>Technologies Used</h2>
-                <div className="tech-grid">
-                  {technologies.map((tech) => (
-                    <div key={tech.id} className="tech-item">
-                      {tech.featuredImage?.node && (
-                        <Image
-                          src={tech.featuredImage.node.sourceUrl}
-                          alt={tech.featuredImage.node.altText || tech.title}
-                          width={40}
-                          height={40}
-                          className="tech-icon"
-                          unoptimized
-                        />
+            {/* Key Features */}
+            {project.caseStudy?.projectContent?.keyFeatures && project.caseStudy.projectContent.keyFeatures.length > 0 && (
+              <section className="key-features">
+                <h2>{copy.keyFeaturesHeading}</h2>
+                <div className="features-grid">
+                  {project.caseStudy.projectContent.keyFeatures.map((feature: any, index: number) => (
+                    <div key={index} className="feature-item">
+                      {feature.image && (
+                        <div className="feature-image">
+                          <Image
+                            src={feature.image.sourceUrl}
+                            alt={feature.image.altText || feature.title}
+                            width={feature.image.mediaDetails?.width || 400}
+                            height={feature.image.mediaDetails?.height || 300}
+                            className="feature-img"
+                          />
+                        </div>
                       )}
-                      <span>{tech.title}</span>
+                      <div className="feature-content">
+                        <h3>{feature.title}</h3>
+                        <p>{feature.description}</p>
+                      </div>
                     </div>
                   ))}
                 </div>
               </section>
-            ) : null;
-          })()}
+            )}
 
-          {/* Project Links Section */}
-          {project.caseStudy?.projectLinks && (
-            <section className="project-action-links">
-              <h2>View Project</h2>
-              <div className="action-links">
-                {project.caseStudy.projectLinks.liveSite && (
-                  <a
-                    href={project.caseStudy.projectLinks.liveSite}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="action-link primary"
-                  >
-                    Visit Live Site
-                  </a>
-                )}
-                {project.caseStudy.projectLinks.github && (
-                  <a
-                    href={project.caseStudy.projectLinks.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="action-link secondary"
-                  >
-                    View Source Code
-                  </a>
-                )}
-              </div>
-            </section>
-          )}
-
-          {/* Key Features */}
-          {project.caseStudy?.projectContent?.keyFeatures && project.caseStudy.projectContent.keyFeatures.length > 0 && (
-            <section className="key-features">
-              <h2>Key Features</h2>
-              <div className="features-grid">
-                {project.caseStudy.projectContent.keyFeatures.map((feature: any, index: number) => (
-                  <div key={index} className="feature-item">
-                    {feature.image && (
-                      <div className="feature-image">
-                        <Image
-                          src={feature.image.sourceUrl}
-                          alt={feature.image.altText || feature.title}
-                          width={feature.image.mediaDetails?.width || 400}
-                          height={feature.image.mediaDetails?.height || 300}
-                          className="feature-img"
-                        />
-                      </div>
-                    )}
-                    <div className="feature-content">
-                      <h3>{feature.title}</h3>
-                      <p>{feature.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Project Gallery */}
-          {project.caseStudy?.projectGallery && project.caseStudy.projectGallery.length > 0 && (
-            <section className="project-gallery">
-              <h2>Project Gallery</h2>
-              <div className="gallery-grid">
-                {project.caseStudy.projectGallery
-                  .filter((image: any) => image.url && image.url.trim() !== '')
-                  .map((image: any, index: number) => (
-                    <div key={index} className="gallery-item">
-                      <Image
-                        src={image.url}
-                        alt={image.alt || `${project.title} gallery image ${index + 1}`}
-                        width={image.width || 400}
-                        height={image.height || 300}
-                        className="gallery-image"
-                      />
-                    </div>
-                  ))}
-              </div>
-            </section>
-          )}
+            {/* Project Gallery */}
+            {project.caseStudy?.projectGallery && project.caseStudy.projectGallery.length > 0 && (
+              <section className="project-gallery">
+                <h2>{copy.galleryHeading}</h2>
+                <GalleryLightbox
+                  images={galleryImages(project.caseStudy.projectGallery, project.title)}
+                  labels={galleryLightboxLabels(siteContent)}
+                />
+              </section>
+            )}
+          </div>
         </div>
 
         {/* More Projects Section */}
-        <MoreProjects currentProjectSlug={slug} allProjects={allProjects} />
+        <MoreProjects
+          currentProjectSlug={slug}
+          allProjects={allProjects}
+          title={copy.moreProjectsHeading}
+          labels={projectCardLabels(siteContent)}
+        />
       </main>
       <Footer />
 
@@ -334,7 +304,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   );
 }
 
-// Enable ISR (Incremental Static Regeneration) — cached render refreshed at most
+// Enable ISR (Incremental Static Regeneration): cached render refreshed at most
 // once per 60s instead of fetching WordPress on every request. Next requires this
 // segment export to be a static literal (keep in sync with CMS_REVALIDATE = 60).
 export const revalidate = 60;

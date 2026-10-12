@@ -1,0 +1,107 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// Article contents (design C1). Desktop: sticky side column. Tablet and phone:
+// collapsed <details> above the text. Only one of the two is displayed.
+.article-toc {
+  // Sticky on the nav itself: its parent column spans the whole article height.
+  position: sticky;
+  top: $spacing-lg;
+  font-family: $font-family-base;
+
+  @include tablet {
+    position: static;
+  }
+
+  &__side {
+    @include tablet {
+      display: none;
+    }
+  }
+
+  &__collapsed {
+    display: none;
+    border: 1px solid rgba($white, 0.15);
+    border-radius: $border-radius-md;
+
+    @include tablet {
+      display: block;
+    }
+
+    &[open] .article-toc__list {
+      padding-bottom: $spacing-sm;
+    }
+  }
+
+  &__summary {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 $spacing-md;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: $white;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid $color-beige;
+      outline-offset: 2px;
+      border-radius: $border-radius-md;
+    }
+  }
+
+  &__heading {
+    margin: 0 0 calc($spacing-unit * 1.25);
+    font-family: $font-family-syncopate;
+    font-size: 11px;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: $text-light-gray;
+  }
+
+  &__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-left: 1px solid rgba($white, 0.1);
+
+    .article-toc__collapsed & {
+      margin: 0 $spacing-md;
+    }
+  }
+
+  &__link {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    margin-left: -1px;
+    padding: calc($spacing-unit * 0.75) 0 calc($spacing-unit * 0.75) calc($spacing-unit * 1.75);
+    font-size: $font-size-sm;
+    line-height: 1.4;
+    color: $text-light-gray;
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    transition:
+      color $transition-fast,
+      border-color $transition-fast;
+
+    &:hover {
+      color: $white;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $color-beige;
+      outline-offset: 2px;
+    }
+
+    &[aria-current] {
+      color: $color-beige;
+      border-left-color: $color-beige;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+  }
+}

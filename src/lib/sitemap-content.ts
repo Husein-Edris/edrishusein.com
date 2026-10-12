@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next';
-import { cmsRest } from './rest-client';
+import { cmsRest, isTransientCmsError } from './rest-client';
 
 export interface SitemapContentItem {
   slug: string;
@@ -8,14 +8,20 @@ export interface SitemapContentItem {
 }
 
 /**
- * Fetch slug + dates for a CMS content type for the sitemap. Returns [] on any
- * failure so the sitemap still generates (FR-4).
+ * Fetch slug + dates for a CMS content type for the sitemap.
+ *
+ * A transient CMS failure throws: ISR then keeps serving the last good sitemap.
+ * Returning [] here used to publish a sitemap with every post and project
+ * missing (28 URLs down to 9) and cache it for the whole revalidate window.
+ * A permanent answer (4xx, non-array body) still yields [] so the static pages
+ * are listed.
  */
 export async function fetchSitemapContent(restPath: string): Promise<SitemapContentItem[]> {
   try {
     const items = await cmsRest<SitemapContentItem[]>(restPath);
     return Array.isArray(items) ? items : [];
-  } catch {
+  } catch (error: unknown) {
+    if (isTransientCmsError(error)) throw error;
     return [];
   }
 }
@@ -47,7 +53,7 @@ export function toSitemapEntries(
     .filter((item) => item.slug)
     .map((item) => ({
       url: `${baseUrl}/${segment}/${item.slug}`,
-      // Omit lastModified entirely when no date is available — an epoch date
+      // Omit lastModified entirely when no date is available: an epoch date
       // (1970) would mislead crawlers into deprioritizing the page.
       lastModified: item.modified || item.date
         ? new Date((item.modified || item.date) as string)

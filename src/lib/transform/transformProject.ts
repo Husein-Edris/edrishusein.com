@@ -12,6 +12,11 @@ interface ProjectAcf {
   key_features?: Array<{ title?: string; description?: string }>;
   project_links?: { live_site?: string; github?: string };
   project_gallery?: Array<{ url?: string; alt?: string; width?: number; height?: number }>;
+  // "Project facts" sidebar group (theme inc/acf-fields/project-facts.php).
+  client?: unknown;
+  role?: unknown;
+  year?: unknown;
+  built_at?: unknown;
 }
 
 interface RestProjectDetail {
@@ -36,8 +41,16 @@ export interface CaseStudyProject {
     projectOverview: { technologies: Array<{ id: number; title: string; featuredImage: WordPressImage | null }> };
     projectContent: { challenge: string; solution: string; keyFeatures: Array<{ title: string; description: string }> };
     projectLinks: { liveSite: string; github: string };
-    projectGallery: Array<{ url?: string; alt?: string; width?: number; height?: number }>;
+    projectGallery: Array<{ url?: string; alt?: string; caption?: string; width?: number; height?: number }>;
   };
+  /** Sidebar facts; '' when the field is empty, so the row is hidden. */
+  facts: { client: string; role: string; year: string; builtAt: string };
+}
+
+/** A fact field as trimmed text. Numbers (year) are kept, anything else is ''. */
+function factText(value: unknown): string {
+  if (typeof value === 'number' && Number.isFinite(value)) return String(value);
+  return typeof value === 'string' ? decodeEntities(value.trim()) : '';
 }
 
 /** Tech-relation post IDs for a project (FR-8: used to resolve tech badge images separately). */
@@ -93,7 +106,13 @@ export function transformProject(
         liveSite: acf.project_links?.live_site ?? '',
         github: acf.project_links?.github ?? '',
       },
-      projectGallery: asArray<{ url?: string; alt?: string; width?: number; height?: number }>(acf.project_gallery),
+      projectGallery: asArray<{ url?: string; alt?: string; caption?: string; width?: number; height?: number }>(acf.project_gallery),
+    },
+    facts: {
+      client: factText(acf.client),
+      role: factText(acf.role),
+      year: factText(acf.year),
+      builtAt: factText(acf.built_at),
     },
   };
 }

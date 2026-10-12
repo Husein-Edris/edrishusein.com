@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Metadata } from 'next';
+import { getSiteContentOrDefaults } from '@/src/lib/site-content';
 
 export const metadata: Metadata = {
   title: 'Page Not Found - Edris Husein',
@@ -7,13 +8,16 @@ export const metadata: Metadata = {
   robots: 'noindex, nofollow',
 };
 
-export default function NotFound() {
+// Text from Site Content > Global. Never throws: a CMS error must not turn the
+// 404 page itself into an error page (see getSiteContentOrDefaults).
+export default async function NotFound() {
+  const copy = (await getSiteContentOrDefaults()).notFound;
   return (
     <div className="not-found-page">
       <div className="container">
-        <h2>Not Found</h2>
-        <p>Could not find the requested resource</p>
-        <Link href="/">Return Home</Link>
+        <h2>{copy.heading}</h2>
+        <p>{copy.text}</p>
+        <Link href="/">{copy.homeLinkLabel}</Link>
       </div>
     </div>
   );

@@ -1,0 +1,42 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// Static fallback (no WebGL, chunk blocked, or before the idle import): a
+// faint beige dot grid fading in from the bottom. The canvas replaces it.
+.hero-scene {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background-image:
+    radial-gradient(ellipse 70% 45% at 50% 100%, rgba($color-beige, 0.14), transparent 70%),
+    radial-gradient(circle at center, rgba($color-beige, 0.28) 1px, transparent 1.5px);
+  background-size: 100% 100%, $spacing-lg $spacing-lg;
+  // The fade keeps the upper half (where the copy sits) close to the page color.
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba($black, 0.25) 40%, $black 85%);
+  transition: background-image $transition-slow;
+
+  &--live {
+    background-image: none;
+  }
+
+  &__canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    animation: hero-scene-in 1200ms $ease-out-quart forwards;
+
+    @media (prefers-reduced-motion: reduce) {
+      opacity: 1;
+      animation: none;
+    }
+  }
+}
+
+@keyframes hero-scene-in {
+  to {
+    opacity: 1;
+  }
+}

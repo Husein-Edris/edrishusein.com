@@ -1,16 +1,17 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
+import TechGrid from '@/src/components/TechGrid/TechGrid';
+import { cmsRest, isTransientCmsError } from '@/src/lib/rest-client';
 import { rewriteImageUrls } from '@/src/lib/image-utils';
-import { cmsRest } from '@/src/lib/rest-client';
-import { transformMedia } from '@/src/lib/transform/transformMedia';
-import { rendered } from '@/src/lib/transform/transformProjects';
+import { buildTechGrid } from '@/src/lib/tech-usage';
+import { getSiteContent } from '@/src/lib/site-content';
 import { generateStructuredData, pageOpenGraph, safeJsonLd } from '@/src/lib/seo-utils';
 import '@/src/styles/pages/CaseStudy.scss';
 
-// Kept dynamic on purpose: the tech grid is shuffled per request (below).
-export const dynamic = 'force-dynamic';
+// ISR: the grid has a stable order (most used first), so the page is cached and
+// refreshed at most once per 60s. Static literal, keep in sync with CMS_REVALIDATE.
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: 'Tech Stack: Next.js, React & WordPress - Edris Husein',
@@ -23,44 +24,45 @@ export const metadata: Metadata = {
   }),
 };
 
-// Fisher-Yates shuffle algorithm for random array ordering
-function shuffleArray<T>(array: T[]): T[] {
-  const shuffled = [...array]; // Create a copy to avoid mutating original
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
+// Tech posts with their logo (featured image), categories and the optional usage_note.
+const TECHS_PATH =
+  '/tech?per_page=100&_embed=wp:featuredmedia&_fields=id,title,tech_category,acf_fields,_links,_embedded';
+// Category names for the filter buttons; tools without one go under "Other".
+const CATEGORIES_PATH = '/tech_category?per_page=100&_fields=id,name';
+// Projects; only the tech_stack relation is needed to count usage.
+const PROJECTS_PATH = '/project?per_page=100&acf_format=standard&_fields=id,acf_fields.project_overview';
+
+interface TechGridSources {
+  techs: unknown[];
+  projects: unknown[];
+  categories: unknown[];
 }
 
-async function getTechStackData() {
+const asList = (value: unknown): unknown[] => (Array.isArray(value) ? value : []);
+
+/**
+ * The three lists for the grid. A transient CMS failure rethrows so ISR keeps
+ * the last good render instead of caching a grid where every count is zero.
+ */
+async function getTechGridSources(): Promise<TechGridSources> {
   try {
-    const techs = await cmsRest<Array<{ id: number | string; title?: unknown; excerpt?: unknown; _embedded?: { 'wp:featuredmedia'?: unknown[] } }>>(
-      '/tech?_embed&per_page=100'
-    );
-    if (!Array.isArray(techs)) return [];
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`✅ ${techs.length} tech items loaded via REST API`);
-    }
-    return rewriteImageUrls(
-      techs.map((tech) => ({
-        id: String(tech.id),
-        title: rendered(tech.title as never),
-        excerpt: rendered(tech.excerpt as never),
-        featuredImage: transformMedia(tech._embedded?.['wp:featuredmedia']?.[0] as never),
-      }))
-    );
-  } catch (error) {
-    console.error('Error fetching tech stack:', error);
-    return [];
+    const [techs, projects, categories] = await Promise.all([
+      cmsRest<unknown>(TECHS_PATH),
+      cmsRest<unknown>(PROJECTS_PATH),
+      cmsRest<unknown>(CATEGORIES_PATH),
+    ]);
+    return { techs: asList(techs), projects: asList(projects), categories: asList(categories) };
+  } catch (error: unknown) {
+    if (isTransientCmsError(error)) throw error;
+    console.error('Error fetching tech stack:', error instanceof Error ? error.message : error);
+    return { techs: [], projects: [], categories: [] };
   }
 }
 
 export default async function TechStackPage() {
-  const techItems = await getTechStackData() || [];
-  
-  // Randomize the order of tech items on each page load
-  const randomizedTechItems = shuffleArray(techItems);
+  const [{ techs, projects, categories }, siteContent] = await Promise.all([getTechGridSources(), getSiteContent()]);
+  const copy = siteContent.techStackPage;
+  const grid = rewriteImageUrls(buildTechGrid(techs, projects, categories, copy));
 
   const webPageJsonLd = generateStructuredData('WebPage', {
     title: 'Tech Stack: Next.js, React & WordPress - Edris Husein',
@@ -79,48 +81,20 @@ export default async function TechStackPage() {
         {/* Hero Section */}
         <div className="hero-section">
           <div className="container">
-            <h1 className="title">TECH STACK</h1>
+            <h1 className="title">{copy.title}</h1>
             <div className="overview">
-              <p>The dev tools, apps, devices, and games I use and play with</p>
+              <p>{copy.intro}</p>
             </div>
           </div>
         </div>
 
         <div className="container">
-          {/* Tech Grid */}
           <section className="tech-section">
-            <div className="tech-grid">
-              {randomizedTechItems.length > 0 ? (
-                randomizedTechItems.map((tech: any) => (
-                  <div key={tech.id} className="tech-card">
-                    {tech.featuredImage?.node && (
-                      <div className="tech-image">
-                        <Image
-                          src={tech.featuredImage.node.sourceUrl}
-                          alt={tech.featuredImage.node.altText || tech.title}
-                          width={tech.featuredImage.node.mediaDetails?.width || 100}
-                          height={tech.featuredImage.node.mediaDetails?.height || 100}
-                          className="featured-image"
-                        />
-                      </div>
-                    )}
-                    <div className="tech-content">
-                      <h3 className="tech-title">{tech.title}</h3>
-                      {tech.excerpt && (
-                        <div
-                          className="tech-description"
-                          dangerouslySetInnerHTML={{ __html: tech.excerpt }}
-                        />
-                      )}
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="no-tech-message" style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
-                  <p>Tech stack information is currently being updated. Please check back later.</p>
-                </div>
-              )}
-            </div>
+            {grid.items.length > 0 ? (
+              <TechGrid items={grid.items} tabs={grid.tabs} labels={copy} />
+            ) : (
+              <p className="no-tech-message">{copy.emptyMessage}</p>
+            )}
           </section>
         </div>
       </main>
