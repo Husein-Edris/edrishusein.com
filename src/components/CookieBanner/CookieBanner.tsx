@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { notifyConsentChange } from '@/src/lib/consent';
+import { SITE_CONTENT_DEFAULTS, type CookieBannerContent } from '@/src/lib/transform/transformSiteContent';
 import './CookieBanner.scss';
 
 interface CookieConsent {
@@ -12,7 +13,12 @@ interface CookieConsent {
   functional: boolean;
 }
 
-const CookieBanner = () => {
+interface CookieBannerProps {
+  // Site Content > Cookie banner, passed from the root layout (server side).
+  copy?: CookieBannerContent;
+}
+
+const CookieBanner = ({ copy = SITE_CONTENT_DEFAULTS.cookieBanner }: CookieBannerProps) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -118,44 +124,23 @@ const CookieBanner = () => {
   return (
     <div className="cookie-banner" role="region" aria-label="Cookie consent">
       <div className="cookie-banner-content">
-        <div className="cookie-banner-main">
-          <h3 className="cookie-title">We use cookies</h3>
-          <p className="cookie-description">
-            We use cookies to enhance your browsing experience, serve personalized content,
-            and analyze our traffic. By clicking "Accept All", you consent to our use of cookies.
-          </p>
-
-          <div className="cookie-buttons">
-            <button
-              className="cookie-btn cookie-btn-accept"
-              onClick={handleAcceptAll}
-            >
-              Accept All
-            </button>
-            <button
-              className="cookie-btn cookie-btn-reject"
-              onClick={handleRejectAll}
-            >
-              Reject All
-            </button>
-            <Link
-              href="/cookie-settings"
-              className="cookie-btn cookie-btn-settings"
-            >
-              Cookie Settings
-            </Link>
-          </div>
-
-          <div className="cookie-links">
-            <Link href="/privacy-policy" className="cookie-link">
-              Privacy Policy
-            </Link>
-            <Link href="/imprint" className="cookie-link">
-              Imprint
-            </Link>
-          </div>
+        <p className="cookie-description">
+          {copy.text}{' '}
+          <Link href="/privacy-policy" className="cookie-link">
+            {copy.privacyLinkLabel}
+          </Link>
+        </p>
+        <div className="cookie-buttons">
+          <button type="button" className="cookie-btn cookie-btn-reject" onClick={handleRejectAll}>
+            {copy.rejectLabel}
+          </button>
+          <button type="button" className="cookie-btn cookie-btn-accept" onClick={handleAcceptAll}>
+            {copy.acceptLabel}
+          </button>
+          <Link href="/cookie-settings" className="cookie-settings-link">
+            {copy.settingsLabel}
+          </Link>
         </div>
-
       </div>
     </div>
   );

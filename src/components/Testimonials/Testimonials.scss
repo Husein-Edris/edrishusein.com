@@ -1,0 +1,271 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// Design S2: section label and counter on the left (~30%), one quote on the
+// right. Phones stack label, quote, attribution, then the counter row.
+// No cards; a hairline on top separates it from the hero.
+$testimonial-muted: $text-light-gray;
+$testimonial-logo-height: 28px;
+$testimonial-logo-max-width: 144px;
+
+.testimonials {
+  background-color: $primary-color;
+  border-top: 1px solid rgba($white, 0.12);
+  padding: $spacing-4xl $container-padding;
+  display: flex;
+  justify-content: center;
+
+  @include tablet {
+    padding: $spacing-3xl $container-padding-mobile;
+  }
+
+  @include mobile {
+    padding: $spacing-2xl $spacing-md;
+  }
+
+  &__container {
+    max-width: $desktop;
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 7fr);
+    column-gap: $spacing-3xl;
+    align-items: start;
+
+    @include tablet {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: $spacing-lg;
+    }
+  }
+
+  &__side {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+    padding-top: 6px;
+
+    // Stacked: label first, quote, then the counter row under the attribution.
+    @include tablet {
+      display: contents;
+    }
+  }
+
+  &__label {
+    margin: 0;
+    color: $color-beige;
+    font-family: $font-family-syncopate;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.1em;
+    line-height: 1.4;
+    text-transform: uppercase;
+
+    @include tablet {
+      order: 1;
+    }
+  }
+
+  // All quotes share one grid cell, so the section keeps the height of the
+  // longest quote and the page below does not jump on Prev/Next.
+  &__main {
+    min-width: 0;
+    display: grid;
+
+    @include tablet {
+      order: 2;
+    }
+  }
+
+  &__nav {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+
+    &[hidden] {
+      display: none;
+    }
+
+    @include tablet {
+      order: 3;
+    }
+  }
+
+  &__arrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: $border-radius-sm;
+    background: none;
+    color: $testimonial-muted;
+    font-family: $font-family-base;
+    font-size: $font-size-sm;
+    cursor: pointer;
+    transition: color $transition-base;
+
+    &:first-child {
+      padding-left: 0;
+    }
+
+    &:hover {
+      color: $white;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $color-beige;
+      outline-offset: 2px;
+    }
+  }
+
+  &__count {
+    margin: 0;
+    min-width: 5ch;
+    color: $testimonial-muted;
+    font-size: $font-size-sm;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+  }
+}
+
+.testimonial {
+  margin: 0;
+  grid-area: 1 / 1;
+  min-width: 0;
+
+  // Out of view and out of the accessibility tree, but still sizing the cell.
+  // A class, not [hidden]: Safari 27 did not restyle on the attribute change.
+  // Opacity plus its own layer as well: WebKit sometimes kept painting the old
+  // quote text after a visibility-only switch (seen in testing, names updated
+  // but the quote did not).
+  will-change: opacity;
+
+  &--off {
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  &__quote {
+    margin: 0;
+
+    p {
+      margin: 0;
+      max-width: 60ch;
+      color: $white;
+      font-family: $font-family-base;
+      font-size: clamp(19px, 0.9rem + 0.9vw, 27px);
+      font-weight: $font-weight-light;
+      line-height: 1.45;
+      letter-spacing: -0.005em;
+      text-wrap: pretty;
+
+      // Typographic quotes come from the design, not the CMS text.
+      &::before {
+        content: '\201C';
+      }
+
+      &::after {
+        content: '\201D';
+      }
+    }
+  }
+
+  &__by {
+    margin-top: $spacing-lg;
+  }
+
+  &__link,
+  &__line {
+    display: inline-flex;
+    align-items: center;
+    // Logo always stays left of the two text rows; long roles wrap inside.
+    flex-wrap: nowrap;
+    max-width: 100%;
+    column-gap: $spacing-md;
+    row-gap: 4px;
+    min-height: 44px;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  &__link {
+    border-radius: $border-radius-sm;
+
+    &:hover .testimonial__name {
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    &:hover .testimonial__logo {
+      opacity: 1;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $color-beige;
+      outline-offset: 4px;
+    }
+  }
+
+  // Monochrome: any logo colour becomes the muted text grey (#b3b3b3).
+  // Needs a transparent background (SVG or PNG with alpha).
+  &__logo {
+    display: block;
+    flex-shrink: 0;
+    // Size comes from the width/height attributes (already fitted to 28px tall,
+    // 144px max), so the box is reserved before the lazy image loads: no shift.
+    max-height: $testimonial-logo-height;
+    max-width: $testimonial-logo-max-width;
+    object-fit: contain;
+    filter: brightness(0) invert(0.7);
+    opacity: 0.9;
+    transition: opacity $transition-base;
+  }
+
+  &__name {
+    color: $white;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+  }
+
+  &__who {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    line-height: 1.3;
+  }
+
+  &__company {
+    color: $testimonial-muted;
+    font-size: $font-size-sm;
+  }
+}
+
+// Quote change: a short fade after the first Prev/Next, never on first paint.
+.testimonials--moved .testimonial:not(.testimonial--off) {
+  animation: testimonial-in 280ms ease-out;
+}
+
+@keyframes testimonial-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .testimonials--moved .testimonial:not(.testimonial--off) {
+    animation: none;
+  }
+
+  .testimonials__arrow,
+  .testimonial__logo {
+    transition: none;
+  }
+}

@@ -318,6 +318,27 @@ describe('SectionFactory', () => {
       expect(result).toHaveLength(6);
     });
 
+    it('shows projects only as the hero strip, highlighted lead in the middle frame', () => {
+      const site = (slug: string, highlighted = false) => ({
+        title: slug,
+        slug,
+        highlighted,
+        featuredImage: { node: { sourceUrl: `https://cms.example/${slug}.jpg`, altText: '', mediaDetails: { width: 1, height: 1 } } },
+        caseStudy: { projectLinks: { liveSite: `https://${slug}.at` } },
+      });
+      const projects = { projects: { nodes: [site('personal'), site('vlkh', true), site('illwerke', true), site('plugin')] } };
+
+      const result = SectionFactory.createHomepageSections(mockHomepageSections, projects, mockPostsResponse);
+      const frames = result[0].props.frames as { slug: string; isLead: boolean }[];
+
+      expect(result.find((s) => s.id === 'projects')).toBeUndefined();
+      // Flagged projects only (no fill): VLKH leads in the middle.
+      expect(frames.map((f) => [f.slug, f.isLead])).toEqual([
+        ['illwerke', false],
+        ['vlkh', true],
+      ]);
+    });
+
     it('should create sections in correct order', () => {
       const result = SectionFactory.createHomepageSections(
         mockHomepageSections,
@@ -327,7 +348,7 @@ describe('SectionFactory', () => {
 
       expect(result[0].id).toBe('hero');
       expect(result[0].order).toBe(1);
-      expect(result[1].id).toBe('projects');
+      expect(result[1].id).toBe('testimonials');
       expect(result[1].order).toBe(2);
       expect(result[2].id).toBe('about');
       expect(result[2].order).toBe(3);
@@ -347,23 +368,11 @@ describe('SectionFactory', () => {
       );
 
       expect(result[0].component).toBe('hero');
-      expect(result[1].component).toBe('projects');
+      expect(result[1].component).toBe('testimonials');
       expect(result[2].component).toBe('about');
       expect(result[3].component).toBe('infocards');
       expect(result[4].component).toBe('infocards');
       expect(result[5].component).toBe('contact');
-    });
-
-    it('should transform and include project cards', () => {
-      const result = SectionFactory.createHomepageSections(
-        mockHomepageSections,
-        mockProjectsResponse,
-        mockPostsResponse
-      );
-
-      const projectsSection = result.find(s => s.id === 'projects');
-      expect(projectsSection?.props.cards).toHaveLength(2);
-      expect((projectsSection?.props.cards as any[])[0].title).toBe('Test Project 1');
     });
 
     it('should transform and include post cards', () => {
@@ -408,8 +417,7 @@ describe('SectionFactory', () => {
         mockPostsResponse
       );
 
-      const projectsSection = result.find(s => s.id === 'projects');
-      expect(projectsSection?.props.cards).toEqual([]);
+      expect(result[0].props.frames).toEqual([]);
     });
 
     it('should handle empty posts data', () => {
@@ -430,27 +438,10 @@ describe('SectionFactory', () => {
         undefined
       );
 
-      const projectsSection = result.find(s => s.id === 'projects');
       const notebookSection = result.find(s => s.id === 'notebook');
 
-      expect(projectsSection?.props.cards).toEqual([]);
+      expect(result[0].props.frames).toEqual([]);
       expect(notebookSection?.props.cards).toEqual([]);
-    });
-
-    it('should include correct props for projects section', () => {
-      const result = SectionFactory.createHomepageSections(
-        mockHomepageSections,
-        mockProjectsResponse,
-        mockPostsResponse
-      );
-
-      const projectsSection = result.find(s => s.id === 'projects');
-      expect(projectsSection?.props.skin).toBe('projects');
-      expect(projectsSection?.props.variant).toBe('dark');
-      expect(projectsSection?.props.sectionNumber).toBe('01');
-      expect(projectsSection?.props.sectionTitle).toBe('Projects');
-      expect(projectsSection?.props.columns).toBe(3);
-      expect(projectsSection?.props.viewMoreLink).toBe('/projects');
     });
 
     it('should include correct props for notebook section', () => {
@@ -466,6 +457,25 @@ describe('SectionFactory', () => {
       expect(notebookSection?.props.sectionNumber).toBe('03');
       expect(notebookSection?.props.columns).toBe(3);
       expect(notebookSection?.props.viewMoreLink).toBe('/notebook');
+      expect(notebookSection?.props.viewMoreText).toBe('VIEW ALL ARTICLES');
+    });
+
+    it('uses the CMS notebook view-all link when filled and the defaults when blank', () => {
+      const filled = SectionFactory.createHomepageSections(
+        { ...mockHomepageSections, notebookSection: { title: 'NOTES', viewAllLabel: 'ALL NOTES', viewAllUrl: '/notes' } },
+        mockProjectsResponse,
+        mockPostsResponse,
+      ).find(s => s.id === 'notebook');
+      expect(filled?.props.viewMoreText).toBe('ALL NOTES');
+      expect(filled?.props.viewMoreLink).toBe('/notes');
+
+      const blank = SectionFactory.createHomepageSections(
+        { ...mockHomepageSections, notebookSection: { title: 'NOTES', viewAllLabel: ' ', viewAllUrl: '' } },
+        mockProjectsResponse,
+        mockPostsResponse,
+      ).find(s => s.id === 'notebook');
+      expect(blank?.props.viewMoreText).toBe('VIEW ALL ARTICLES');
+      expect(blank?.props.viewMoreLink).toBe('/notebook');
     });
 
     it('should use notebook title from ACF data', () => {

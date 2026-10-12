@@ -10,15 +10,14 @@ const homeFixture = JSON.parse(
 describe('transformHomepage', () => {
   const result = transformHomepage(homeFixture);
 
-  it('uses the constant hero title (no CMS field exists — C6)', () => {
+  it('keeps the constant name as hero title (the visible H1 is `heading`)', () => {
     expect(result.heroSection?.title).toBe('Edris Husein');
   });
 
-  it('reads hero copy from CMS but leaves the hero image to the static default', () => {
+  it('reads hero copy and the hero image from the CMS', () => {
     expect(result.heroSection?.heroCopy).toContain('web developer');
-    // Hero image is intentionally not sourced from the CMS (dormant Preview.svg);
-    // the Hero component supplies the static profile photo when this is undefined.
-    expect(result.heroSection?.heroImage).toBeUndefined();
+    // The fixture still holds the old Preview.svg; resolvePortrait() skips it.
+    expect(result.heroSection?.heroImage?.node.sourceUrl).toContain('Preview.svg');
   });
 
   it('maps about / bookshelf / techstack / notebook / contact groups', () => {
@@ -29,6 +28,60 @@ describe('transformHomepage', () => {
     expect(result.techstackSection?.featuredImage).toBeDefined();
     expect(result.notebookSection?.title).toBe('NOTEBOOK');
     expect(result.contactSection?.email).toBe('kontakt@edrishusein.com');
+  });
+
+  it('maps the hero copy and project label ACF fields', () => {
+    const page = {
+      acf_fields: {
+        hero_section: {
+          hero_eyebrow: 'Eyebrow',
+          hero_title: 'Heading',
+          hero_primary_cta_label: 'Email me',
+          hero_primary_cta_url: 'mailto:a@b.c',
+          hero_secondary_cta_label: 'See projects',
+          hero_secondary_cta_url: '/projects',
+        },
+        projects_section: {
+          title: 'Projects',
+          view_all_label: 'All work',
+          view_all_url: '/work',
+        },
+      },
+    };
+    const mapped = transformHomepage(page);
+    expect(mapped.heroSection).toMatchObject({
+      eyebrow: 'Eyebrow',
+      heading: 'Heading',
+      primaryCtaLabel: 'Email me',
+      primaryCtaUrl: 'mailto:a@b.c',
+      secondaryCtaLabel: 'See projects',
+      secondaryCtaUrl: '/projects',
+    });
+    expect(mapped.projectsSection).toEqual({
+      title: 'Projects',
+      viewAllLabel: 'All work',
+      viewAllUrl: '/work',
+    });
+  });
+
+  it('leaves new copy fields empty when the CMS has not saved them yet', () => {
+    // The live home page predates these fields, so get_fields() omits them.
+    expect(result.heroSection?.heading).toBe('');
+    expect(result.heroSection?.primaryCtaUrl).toBe('');
+    expect(result.projectsSection?.viewAllLabel).toBe('');
+    expect(result.notebookSection?.viewAllLabel).toBe('');
+    expect(result.aboutSection?.learnMoreLabel).toBe('');
+  });
+
+  it('maps the notebook view-all link and the about button', () => {
+    const mapped = transformHomepage({
+      acf_fields: {
+        about_me_section: { title: 'About', learn_more_label: 'More about me', learn_more_url: '/me' },
+        notebook_section: { title: 'NOTES', view_all_label: 'ALL NOTES', view_all_url: '/notes' },
+      },
+    });
+    expect(mapped.aboutSection).toMatchObject({ learnMoreLabel: 'More about me', learnMoreUrl: '/me' });
+    expect(mapped.notebookSection).toEqual({ title: 'NOTES', viewAllLabel: 'ALL NOTES', viewAllUrl: '/notes' });
   });
 
   it('falls back to light defaults when acf_fields is absent', () => {

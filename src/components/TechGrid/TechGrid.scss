@@ -1,0 +1,162 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// Tech stack logo grid (design A4): filter buttons, then one tile per tool.
+.tech-grid {
+  &__tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-lg;
+  }
+
+  &__tab {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-xs;
+    min-height: 44px;
+    padding: $spacing-sm calc($spacing-unit * 1.75);
+    font-family: $font-family-base;
+    font-size: $font-size-sm;
+    line-height: $line-height-tight;
+    color: $text-lighter-gray;
+    background: transparent;
+    border: 1px solid rgba($white, 0.22);
+    border-radius: $border-radius-full;
+    cursor: pointer;
+    transition:
+      background-color $transition-fast,
+      border-color $transition-fast,
+      color $transition-fast;
+
+    &:hover {
+      color: $white;
+      border-color: $text-light-gray;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $color-beige;
+      outline-offset: 3px;
+    }
+
+    &[aria-pressed='true'] {
+      color: $primary-color;
+      background: $white;
+      border-color: $white;
+
+      .tech-grid__tab-count {
+        color: $text-muted-on-light;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+  }
+
+  &__tab-count {
+    font-size: $font-size-xs;
+    color: $text-light-gray;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__status {
+    @include visually-hidden;
+  }
+
+  &__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+    gap: $spacing-md;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    // Two columns only on narrow phones; tablets keep auto-fill (4+ per row).
+    @media (max-width: 480px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: calc($spacing-unit * 1.5);
+    }
+  }
+
+  &__tile {
+    display: flex;
+    flex-direction: column;
+    padding: calc($spacing-unit * 1.5);
+    border: 1px solid rgba($white, 0.1);
+    border-radius: $border-radius-md;
+    background: rgba($text-light-gray, 0.04);
+    animation: tech-grid-in $animation-base $ease-out-quart both;
+
+    &[hidden] {
+      display: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  // Light backing so dark logos (jQuery, MySQL, Plesk) stay visible, as on the case study chips.
+  &__logo {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: rgba($white, 0.92);
+    border-radius: $border-radius-sm;
+
+    // Absolutely placed so the logo's intrinsic size never widens the tile.
+    img {
+      position: absolute;
+      inset: 22%;
+      width: 56%;
+      height: 56%;
+      object-fit: contain;
+    }
+  }
+
+  &__initial {
+    font-family: $font-family-syncopate;
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-bold;
+    color: $text-dark-gray;
+  }
+
+  &__name {
+    margin: calc($spacing-unit * 1.25) 0 0;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    line-height: $line-height-tight;
+    color: $white;
+    overflow-wrap: anywhere;
+  }
+
+  &__count {
+    margin: $spacing-xs 0 0;
+    font-size: $font-size-xs;
+    color: $text-light-gray;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__note {
+    margin: $spacing-xs 0 0;
+    font-size: $font-size-xs;
+    line-height: $line-height-base;
+    color: $color-beige;
+  }
+}
+
+@keyframes tech-grid-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

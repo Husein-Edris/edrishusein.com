@@ -1,6 +1,7 @@
 import type { ProjectsResponse, WordPressProject } from '@/src/types/wordpress';
 import { transformMedia } from './transformMedia';
 import { decodeEntities } from './decodeEntities';
+import { asBoolean } from './asBoolean';
 
 type Rendered = { rendered?: string } | string | undefined;
 
@@ -10,9 +11,23 @@ export interface RestProjectListItem {
   title?: Rendered;
   excerpt?: Rendered;
   _embedded?: { 'wp:featuredmedia'?: unknown[] };
-  acf_fields?: { project_links?: { live_site?: string; github?: string } };
-  acf?: { project_links?: { live_site?: string; github?: string } };
+  acf_fields?: ProjectListAcf;
+  acf?: ProjectListAcf;
 }
+
+interface ProjectListAcf {
+  project_links?: { live_site?: string; github?: string };
+  highlighted?: unknown;
+  // "Project facts" sidebar group (theme inc/acf-fields/project-facts.php).
+  built_at?: unknown;
+  showcase_video?: unknown;
+}
+
+const trimmedText = (value: unknown): string => (typeof value === 'string' ? decodeEntities(value.trim()) : '');
+
+// ACF file field (return format URL): a URL string when set, '' / false / null when empty.
+const httpUrl = (value: unknown): string =>
+  typeof value === 'string' && /^https?:\/\//i.test(value.trim()) ? value.trim() : '';
 
 export const rendered = (v: Rendered): string =>
   typeof v === 'string' ? v : v?.rendered ?? '';
@@ -28,6 +43,9 @@ export function transformProjectListItem(project: RestProjectListItem): WordPres
     excerpt: rendered(project.excerpt),
     slug: project.slug,
     featuredImage: transformMedia(featured as never) ?? undefined,
+    highlighted: asBoolean(acf.highlighted),
+    builtAt: trimmedText(acf.built_at),
+    showcaseVideo: httpUrl(acf.showcase_video),
     caseStudy: {
       projectLinks: {
         liveSite: acf.project_links?.live_site || '',

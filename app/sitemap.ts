@@ -5,7 +5,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://edrishusein.com';
 
   // Fetch dynamic content first so static index pages can derive an honest
-  // lastmod from their freshest child (returns [] on failure, sitemap still builds).
+  // lastmod from their freshest child. A CMS outage throws, so ISR keeps the last
+  // good sitemap instead of caching one without posts and projects.
   const [posts, projects] = await Promise.all([
     fetchSitemapContent('/posts?per_page=100&orderby=date&order=desc&_fields=slug,modified,date'),
     fetchSitemapContent('/project?per_page=100&orderby=date&order=desc&_fields=slug,modified,date'),

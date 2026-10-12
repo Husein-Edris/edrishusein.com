@@ -1,3 +1,4 @@
+import type { TestimonialsSection } from '@/src/lib/transform/transformTestimonials';
 // Core WordPress types matching GraphQL schema
 
 export interface WordPressImage {
@@ -23,6 +24,12 @@ export interface WordPressProject {
   excerpt: string;
   slug: string;
   featuredImage?: WordPressImage;
+  /** ACF true_false `highlighted`: feature this project on /projects. */
+  highlighted?: boolean;
+  /** Project facts `built_at` (e.g. Freelance); '' when empty. */
+  builtAt?: string;
+  /** Project facts `showcase_video` file URL for the homepage hero; '' when empty. */
+  showcaseVideo?: string;
   caseStudy?: {
     projectLinks?: {
       liveSite?: string;
@@ -75,15 +82,28 @@ export interface HeroSection {
   title?: string;
   heroCopy?: string;
   heroImage?: ACFImage;
+  /** Visible copy; empty means the Hero component's built-in default renders. */
+  eyebrow?: string;
+  heading?: string;
+  primaryCtaLabel?: string;
+  primaryCtaUrl?: string;
+  secondaryCtaLabel?: string;
+  secondaryCtaUrl?: string;
 }
 
 export interface ProjectsSection {
   title?: string;
+  /** "View all" link next to the homepage section title; empty means the code default renders. */
+  viewAllLabel?: string;
+  viewAllUrl?: string;
 }
 
 export interface AboutSection {
   title?: string;
   aboutMeText?: string;
+  /** "Learn more about me" button; empty means the code default renders. */
+  learnMoreLabel?: string;
+  learnMoreUrl?: string;
 }
 
 export interface BookshelfSection {
@@ -100,6 +120,9 @@ export interface TechStackSection {
 
 export interface NotebookSection {
   title?: string;
+  /** "View all" link next to the homepage section title; empty means the code default renders. */
+  viewAllLabel?: string;
+  viewAllUrl?: string;
 }
 
 export interface ContactSection {
@@ -116,6 +139,8 @@ export interface HomepageSections {
   techstackSection?: TechStackSection;
   notebookSection?: NotebookSection;
   contactSection?: ContactSection;
+  // Set by DataFetcher.getHomepageData() from the same home page REST response.
+  testimonialsSection?: TestimonialsSection;
 }
 
 export interface ProjectsResponse {

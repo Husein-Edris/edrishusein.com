@@ -1,39 +1,6 @@
 @use '../../styles/variables' as *;
 @use '../../styles/mixins' as *;
 
-// Animation classes for About section
-.about-header-animated {
-  @include fade-in-up;
-}
-
-.animated-description {
-  @include fade-in-up;
-  
-  // Animate individual paragraphs and headings with staggered delay
-  p, h3, ul {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 600ms $ease-out-expo, transform 600ms $ease-out-expo;
-    
-    @for $i from 1 through 10 {
-      &:nth-child(#{$i}) {
-        transition-delay: #{$i * 150}ms;
-      }
-    }
-  }
-  
-  &.animate-in {
-    p, h3, ul {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-}
-
-.animated-cta {
-  @include scale-in;
-}
-
 .about {
   background-color: $bg-light;
   padding: $container-padding;
@@ -51,6 +18,10 @@
 
   .container {
     max-width: $desktop;
+    // Flex child: without these a long word sets min-content wider than a 320px screen.
+    width: 100%;
+    min-width: 0;
+    overflow-wrap: anywhere;
 
     .description {
       color: $secondary-color;
@@ -130,8 +101,10 @@
 
         @include mobile {
           width: 100%;
+          white-space: normal;
+          text-align: center;
         }
-        
+
       }
     }
   }

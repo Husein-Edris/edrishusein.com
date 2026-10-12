@@ -3,6 +3,8 @@ import { transformMedia } from './transformMedia';
 import { rendered } from './transformProjects';
 import { decodeEntities } from './decodeEntities';
 import { asArray } from './asArray';
+import { resolveReadingTime } from '../reading-time';
+import { detectContentLanguage, type ContentLanguage } from '../detect-language';
 
 interface RestTerm { name?: string; slug?: string; taxonomy?: string }
 
@@ -40,7 +42,12 @@ export interface PostListItem {
   date: string;
   modified: string;
   featuredImage: WordPressImage | null;
-  readingTime: string;
+  /** Minutes: the ACF reading_time when plausible, else computed from the content. */
+  readingMinutes: number;
+  /** The ACF reading_time that was ignored as implausible (see resolveReadingTime), else null. */
+  rejectedReadingTime: number | null;
+  /** Stopword guess over title, excerpt and the start of the content. */
+  language: ContentLanguage;
 }
 
 export interface PostDetail extends PostListItem {
@@ -52,38 +59,34 @@ export interface PostDetail extends PostListItem {
   conclusionSection: { conclusionTitle: string; conclusionPoints: Array<{ pointText: string }> } | null;
 }
 
-const WORDS_PER_MINUTE = 200;
-
-export function calculateReadingTime(html: string): string {
-  const words = html.replace(/<[^>]*>/g, '').split(/\s+/).filter(Boolean).length;
-  return `${Math.max(1, Math.ceil(words / WORDS_PER_MINUTE))} min read`;
-}
-
-function readingTimeFrom(acf: PostAcf | undefined, content: string): string {
-  const rt = acf?.reading_time;
-  if (rt !== undefined && rt !== null && `${rt}`.trim() !== '') {
-    // ACF stores a bare number of minutes; present it consistently.
-    return /^\d+$/.test(`${rt}`.trim()) ? `${rt} min read` : `${rt}`;
-  }
-  return calculateReadingTime(content);
+/** Text the language guess reads: title, excerpt and the first 1000 characters of content. */
+export function languageSample(title: string, excerpt: string, content: string): string {
+  return `${title} ${excerpt} ${content.slice(0, 1000)}`;
 }
 
 /** REST post → list/grid item (notebook list, homepage notebook, "more articles"). */
 export function transformPostListItem(post: RestPost): PostListItem {
   const featured = post._embedded?.['wp:featuredmedia']?.[0];
+  const title = decodeEntities(rendered(post.title));
+  const excerpt = rendered(post.excerpt);
+  // List requests may omit content (_fields); the excerpt then stands in for the word count.
+  const content = rendered(post.content);
+  const readingTime = resolveReadingTime(post.acf?.reading_time, content || excerpt);
   return {
     id: String(post.id),
-    title: decodeEntities(rendered(post.title)),
-    excerpt: rendered(post.excerpt),
+    title,
+    excerpt,
     slug: post.slug,
     date: post.date ?? '',
     modified: post.modified ?? post.date ?? '',
     featuredImage: transformMedia(featured as never),
-    readingTime: readingTimeFrom(post.acf, rendered(post.excerpt)),
+    readingMinutes: readingTime.minutes,
+    rejectedReadingTime: readingTime.rejectedCmsValue,
+    language: detectContentLanguage(languageSample(title, excerpt, content)),
   };
 }
 
-/** REST post → full article detail (notebook/[slug], api/post?slug). */
+/** REST post → full article detail (notebook/[slug]). */
 export function transformPostDetail(post: RestPost): PostDetail {
   const content = rendered(post.content);
   const termGroups = post._embedded?.['wp:term'] ?? [];
@@ -97,7 +100,6 @@ export function transformPostDetail(post: RestPost): PostDetail {
   return {
     ...transformPostListItem(post),
     content,
-    readingTime: readingTimeFrom(acf, content || rendered(post.excerpt)),
     author: authorNode
       ? {
           name: authorNode.name ?? 'Edris Husein',

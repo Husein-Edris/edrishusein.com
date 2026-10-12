@@ -1,0 +1,41 @@
+@use '../../styles/variables' as *;
+
+.post-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $spacing-xs 0;
+  margin: 0;
+  font-family: $font-family-base;
+  font-size: 13px;
+  line-height: $line-height-base;
+  color: $text-light-gray;
+  font-variant-numeric: tabular-nums;
+
+  &__item {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  &__dot {
+    margin: 0 $spacing-sm;
+  }
+
+  &__lang {
+    display: inline-block;
+    padding: 3px 6px;
+    font-family: $font-family-syncopate;
+    font-size: 9px;
+    font-weight: $font-weight-bold;
+    line-height: 1.2;
+    letter-spacing: 0.1em;
+    color: $text-lighter-gray;
+    border: 1px solid rgba($white, 0.22);
+    border-radius: 3px;
+
+    &--de {
+      color: $color-beige;
+      border-color: rgba($color-beige, 0.6);
+    }
+  }
+}

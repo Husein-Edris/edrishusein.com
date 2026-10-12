@@ -3,6 +3,14 @@ import { transformMedia, type RestMedia } from './transformMedia';
 import { rendered } from './transformProjects';
 import { decodeEntities } from './decodeEntities';
 import { asArray } from './asArray';
+import { cmsText } from '../cms-text';
+
+// Code fallbacks for About page fields (theme inc/acf-fields/about-page.php,
+// same strings as the fields' default_value). Map: docs/acf-content-map.md.
+export const ABOUT_TEXT_DEFAULTS = {
+  technologiesLabel: 'Technologies:',
+  hobbiesTitle: 'Interests & Hobbies',
+} as const;
 
 interface RelationPost {
   ID?: number;
@@ -12,12 +20,25 @@ interface RelationPost {
   post_content?: string;
 }
 
-interface ExperienceItem {
+// `technologies` is an ACF relationship to the Tech CPT. Over REST it arrives as
+// tech post IDs (or `false` when empty); older content stored a plain string.
+type TechReference = number | string | { ID?: number; id?: number; post_title?: string };
+
+interface RestExperienceItem {
   company_name?: string;
   position?: string;
   duration?: string;
   description?: string;
-  technologies?: string;
+  technologies?: string | TechReference[] | false;
+}
+
+interface ExperienceItem {
+  company_name: string;
+  position: string;
+  duration: string;
+  description: string;
+  /** Comma-separated tech names; '' when none resolve (the row is hidden). */
+  technologies: string;
 }
 
 interface AboutAcf {
@@ -25,12 +46,14 @@ interface AboutAcf {
   about_hero_subtitle?: string;
   about_hero_image?: RestMedia;
   experience_section_title?: string;
-  experience_items?: ExperienceItem[];
+  experience_technologies_label?: string;
+  experience_items?: RestExperienceItem[];
   skills_section_title?: string;
   selected_skills?: RelationPost[];
   personal_section_title?: string;
   personal_content?: string;
   personal_image?: RestMedia;
+  hobbies_section_title?: string;
   selected_hobbies?: RelationPost[];
 }
 
@@ -55,12 +78,13 @@ export interface AboutPageData {
       aboutHeroTitle: string;
       aboutHeroSubtitle: string;
       aboutHeroImage: WordPressImage | null;
-      experienceSection: { sectionTitle: string; experienceItems: Required<ExperienceItem>[] };
+      experienceSection: { sectionTitle: string; technologiesLabel: string; experienceItems: ExperienceItem[] };
       skillsSection: { sectionTitle: string; selectedSkills: RelationItem[] };
       personalSection: {
         sectionTitle: string;
         personalContent: string;
         personalImage: WordPressImage | null;
+        hobbiesTitle: string;
         selectedHobbies: RelationItem[];
       };
     };
@@ -76,13 +100,54 @@ function mapRelation(items: RelationPost[] | undefined): RelationItem[] {
   }));
 }
 
+function techId(ref: TechReference): number {
+  if (typeof ref === 'number') return ref;
+  if (typeof ref === 'string') return Number(ref);
+  return Number(ref.ID ?? ref.id);
+}
+
+function experienceTechRefs(items: RestExperienceItem[] | undefined): TechReference[] {
+  return asArray<RestExperienceItem>(items).flatMap((item) =>
+    Array.isArray(item.technologies) ? item.technologies : []
+  );
+}
+
+/** Unique Tech CPT IDs referenced by experience items, for a `/tech?include=` lookup. */
+export function extractExperienceTechIds(page: RestAboutPage): number[] {
+  const acf = page.acf_fields ?? page.acf ?? {};
+  const ids = experienceTechRefs(acf.experience_items)
+    .map(techId)
+    .filter((n) => Number.isFinite(n) && n > 0);
+  return [...new Set(ids)];
+}
+
+function techNamesFor(
+  technologies: RestExperienceItem['technologies'],
+  techNames: Map<number, string>
+): string {
+  if (typeof technologies === 'string') return technologies;
+  if (!Array.isArray(technologies)) return '';
+  return technologies
+    .map((ref) =>
+      typeof ref === 'object' && ref.post_title
+        ? decodeEntities(ref.post_title)
+        : techNames.get(techId(ref))
+    )
+    .filter((name): name is string => Boolean(name))
+    .join(', ');
+}
+
 /**
  * Transform the WordPress REST `about-me` page into the `AboutPageData` shape the
  * About page consumes. Relation fields (`selected_skills`, `selected_hobbies`)
- * already resolve to full post objects, so no extra CPT fetches are needed.
+ * already resolve to full post objects. Experience `technologies` arrive as tech
+ * IDs, so the caller resolves names (via `/tech?include=`) and passes them in.
  * SEO is handled separately (RankMath, feature 009).
  */
-export function transformAbout(page: RestAboutPage): AboutPageData {
+export function transformAbout(
+  page: RestAboutPage,
+  techNames: Map<number, string> = new Map()
+): AboutPageData {
   const acf = page.acf_fields ?? page.acf ?? {};
   const featured = page._embedded?.['wp:featuredmedia']?.[0];
 
@@ -98,12 +163,13 @@ export function transformAbout(page: RestAboutPage): AboutPageData {
         aboutHeroImage: transformMedia(acf.about_hero_image),
         experienceSection: {
           sectionTitle: acf.experience_section_title || 'Experience',
-          experienceItems: asArray<ExperienceItem>(acf.experience_items).map((item) => ({
+          technologiesLabel: cmsText(acf.experience_technologies_label, ABOUT_TEXT_DEFAULTS.technologiesLabel),
+          experienceItems: asArray<RestExperienceItem>(acf.experience_items).map((item) => ({
             company_name: item.company_name ?? '',
             position: item.position ?? '',
             duration: item.duration ?? '',
             description: item.description ?? '',
-            technologies: item.technologies ?? '',
+            technologies: techNamesFor(item.technologies, techNames),
           })),
         },
         skillsSection: {
@@ -114,6 +180,7 @@ export function transformAbout(page: RestAboutPage): AboutPageData {
           sectionTitle: acf.personal_section_title || 'Personal',
           personalContent: acf.personal_content ?? '',
           personalImage: transformMedia(acf.personal_image),
+          hobbiesTitle: cmsText(acf.hobbies_section_title, ABOUT_TEXT_DEFAULTS.hobbiesTitle),
           selectedHobbies: mapRelation(acf.selected_hobbies),
         },
       },

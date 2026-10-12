@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { cmsRest, CmsRequestError } from './rest-client';
+import { cmsRest, CmsRequestError, isTransientCmsError } from './rest-client';
 import { CMS_REVALIDATE } from './config';
 
 const mockFetch = vi.fn();
@@ -128,5 +128,20 @@ describe('cmsRest', () => {
       /500/
     );
     expect(mockFetch).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('isTransientCmsError', () => {
+  it('is true for a transient CmsRequestError (5xx, timeout, 429)', () => {
+    expect(isTransientCmsError(new CmsRequestError('500', { status: 500, isTransient: true }))).toBe(true);
+  });
+
+  it('is false for a permanent CmsRequestError (4xx)', () => {
+    expect(isTransientCmsError(new CmsRequestError('404', { status: 404, isTransient: false }))).toBe(false);
+  });
+
+  it('is false for any other error', () => {
+    expect(isTransientCmsError(new Error('boom'))).toBe(false);
+    expect(isTransientCmsError('boom')).toBe(false);
   });
 });

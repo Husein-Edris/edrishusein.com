@@ -6,9 +6,10 @@
  * In production this is a no-op.
  */
 
-const wpBase = process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.replace('/graphql', '') || '';
-const isLocalCms = process.env.NODE_ENV === 'development' && wpBase.includes('.local');
-const uploadPrefix = `${wpBase}/wp-content/uploads/`;
+import { CMS_BASE_URL } from './config';
+
+const isLocalCms = process.env.NODE_ENV === 'development' && CMS_BASE_URL.includes('.local');
+const uploadPrefix = `${CMS_BASE_URL}/wp-content/uploads/`;
 
 export function rewriteUploadUrl(url: string): string {
   if (!isLocalCms) return url;

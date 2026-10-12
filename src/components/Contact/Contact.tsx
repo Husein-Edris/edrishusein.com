@@ -8,14 +8,14 @@ interface ContactProps {
     title?: string;
     email?: string;
   }
-  /** Optional short paragraph shown under the email — used to give the standalone /contact page more presence. */
+  /** Optional short paragraph shown under the email: used to give the standalone /contact page more presence. */
   intro?: string;
 }
 
 const Contact = ({ data, intro }: ContactProps) => {
   // Use data from props if available, otherwise use fallbacks
-  const subtitle = data?.subTitle || "WANT TO WORK TOGETHER?";
-  const title = data?.title || "SAY HI!";
+  const subtitle = data?.subTitle || "Freelance WordPress and Next.js work";
+  const title = data?.title || "Start a project";
   const email = data?.email || "kontakt@edrishusein.com";
 
   return (

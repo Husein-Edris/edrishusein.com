@@ -434,4 +434,11 @@
       }
     }
   }
+
+  // Narrow phones: the decorative line would run past the screen edge.
+  @media (max-width: 480px) {
+    .section-title::after {
+      display: none;
+    }
+  }
 }

@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 import LegalPage, { getLegalPageData, generateLegalMetadata } from '@/src/components/LegalPage/LegalPage';
 
-// Force dynamic rendering for fresh content
-export const dynamic = 'force-dynamic';
+// ISR: cached render refreshed at most once per 60s (keep in sync with CMS_REVALIDATE = 60).
+export const revalidate = 60;
 
 // Generate metadata for the privacy policy page
 export async function generateMetadata(): Promise<Metadata> {

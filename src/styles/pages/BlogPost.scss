@@ -89,7 +89,10 @@
             color: rgba($primary-dark, 0.8);
             text-decoration: none;
             transition: color $transition-base;
-           
+            // 44px tap target without changing the line.
+            display: inline-flex;
+            align-items: center;
+            min-height: 44px;
 
             &:hover {
               color: $primary-dark;
@@ -915,4 +918,63 @@
       }
     }
   }
+}
+// Article template (design C1): centered header, 68ch text column, sticky
+// contents column on desktop (ArticleToc). The third column mirrors the
+// contents width so the text stays centered on the page.
+.blog-post {
+  .article-header__meta {
+    justify-content: center;
+    margin-bottom: $spacing-md;
+  }
+
+  .article-layout {
+    margin-top: $spacing-2xl;
+
+    @include mobile {
+      margin-top: $spacing-xl;
+    }
+
+    &--with-toc {
+      display: grid;
+      grid-template-columns: 200px minmax(0, 68ch) 200px;
+      justify-content: center;
+      gap: $spacing-xl;
+
+      @media (max-width: $desktop) {
+        grid-template-columns: 200px minmax(0, 68ch);
+      }
+
+      @include tablet {
+        grid-template-columns: minmax(0, 1fr);
+        gap: $spacing-lg;
+      }
+    }
+
+    &__toc {
+      align-self: stretch;
+
+      @include tablet {
+        max-width: 68ch;
+        width: 100%;
+        margin: 0 auto;
+      }
+    }
+
+    .article-content {
+      width: 100%;
+    }
+
+    // Leave room above a heading reached through a contents link.
+    .content h2[id] {
+      scroll-margin-top: $spacing-lg;
+    }
+  }
+}
+
+// Article breadcrumbs: 44px tap targets (the C1 header no longer nests them in .post-meta).
+nav.breadcrumbs a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
 }

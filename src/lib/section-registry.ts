@@ -1,8 +1,10 @@
 // Section registry for dynamic section rendering
 import { HomepageSections, TransformedProject, InfoCardData } from '@/src/types/wordpress';
+import { buildHeroCopyLinks, buildHeroFrames } from '@/src/lib/hero-frames';
+import { cmsText } from '@/src/lib/cms-text';
 
 // Component types
-export type ComponentType = 'hero' | 'about' | 'projects' | 'infocards' | 'contact';
+export type ComponentType = 'hero' | 'about' | 'projects' | 'infocards' | 'testimonials' | 'contact';
 
 // Section configuration type
 export interface SectionConfig {
@@ -105,26 +107,23 @@ export class SectionFactory {
     projectsData: unknown,
     postsData: unknown
   ): SectionConfig[] {
+    // Projects appear only as the hero strip (design H9); the separate homepage
+    // projects section was removed 2026-10-12 because it repeated the same work.
     const projectNodes = (projectsData as any)?.projects?.nodes || [];
-    const transformedProjects = SectionTransformers.transformProjects(projectNodes);
     
     const postNodes = (postsData as any)?.posts?.nodes || [];
     const transformedPosts = SectionTransformers.transformPosts(postNodes);
 
     return [
       createSectionConfig('hero', 'hero', {
-        data: homepageData?.heroSection
+        data: homepageData?.heroSection,
+        frames: buildHeroFrames(projectNodes),
+        copyLinks: buildHeroCopyLinks(projectNodes)
       }, 1),
 
-      createSectionConfig('projects', 'projects', {
-        skin: 'projects',
-        variant: 'dark',
-        sectionNumber: '01',
-        sectionTitle: 'Projects',
-        columns: 3,
-        cards: transformedProjects,
-        viewMoreLink: '/projects',
-        viewMoreText: 'VIEW ALL PROJECTS'
+      // Testimonials sit right after the hero, which now holds the projects.
+      createSectionConfig('testimonials', 'testimonials', {
+        data: homepageData?.testimonialsSection
       }, 2),
 
       createSectionConfig('about', 'about', {
@@ -145,8 +144,8 @@ export class SectionFactory {
         sectionTitle: homepageData?.notebookSection?.title || 'NOTEBOOK',
         columns: 3,
         cards: transformedPosts,
-        viewMoreLink: '/notebook',
-        viewMoreText: 'VIEW ALL ARTICLES'
+        viewMoreLink: cmsText(homepageData?.notebookSection?.viewAllUrl, '/notebook'),
+        viewMoreText: cmsText(homepageData?.notebookSection?.viewAllLabel, 'VIEW ALL ARTICLES')
       }, 5),
 
       createSectionConfig('contact', 'contact', {
