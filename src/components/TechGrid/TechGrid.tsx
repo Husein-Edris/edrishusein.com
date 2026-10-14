@@ -2,13 +2,13 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { ALL_KEY, formatCaseStudyCount, isInFilter, type TechFilterTab, type TechGridItem } from '@/src/lib/tech-usage';
+import { ALL_KEY, isInFilter, type TechFilterTab, type TechGridItem } from '@/src/lib/tech-usage';
 import { fillLabel, type SiteContent } from '@/src/lib/transform/transformSiteContent';
 import './TechGrid.scss';
 
 export type TechGridLabels = Pick<
   SiteContent['techStackPage'],
-  'filterLabel' | 'statusFormat' | 'countNone' | 'countOne' | 'countMany'
+  'filterLabel' | 'statusFormat'
 >;
 
 interface TechGridProps {
@@ -67,7 +67,7 @@ export default function TechGrid({ items, tabs, labels }: TechGridProps) {
               )}
             </div>
             <p className="tech-grid__name">{item.title}</p>
-            <p className="tech-grid__count">{formatCaseStudyCount(item.count, labels)}</p>
+            {item.description && <p className="tech-grid__desc">{item.description}</p>}
             {item.usageNote && <p className="tech-grid__note">{item.usageNote}</p>}
           </li>
         ))}

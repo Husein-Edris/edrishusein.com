@@ -242,6 +242,8 @@
     &__link {
       display: inline-flex;
       align-items: center;
+      // Flex drops the space before the arrow, so the gap keeps it off the text.
+      gap: 0.3em;
       min-height: 44px;
       color: $color-beige;
       text-decoration: underline;
@@ -627,10 +629,13 @@
           border-bottom: 1px solid rgba($text-light-gray, 0.2);
         }
 
+        // Header row: white on a light band with a beige rule (the beige fill
+        // with dark text read as muddy on the dark page).
         th {
-          background: $color-beige;
-          color: $primary-dark;
+          background: rgba($white, 0.08);
+          color: $white;
           font-weight: 600;
+          border-bottom: 2px solid $color-beige;
         }
 
         td {

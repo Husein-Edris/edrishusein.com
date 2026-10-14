@@ -134,11 +134,11 @@
     overflow-wrap: anywhere;
   }
 
-  &__count {
+  &__desc {
     margin: $spacing-xs 0 0;
     font-size: $font-size-xs;
+    line-height: $line-height-base;
     color: $text-light-gray;
-    font-variant-numeric: tabular-nums;
   }
 
   &__note {

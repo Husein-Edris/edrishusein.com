@@ -318,7 +318,7 @@ describe('SectionFactory', () => {
       expect(result).toHaveLength(6);
     });
 
-    it('shows projects only as the hero strip, highlighted lead in the middle frame', () => {
+    it('shows projects only as the hero strip, highlighted lead first', () => {
       const site = (slug: string, highlighted = false) => ({
         title: slug,
         slug,
@@ -332,10 +332,10 @@ describe('SectionFactory', () => {
       const frames = result[0].props.frames as { slug: string; isLead: boolean }[];
 
       expect(result.find((s) => s.id === 'projects')).toBeUndefined();
-      // Flagged projects only (no fill): VLKH leads in the middle.
+      // Flagged projects only (no fill): VLKH leads (CSS puts it in the middle column).
       expect(frames.map((f) => [f.slug, f.isLead])).toEqual([
-        ['illwerke', false],
         ['vlkh', true],
+        ['illwerke', false],
       ]);
     });
 

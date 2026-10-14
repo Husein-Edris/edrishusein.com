@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { WordPressProject } from '@/src/types/wordpress';
-import { arrangeForStrip, buildHeroCopyLinks, buildHeroFrames, selectHeroProjects, HERO_FRAME_COUNT } from './hero-frames';
+import { buildHeroCopyLinks, buildHeroFrames, selectHeroProjects, HERO_FRAME_COUNT } from './hero-frames';
 
 const image = (sourceUrl: string) => ({
   node: { sourceUrl, altText: '', mediaDetails: { width: 1600, height: 1000 } },
@@ -64,16 +64,8 @@ describe('selectHeroProjects', () => {
   });
 });
 
-describe('arrangeForStrip', () => {
-  it('places the lead project in the middle column', () => {
-    expect(arrangeForStrip(['lead', 'second', 'third'])).toEqual(['second', 'lead', 'third']);
-    expect(arrangeForStrip(['lead', 'second'])).toEqual(['second', 'lead']);
-    expect(arrangeForStrip(['lead'])).toEqual(['lead']);
-  });
-});
-
 describe('buildHeroFrames', () => {
-  it('maps projects to frames in strip order with the lead flagged', () => {
+  it('maps projects to frames, lead first and flagged', () => {
     const frames = buildHeroFrames([
       ...PROD_ORDER.slice(0, 5),
       client('fhe-gastro-website-relaunch', 'https://www.fhe.at/', {
@@ -83,11 +75,11 @@ describe('buildHeroFrames', () => {
     ]);
 
     expect(frames.map((f) => [f.slug, f.isLead])).toEqual([
-      ['geschaftsbericht-fur-vorarlberger-landeskrankenhauser', false],
       ['illwerke-vkw-website-relaunch', true],
+      ['geschaftsbericht-fur-vorarlberger-landeskrankenhauser', false],
       ['fhe-gastro-website-relaunch', false],
     ]);
-    expect(frames[1]).toMatchObject({
+    expect(frames[0]).toMatchObject({
       href: '/projects/illwerke-vkw-website-relaunch',
       domain: 'lehre.illwerkevkw.at',
       builtAt: '',

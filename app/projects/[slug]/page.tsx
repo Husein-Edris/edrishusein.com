@@ -11,7 +11,7 @@ import { rewriteImageUrls } from '@/src/lib/image-utils';
 import { getSiteContent } from '@/src/lib/site-content';
 import { galleryLightboxLabels, projectCardLabels } from '@/src/lib/transform/transformSiteContent';
 import { decodeEntities } from '@/src/lib/transform/decodeEntities';
-import { cmsRest } from '@/src/lib/rest-client';
+import { cmsRest, isTransientCmsError } from '@/src/lib/rest-client';
 import { transformProject, extractTechIds } from '@/src/lib/transform/transformProject';
 import { transformProjects } from '@/src/lib/transform/transformProjects';
 import { transformMedia } from '@/src/lib/transform/transformMedia';
@@ -101,6 +101,7 @@ async function getAllProjectsForMoreProjects() {
     if (!Array.isArray(projects)) return null;
     return rewriteImageUrls(transformProjects(projects as never));
   } catch (error) {
+    if (isTransientCmsError(error)) throw error;
     console.error('Error fetching projects for MoreProjects:', error);
     return null;
   }
@@ -119,6 +120,9 @@ async function resolveTechImages(ids: number[]): Promise<Map<number, WordPressIm
       map.set(Number(tech.id), transformMedia(tech._embedded?.['wp:featuredmedia']?.[0] as never));
     }
   } catch (error) {
+    // A CMS fault must not be cached as a page without badges: rethrow so ISR
+    // keeps serving the last good render. Anything else degrades to no icons.
+    if (isTransientCmsError(error)) throw error;
     console.error('Error resolving tech images:', error);
   }
   return map;

@@ -4,7 +4,6 @@ import {
   OTHER_KEY,
   buildTechGrid,
   caseStudyCountsByTech,
-  formatCaseStudyCount,
   isInFilter,
 } from './tech-usage';
 import { SITE_CONTENT_DEFAULTS } from './transform/transformSiteContent';
@@ -30,18 +29,6 @@ describe('caseStudyCountsByTech', () => {
   });
 });
 
-describe('formatCaseStudyCount', () => {
-  it('uses the none, one and many labels', () => {
-    expect(formatCaseStudyCount(0, labels)).toBe('No case study yet');
-    expect(formatCaseStudyCount(1, labels)).toBe('1 case study');
-    expect(formatCaseStudyCount(7, labels)).toBe('7 case studies');
-  });
-
-  it('fills the CMS format', () => {
-    expect(formatCaseStudyCount(3, { ...labels, countMany: '{count} Fallstudien' })).toBe('3 Fallstudien');
-  });
-});
-
 describe('buildTechGrid', () => {
   const projects = [project([1, 2]), project([1]), project([1, 3])];
   const categories = [
@@ -51,7 +38,11 @@ describe('buildTechGrid', () => {
   ];
   const techs = [
     tech(3, 'Zed', { tech_category: [10] }),
-    tech(2, 'alpha', { tech_category: [10, 11], acf_fields: { usage_note: '  Written by hand.  ' } }),
+    tech(2, 'alpha', {
+      tech_category: [10, 11],
+      excerpt: { rendered: '<p>Fast &amp; small\n  build tool</p>\n' },
+      acf_fields: { usage_note: '  Written by hand.  ' },
+    }),
     tech(1, 'PHP', {
       tech_category: [],
       acf_fields: [],
@@ -66,11 +57,11 @@ describe('buildTechGrid', () => {
     expect(items.map((t) => t.title)).toEqual(['PHP', 'alpha', 'Zed', 'Unused']);
   });
 
-  it('computes count, note, logo and filter keys; unknown terms fall back to Other', () => {
+  it('computes count, description, note, logo and filter keys; unknown terms fall back to Other', () => {
     const [php, alpha, zed, unused] = buildTechGrid(techs, projects, categories, labels).items;
-    expect(php).toMatchObject({ count: 3, usageNote: '', filterKeys: [OTHER_KEY] });
+    expect(php).toMatchObject({ count: 3, description: '', usageNote: '', filterKeys: [OTHER_KEY] });
     expect(php.logo?.node.sourceUrl).toBe('https://cms/php.svg');
-    expect(alpha).toMatchObject({ count: 1, usageNote: 'Written by hand.', filterKeys: ['cat-10', 'cat-11'], logo: null });
+    expect(alpha).toMatchObject({ count: 1, description: 'Fast & small build tool', usageNote: 'Written by hand.', filterKeys: ['cat-10', 'cat-11'], logo: null });
     expect(zed).toMatchObject({ count: 1, filterKeys: ['cat-10'] });
     expect(unused).toMatchObject({ count: 0, filterKeys: [OTHER_KEY] });
   });
