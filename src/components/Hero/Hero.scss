@@ -3,7 +3,7 @@
 
 // Hero H9: centred intro over a strip of three browser-window frames showing
 // real project work. The dot terrain (HeroScene) stays behind both.
-$strip-single: 640px; // under this only the lead frame shows
+$strip-single: 640px; // under this the frames become a swipe row
 $frame-gap: $spacing-md;
 $frame-radius: $border-radius-md;
 $frame-bg: #151515;
@@ -179,20 +179,40 @@ $frame-line-strong: rgba($white, 0.22);
     gap: $frame-gap;
     align-items: end;
 
-    @include tablet {
-      grid-template-columns: 1fr 1.4fr;
-
-      // Two columns: the frame after the lead drops out.
-      .hero-frame--lead ~ .hero-frame {
-        display: none;
-      }
+    // The lead comes first in the DOM (keyboard and swipe order) and sits in
+    // the middle column here; the other two fill columns 1 and 3.
+    .hero-frame--lead {
+      grid-column: 2;
+      grid-row: 1;
     }
 
+    // Phones: all three frames in a swipe row, lead first, the next frame
+    // peeking in from the right as the cue. The row bleeds to the screen edge.
     @media (max-width: $strip-single) {
-      grid-template-columns: 1fr;
+      display: flex;
+      align-items: flex-start;
+      gap: $spacing-sm;
+      margin-inline: calc(-1 * #{$spacing-md});
+      padding-inline: $spacing-md;
+      // Room below for most of the window shadow, which the scroll box clips.
+      padding-bottom: $spacing-lg;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: $spacing-md;
+      scrollbar-width: none;
 
-      .hero-frame:not(.hero-frame--lead) {
+      &::-webkit-scrollbar {
         display: none;
+      }
+
+      // Room above for the 4px hover lift, which the scroll box would clip.
+      margin-top: calc(clamp(#{$spacing-xl}, 3vw, #{$spacing-2xl}) - 6px);
+      padding-top: 6px;
+
+      .hero-frame {
+        flex: 0 0 82%;
+        scroll-snap-align: start;
       }
     }
   }

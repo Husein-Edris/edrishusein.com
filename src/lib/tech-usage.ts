@@ -3,11 +3,11 @@ import { asArray } from './transform/asArray';
 import { decodeEntities } from './transform/decodeEntities';
 import { transformMedia } from './transform/transformMedia';
 import { rendered } from './transform/transformProjects';
-import { fillLabel, type SiteContent } from './transform/transformSiteContent';
+import { type SiteContent } from './transform/transformSiteContent';
 
-// Tech stack logo grid (design A4): one tile per tech post, with the number of
-// case studies that list it in project_overview.tech_stack, filterable by the
-// tech_category taxonomy.
+// Tech stack logo grid (design A4): one tile per tech post with its short
+// description (the post excerpt), ordered by how many case studies list it in
+// project_overview.tech_stack, filterable by the tech_category taxonomy.
 
 /** Filter key of the "All" tab. */
 export const ALL_KEY = 'all';
@@ -17,7 +17,10 @@ export const OTHER_KEY = 'other';
 export interface TechGridItem {
   readonly id: string;
   readonly title: string;
+  /** Case studies that use it; only orders the tiles, not shown. */
   readonly count: number;
+  /** Short description from the post excerpt, '' when empty. */
+  readonly description: string;
   /** Optional ACF usage_note, '' when empty. */
   readonly usageNote: string;
   readonly logo: WordPressImage | null;
@@ -38,7 +41,6 @@ export interface TechGrid {
 }
 
 export type TechGridLabels = Pick<SiteContent['techStackPage'], 'allLabel' | 'otherLabel'>;
-export type TechCountLabels = Pick<SiteContent['techStackPage'], 'countNone' | 'countOne' | 'countMany'>;
 
 function record(value: unknown): Record<string, unknown> {
   return value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
@@ -64,11 +66,9 @@ export function caseStudyCountsByTech(projects: readonly unknown[]): Map<number,
   return counts;
 }
 
-/** "No case study yet", "1 case study", "4 case studies" from the CMS labels. */
-export function formatCaseStudyCount(count: number, labels: TechCountLabels): string {
-  if (count <= 0) return labels.countNone;
-  if (count === 1) return labels.countOne;
-  return fillLabel(labels.countMany, { count });
+/** Plain text of a rendered excerpt: tags stripped, entities decoded, whitespace collapsed. */
+function plainText(html: string): string {
+  return decodeEntities(html.replace(/<[^>]*>/g, ' ')).replace(/\s+/g, ' ').trim();
 }
 
 function categoryNames(categories: readonly unknown[]): Map<number, string> {
@@ -112,6 +112,7 @@ export function buildTechGrid(
         id: String(tech.id),
         title: decodeEntities(rendered(tech.title as never)).trim(),
         count: counts.get(id) ?? 0,
+        description: plainText(rendered(tech.excerpt as never)),
         usageNote: typeof note === 'string' ? note.trim() : '',
         logo: transformMedia(featured as never),
         filterKeys: termIds.length > 0 ? [...new Set(termIds)].map((termId) => `cat-${termId}`) : [OTHER_KEY],

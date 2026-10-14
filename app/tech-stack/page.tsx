@@ -24,9 +24,9 @@ export const metadata: Metadata = {
   }),
 };
 
-// Tech posts with their logo (featured image), categories and the optional usage_note.
+// Tech posts with their logo (featured image), excerpt, categories and the optional usage_note.
 const TECHS_PATH =
-  '/tech?per_page=100&_embed=wp:featuredmedia&_fields=id,title,tech_category,acf_fields,_links,_embedded';
+  '/tech?per_page=100&_embed=wp:featuredmedia&_fields=id,title,excerpt,tech_category,acf_fields,_links,_embedded';
 // Category names for the filter buttons; tools without one go under "Other".
 const CATEGORIES_PATH = '/tech_category?per_page=100&_fields=id,name';
 // Projects; only the tech_stack relation is needed to count usage.

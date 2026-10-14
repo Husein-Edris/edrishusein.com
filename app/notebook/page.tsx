@@ -7,7 +7,6 @@ import { rewriteImageUrls } from '@/src/lib/image-utils';
 import { cmsRest, isTransientCmsError } from '@/src/lib/rest-client';
 import { transformPostListItem } from '@/src/lib/transform/transformPost';
 import { getSiteContent } from '@/src/lib/site-content';
-import { magazineSizes, showsExcerpt } from '@/src/lib/magazine-layout';
 import { decodeEntities } from '@/src/lib/transform/decodeEntities';
 import PostMeta from '@/src/components/PostMeta/PostMeta';
 import { generateCollectionPageStructuredData, pageOpenGraph, safeJsonLd } from '@/src/lib/seo-utils';
@@ -27,14 +26,8 @@ export const metadata: Metadata = {
   }),
 };
 
-// Rendered width of each card size, for next/image srcset selection.
-const IMAGE_SIZES = {
-    xl: '(max-width: 768px) 100vw, (max-width: 1024px) 100vw, 800px',
-    m: '(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 400px',
-    s: '(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 400px',
-    w: '(max-width: 768px) 100vw, (max-width: 1024px) 100vw, 600px',
-    full: '(max-width: 768px) 100vw, 1200px',
-} as const;
+// The list thumbnail is a small fixed square (see Blog.scss .notebook-list__thumb).
+const THUMB_SIZES = '(max-width: 768px) 80px, 128px';
 
 function plainExcerpt(html: string): string {
     return decodeEntities(html.replace(/<[^>]*>/g, ' ')).replace(/\s+/g, ' ').trim();
@@ -57,7 +50,6 @@ async function getPostsData() {
 export default async function BlogArchivePage() {
     const [posts, siteContent] = await Promise.all([getPostsData(), getSiteContent()]);
     const copy = siteContent.notebookPage;
-    const sizes = magazineSizes(posts.length);
 
     const collectionJsonLd = generateCollectionPageStructuredData({
         name: 'Notebook',
@@ -87,50 +79,46 @@ export default async function BlogArchivePage() {
 
                 <div className="container">
                     {posts.length > 0 ? (
-                        <ul className="magazine">
+                        // Text-first list (2026-10-14): one column, equal weight per post, the
+                        // cover as a small uncropped thumbnail so the titles lead, not the art.
+                        <ul className="notebook-list">
                             {posts.map((post, index) => {
-                                const size = sizes[index];
                                 const lang = post.language === 'de' ? 'de' : undefined;
                                 const image = post.featuredImage?.node;
-                                const excerpt = showsExcerpt(size) ? plainExcerpt(post.excerpt) : '';
+                                const excerpt = plainExcerpt(post.excerpt);
                                 return (
-                                    <li key={post.id} className={`magazine__card magazine__card--${size}`}>
-                                        <div className="magazine__media">
-                                            {image ? (
-                                                <Image
-                                                    src={image.sourceUrl}
-                                                    alt=""
-                                                    fill
-                                                    sizes={IMAGE_SIZES[size]}
-                                                    priority={index === 0}
-                                                    className="magazine__image"
-                                                />
-                                            ) : (
-                                                // No featured image: a tinted block with the title, never a stock picture.
-                                                <span className="magazine__placeholder" aria-hidden="true" lang={lang}>
-                                                    {post.title}
-                                                </span>
-                                            )}
-                                        </div>
-                                        <div className="magazine__body">
+                                    <li key={post.id} className="notebook-list__item">
+                                        <div className="notebook-list__body">
                                             <PostMeta
                                                 date={post.date}
                                                 readingMinutes={post.readingMinutes}
                                                 language={post.language}
                                                 labels={copy}
                                             />
-                                            {/* h2: sits directly under the page h1 (WCAG 1.3.1). The link covers the whole card. */}
-                                            <h2 className="magazine__title" lang={lang}>
-                                                <Link href={`/notebook/${post.slug}`} className="magazine__link">
+                                            {/* h2: sits directly under the page h1 (WCAG 1.3.1). The link covers the whole row. */}
+                                            <h2 className="notebook-list__title" lang={lang}>
+                                                <Link href={`/notebook/${post.slug}`} className="notebook-list__link">
                                                     {post.title}
                                                 </Link>
                                             </h2>
                                             {excerpt && (
-                                                <p className="magazine__excerpt" lang={lang}>
+                                                <p className="notebook-list__excerpt" lang={lang}>
                                                     {excerpt}
                                                 </p>
                                             )}
                                         </div>
+                                        {image && (
+                                            <div className="notebook-list__thumb">
+                                                <Image
+                                                    src={image.sourceUrl}
+                                                    alt=""
+                                                    fill
+                                                    sizes={THUMB_SIZES}
+                                                    priority={index === 0}
+                                                    className="notebook-list__image"
+                                                />
+                                            </div>
+                                        )}
                                     </li>
                                 );
                             })}

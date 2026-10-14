@@ -40,3 +40,26 @@
     opacity: 1;
   }
 }
+
+// Homepage opening (hero + testimonials) over one shared scene.
+.hero-band {
+  position: relative;
+  isolation: isolate;
+  background-color: $primary-color;
+
+  > section {
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero,
+  .testimonials {
+    background-color: transparent;
+  }
+
+  // The hero's bottom padding already separates the two; no hairline.
+  .testimonials {
+    border-top: 0;
+    padding-top: 0;
+  }
+}

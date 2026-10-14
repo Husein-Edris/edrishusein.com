@@ -439,10 +439,13 @@
             border-bottom: 1px solid rgba($primary-color, 0.1);
           }
 
+          // Header row: white on a light band with a beige rule, so the
+          // titles stand out on the dark page (the beige fill read as muddy).
           th {
-            background: $color-beige;
-            color: $primary-dark;
+            background: rgba($white, 0.08);
+            color: $white;
             font-weight: $font-weight-semibold;
+            border-bottom: 2px solid $color-beige;
           }
 
           tr:hover {
@@ -977,4 +980,50 @@ nav.breadcrumbs a {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
+}
+
+// Reading focus (2026-10-14): the article header sits on the page background
+// (no grey band), the cover shows uncropped at the reading width, and the
+// author box is a quiet hairline row instead of a card.
+.case-study.blog-post {
+  .hero-section {
+    background-color: transparent;
+    padding-bottom: 0;
+  }
+
+  .featured-image {
+    max-width: 880px;
+    margin: $spacing-xl auto $spacing-2xl;
+
+    .project-featured-image {
+      width: 100%;
+      height: auto !important;
+      max-height: none;
+      border-radius: $border-radius-sm;
+
+      @include mobile {
+        max-height: none;
+      }
+    }
+  }
+
+  .author-section {
+    max-width: 880px;
+    margin: $spacing-2xl auto;
+    padding: $spacing-lg 0 0;
+    border-top: 1px solid rgba($white, 0.1);
+    border-radius: 0;
+    background: none;
+  }
+
+  // "More articles": the section's bottom margin escaped the dark <main> and
+  // showed the white body as a strip above the footer. Heading kept quiet.
+  .info-cards {
+    margin-bottom: 0;
+    border-top: 1px solid rgba($white, 0.1);
+
+    .section-title {
+      font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+    }
+  }
 }

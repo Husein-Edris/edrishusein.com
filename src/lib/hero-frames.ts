@@ -35,13 +35,6 @@ export function selectHeroProjects(projects: readonly WordPressProject[]): WordP
   );
 }
 
-/** Lead item goes to the middle column: [lead, b, c] becomes [b, lead, c]. */
-export function arrangeForStrip<T>(items: readonly T[]): T[] {
-  if (items.length < 2) return [...items];
-  const [lead, second, ...others] = items;
-  return [second, lead, ...others];
-}
-
 function toHeroFrame(project: WordPressProject, isLead: boolean): HeroFrame {
   const live = liveSiteUrl(project);
   return {
@@ -58,8 +51,9 @@ function toHeroFrame(project: WordPressProject, isLead: boolean): HeroFrame {
 
 export function buildHeroFrames(projects: readonly WordPressProject[]): HeroFrame[] {
   const selected = selectHeroProjects(projects);
-  const lead = selected[0];
-  return arrangeForStrip(selected).map((project) => toHeroFrame(project, project === lead));
+  // DOM order is lead first, so keyboard and phone swipe order match; the
+  // desktop grid moves the lead to the middle column in CSS (Hero.scss).
+  return selected.map((project, index) => toHeroFrame(project, index === 0));
 }
 
 // Hero paragraph auto-links (used only while Home > Hero > Hero Copy has no

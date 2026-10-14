@@ -83,17 +83,17 @@
         .nav-list {
             display: flex;
             flex-direction: column;
-            gap: $spacing-md;
+            gap: 0;
             list-style: none;
             margin: 0;
             padding: 0;
             align-items: flex-start;
 
-            @include mobile {
-                gap: $spacing-sm;
-            }
-
+            // 44px tall tap targets; the row gap below makes up the old spacing.
             a, button {
+                display: inline-flex;
+                align-items: center;
+                min-height: 44px;
                 color: $white;
                 text-decoration: none;
                 font-family: $font-family-base;

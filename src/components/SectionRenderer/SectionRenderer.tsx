@@ -5,6 +5,7 @@ import About from '@/src/components/about/about';
 import InfoCards from '@/src/components/InfoCards/InfoCards';
 import Contact from '@/src/components/Contact/Contact';
 import Testimonials from '@/src/components/Testimonials/Testimonials';
+import HeroScene from '@/src/components/HeroScene/HeroScene';
 
 interface SectionRendererProps {
   sections: SectionConfig[];
@@ -23,6 +24,9 @@ const COMPONENT_MAP = {
   contact: Contact,
   testimonials: Testimonials,
 } as const;
+
+// Leading sections drawn over the shared hero background.
+const BAND_COMPONENTS = new Set<string>(['hero', 'testimonials']);
 
 // Individual section wrapper
 function SectionWrapper({ config }: SectionWrapperProps) {
@@ -51,9 +55,23 @@ export default function SectionRenderer({ sections }: SectionRendererProps) {
   // Sort sections by order
   const sortedSections = sections.sort((a, b) => a.order - b.order);
 
+  // Hero and testimonials share one background (the dot terrain), so the
+  // opening of the page reads as one block. Other sections render as before.
+  const bandEnd = sortedSections.findIndex((section) => !BAND_COMPONENTS.has(section.component));
+  const band = bandEnd === -1 ? sortedSections : sortedSections.slice(0, bandEnd);
+  const rest = bandEnd === -1 ? [] : sortedSections.slice(bandEnd);
+
   return (
     <>
-      {sortedSections.map((section) => (
+      {band.length > 0 && (
+        <div className="hero-band">
+          <HeroScene />
+          {band.map((section) => (
+            <SectionWrapper key={section.id} config={section} />
+          ))}
+        </div>
+      )}
+      {rest.map((section) => (
         <SectionWrapper key={section.id} config={section} />
       ))}
     </>

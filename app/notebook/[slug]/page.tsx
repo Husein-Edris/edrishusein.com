@@ -8,7 +8,7 @@ import InfoCards from '@/src/components/InfoCards/InfoCards';
 import '@/src/styles/pages/BlogPost.scss';
 import '@/src/styles/pages/CaseStudy.scss';
 import { rewriteImageUrls } from '@/src/lib/image-utils';
-import { cmsRest } from '@/src/lib/rest-client';
+import { cmsRest, isTransientCmsError } from '@/src/lib/rest-client';
 import { safeJsonLd, metaDescriptionFrom, generateBreadcrumbStructuredData } from '@/src/lib/seo-utils';
 import { getSiteContent } from '@/src/lib/site-content';
 import { detectContentLanguage } from '@/src/lib/detect-language';
@@ -95,6 +95,7 @@ async function getMoreArticles(excludeSlug: string): Promise<PostListItem[]> {
     const all = posts.map((p) => transformPostListItem(p as never));
     return rewriteImageUrls(selectRelatedByRotation(all, excludeSlug, 3));
   } catch (error) {
+    if (isTransientCmsError(error)) throw error;
     console.error('Error fetching more articles:', error);
     return [];
   }
@@ -199,16 +200,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               />
             )}
 
-            {post.categories && post.categories.length > 0 && (
-              <div className="post-categories">
-                {post.categories.map((category, index) => (
-                  <span key={index} className="category-tag">
-                    {category.name}
-                  </span>
-                ))}
-              </div>
-            )}
-
             {/* Featured image only when the post has one; no stock fallback picture. */}
             {post.featuredImage?.node && (
               <div className="featured-image">
@@ -275,7 +266,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         {moreArticles.length > 0 && (
           <InfoCards
             skin="blog"
-            variant="light"
+            variant="dark"
             sectionTitle={copy.moreArticlesHeading}
             columns={3}
             cards={moreArticles.map((article) => ({
@@ -283,7 +274,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               description: article.excerpt?.replace(/<[^>]*>/g, '').substring(0, 120) + '...' || '',
               image: article.featuredImage?.node?.sourceUrl || "/images/Blog-sample-img.png",
               link: `/notebook/${article.slug}`,
-              variant: 'light' as const
+              variant: 'dark' as const
             }))}
           />
         )}

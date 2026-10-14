@@ -14,7 +14,7 @@ function FactValue({ row }: { row: FactRow }) {
     return (
       <a href={row.href} target="_blank" rel="noopener noreferrer" className="case-study-facts__link">
         {row.text}
-        <span aria-hidden="true"> ↗</span>
+        <span aria-hidden="true">↗</span>
       </a>
     );
   }
