@@ -164,10 +164,12 @@ export function generateStructuredData(type: string, data: any): object {
   }
 }
 
-// Generate homepage structured data: a Person entity (the site owner) plus a
-// WebSite entity, emitted together as a schema.org @graph. This gives Google the
-// entity signals a personal-brand homepage needs (name, role, canonical URL,
-// verified social profiles) which the inner pages' page-level schema does not cover.
+// Generate homepage structured data: a Person entity (the site owner), the
+// ProfessionalService he runs, and a WebSite entity, emitted together as a
+// schema.org @graph. Person + WebSite carry the personal-brand entity signals
+// (name, role, canonical URL, verified profiles); ProfessionalService carries the
+// local-search signals (place, area served, languages). No priceRange: rates are
+// never published.
 const SITE_URL = 'https://edrishusein.com';
 
 export function generateHomepageStructuredData(): object {
@@ -178,10 +180,10 @@ export function generateHomepageStructuredData(): object {
         "@type": "Person",
         "@id": `${SITE_URL}/#person`,
         name: "Edris Husein",
-        jobTitle: "Full-Stack Web Developer",
+        jobTitle: "Web Developer",
         url: SITE_URL,
         image: `${SITE_URL}/images/Edris-Husein-Hero.png`,
-        description: "Full-stack web developer in Dornbirn, Austria, building websites and web apps with Next.js, React, TypeScript and WordPress.",
+        description: "Web developer in Dornbirn, Vorarlberg, Austria. Builds, fixes and maintains WordPress sites and web apps for businesses and agencies.",
         knowsAbout: ["Web Development", "React", "Next.js", "TypeScript", "WordPress", "UI/UX Design", "SEO"],
         knowsLanguage: ["en", "de"],
         // Public business address, identical to the live imprint page.
@@ -191,6 +193,35 @@ export function generateHomepageStructuredData(): object {
           postalCode: "6850",
           addressCountry: "AT"
         },
+        sameAs: [
+          "https://github.com/Husein-Edris",
+          "https://www.linkedin.com/in/edris-husein/"
+        ]
+      },
+      {
+        "@type": "ProfessionalService",
+        "@id": `${SITE_URL}/#service`,
+        name: "Edris Husein, Web Development",
+        url: SITE_URL,
+        image: `${SITE_URL}/images/Edris-Husein-Hero.png`,
+        email: "kontakt@edrishusein.com",
+        description: "WordPress websites, maintenance, fixes and web apps for businesses and agencies in Vorarlberg, Austria, Switzerland and Germany.",
+        founder: { "@id": `${SITE_URL}/#person` },
+        address: {
+          "@type": "PostalAddress",
+          addressLocality: "Dornbirn",
+          addressRegion: "Vorarlberg",
+          postalCode: "6850",
+          addressCountry: "AT"
+        },
+        areaServed: [
+          { "@type": "AdministrativeArea", name: "Vorarlberg" },
+          { "@type": "Country", name: "Austria" },
+          { "@type": "Country", name: "Switzerland" },
+          { "@type": "Country", name: "Germany" }
+        ],
+        knowsAbout: ["WordPress", "WooCommerce", "Website maintenance", "Web Development", "Next.js", "React"],
+        knowsLanguage: ["de", "en"],
         sameAs: [
           "https://github.com/Husein-Edris",
           "https://www.linkedin.com/in/edris-husein/"
@@ -223,7 +254,7 @@ export function pageOpenGraph(data: { title: string; description: string; path: 
         url: '/images/Edris-Husein-Hero.png',
         width: 450,
         height: 450,
-        alt: 'Edris Husein - Full-Stack Web Developer',
+        alt: 'Edris Husein - Web Developer',
       },
     ],
   };

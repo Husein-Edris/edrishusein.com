@@ -1,6 +1,17 @@
 @use '../../styles/variables' as *;
 @use '../../styles/mixins' as *;
 
+// The full nav row (6 links, CONTACT, social icons) first fits on one line at
+// 1280px. Below that it clipped CONTACT and the icons (769-1088px) or wrapped
+// TECH STACK onto two lines (up to 1279px), so the hamburger menu takes over.
+$nav-collapse: 1279px;
+
+@mixin nav-collapsed {
+  @media (max-width: $nav-collapse) {
+    @content;
+  }
+}
+
 .header {
   background-color: $primary-color;
   padding: $spacing-md $container-padding;
@@ -64,7 +75,8 @@
     position: relative;
     pointer-events: auto;
 
-    @include mobile {
+    @include nav-collapsed {
+      order: 1;
       // Bars stay visually 30px wide; box grows to a ≥44px tap target (WCAG 2.5.5).
       display: flex;
       flex-direction: column;
@@ -98,7 +110,7 @@
   }
 
   // Mobile menu styles
-  @include mobile {
+  @include nav-collapsed {
 
     .main-nav {
       display: none;
@@ -161,7 +173,8 @@
         display: flex;
         flex-direction: column;
         align-items: flex-start;
-        gap: $spacing-lg;
+        // Links are 44px tall tap targets; the gap keeps the old visual rhythm.
+        gap: $spacing-sm;
         list-style: none;
         margin: 0;
         padding: 0;
@@ -169,11 +182,11 @@
         transition: transform 0.3s ease;
 
         @media (max-height: 600px) {
-          gap: $spacing-md;
+          gap: $spacing-xs;
         }
 
         @media (max-height: 500px) {
-          gap: $spacing-sm;
+          gap: 0;
         }
       }
 
@@ -183,7 +196,9 @@
         color: $white;
         text-decoration: none;
         transition: color $transition-base;
-        display: block;
+        display: flex;
+        align-items: center;
+        min-height: 44px;
 
         @media (max-height: 600px) {
           font-size: $font-size-2xl;
@@ -212,7 +227,7 @@
   }
 
   // Desktop nav styles
-  @media (min-width: #{$mobile + 1}) {
+  @media (min-width: #{$nav-collapse + 1}) {
     .main-nav {
       flex: 1;
       margin: 0 $spacing-md;
@@ -220,14 +235,12 @@
       .navList {
         display: flex;
         justify-content: center;
-        gap: 30px;
+        // Shrinks between items so the DE link fits without TECH STACK
+        // wrapping at 1280px (it already wraps below ~1200px).
+        gap: clamp(#{$spacing-md}, 2vw, 30px);
         list-style: none;
         margin: 0;
         padding: 0;
-
-        @media (max-width: $tablet) {
-          gap: $spacing-lg;
-        }
 
         .navItem {
           position: relative;
@@ -249,10 +262,6 @@
             align-items: center;
             min-height: 44px;
             position: relative;
-
-            @media (max-width: $tablet) {
-              font-size: $font-size-sm;
-            }
 
             &::after {
               content: "";
@@ -305,6 +314,14 @@
     gap: $spacing-sm;
     align-items: center;
     z-index: 1001;
+
+    // Tablet and small laptop: the nav is in the hamburger menu, but there is
+    // room for the icons, so they sit just left of the toggle (the toggle is
+    // moved last with order). Phones keep only logo + toggle, as before.
+    @media (min-width: #{$mobile + 1}) and (max-width: $nav-collapse) {
+      margin-left: auto;
+      margin-right: $spacing-md;
+    }
 
     @include mobile {
       display: none;

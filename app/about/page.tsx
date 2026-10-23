@@ -73,8 +73,8 @@ export async function generateMetadata(): Promise<Metadata> {
   await getAboutPageData();
 
   return generateEnhancedMetadata(null, {
-    title: 'About Edris Husein - Full-Stack Developer, Austria',
-    description: 'About Edris Husein, a full-stack web developer from Dornbirn, Austria, building websites and web apps with Next.js, React, TypeScript and WordPress.',
+    title: 'About Edris Husein - Web Developer in Vorarlberg, Austria',
+    description: 'About Edris Husein, a web developer from Dornbirn, Vorarlberg, building and maintaining WordPress sites and web apps for businesses and agencies.',
     path: '/about',
     type: 'website',
   });
@@ -89,7 +89,7 @@ export default async function AboutPage() {
   // ProfilePage schema: /about is the page about the site's Person entity.
   const structuredData = generateProfilePageStructuredData({
     title: page.title,
-    description: 'About Edris Husein, full-stack web developer in Dornbirn, Austria.',
+    description: 'About Edris Husein, web developer in Dornbirn, Vorarlberg, Austria.',
   });
 
         return (

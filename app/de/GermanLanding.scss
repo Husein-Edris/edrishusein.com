@@ -1,0 +1,70 @@
+@use '../../src/styles/variables' as *;
+@use '../../src/styles/mixins' as *;
+
+// German landing page (/de). Reuses the legal-page shell and prose styles from
+// LegalPage.scss; this file only adds the hero eyebrow and the two CTAs, styled
+// like the homepage hero buttons.
+
+.de-landing {
+  &__eyebrow {
+    font-family: $font-family-syncopate;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: $color-beige;
+    margin: 0 0 $spacing-md;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: $spacing-md;
+    margin-top: $spacing-lg;
+
+    @include mobile {
+      gap: $spacing-sm;
+    }
+  }
+
+  &__cta {
+    @include button-base;
+    @include button-size('md');
+    font-size: $font-size-sm;
+    min-height: 48px;
+    padding: $spacing-md $spacing-xl;
+
+    @include mobile {
+      flex: 1 1 140px;
+      padding: $spacing-md;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $color-beige;
+      outline-offset: 3px;
+    }
+
+    &--primary {
+      background-color: $white;
+      color: $primary-color;
+      border: 2px solid $white;
+
+      &:hover {
+        background-color: $color-beige;
+        border-color: $color-beige;
+      }
+    }
+
+    &--secondary {
+      background-color: transparent;
+      color: $white;
+      border: 2px solid rgba($white, 0.6);
+
+      &:hover {
+        border-color: $white;
+        background-color: rgba($white, 0.08);
+      }
+    }
+  }
+}
