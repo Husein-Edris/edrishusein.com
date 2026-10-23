@@ -6,6 +6,7 @@ import Footer from '@/src/components/Footer/Footer';
 import { DataFetcher } from '@/src/lib/data-fetcher';
 import { SectionFactory } from '@/src/lib/section-registry';
 import { generateHomepageStructuredData, safeJsonLd } from '@/src/lib/seo-utils';
+import { LANGUAGE_ALTERNATES } from '@/src/lib/german-landing';
 
 // ISR: serve a cached homepage render and refresh it at most once per window
 // (see CMS_REVALIDATE in src/lib/client.ts) instead of re-fetching WordPress on
@@ -15,7 +16,7 @@ export const revalidate = 60;
 // Self-canonical for the homepage; the root layout deliberately sets no global
 // canonical (it would leak "/" onto pages that don't override alternates).
 export const metadata: Metadata = {
-  alternates: { canonical: '/' },
+  alternates: { canonical: '/', languages: { ...LANGUAGE_ALTERNATES } },
 };
 
 export default async function HomePage() {
@@ -35,7 +36,7 @@ export default async function HomePage() {
       </main>
       <Footer />
 
-      {/* Structured data: Person + WebSite entity for search engines */}
+      {/* Structured data: Person, ProfessionalService and WebSite entities for search engines */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{

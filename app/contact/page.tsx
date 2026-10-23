@@ -6,12 +6,12 @@ import { getSiteContent } from '@/src/lib/site-content';
 import { generateContactPageStructuredData, pageOpenGraph, safeJsonLd } from '@/src/lib/seo-utils';
 
 export const metadata: Metadata = {
-  title: 'Contact Edris Husein - Hire a Full-Stack Web Developer',
-  description: 'Contact Edris Husein to hire a freelance full-stack web developer in Austria for WordPress, headless CMS and Next.js projects. Replies within a day.',
+  title: 'Contact Edris Husein - Web Developer in Vorarlberg',
+  description: 'Contact Edris Husein, a freelance web developer in Vorarlberg, Austria, for WordPress sites, maintenance, fixes and Next.js projects. Replies within a day.',
   alternates: { canonical: '/contact' },
   openGraph: pageOpenGraph({
-    title: 'Contact Edris Husein - Hire a Full-Stack Web Developer',
-    description: 'Contact Edris Husein to hire a freelance full-stack web developer in Austria for WordPress, headless CMS and Next.js projects. Replies within a day.',
+    title: 'Contact Edris Husein - Web Developer in Vorarlberg',
+    description: 'Contact Edris Husein, a freelance web developer in Vorarlberg, Austria, for WordPress sites, maintenance, fixes and Next.js projects. Replies within a day.',
     path: '/contact',
   }),
 };
@@ -23,7 +23,7 @@ export default async function ContactPage() {
   // Visible copy: CMS "Site Content" options page, Contact page tab.
   const { contactPage } = await getSiteContent();
   const contactJsonLd = generateContactPageStructuredData(
-    'Contact Edris Husein to hire a freelance full-stack web developer in Austria for WordPress, headless CMS and Next.js projects.'
+    'Contact Edris Husein, a freelance web developer in Vorarlberg, Austria, for WordPress sites, maintenance, fixes and Next.js projects.'
   );
 
   return (

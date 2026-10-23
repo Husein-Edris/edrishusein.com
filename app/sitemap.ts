@@ -22,6 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // it rather than fake a build-time date, which would train Google to distrust it.
   const staticPages: MetadataRoute.Sitemap = [
     { url: baseUrl, lastModified: latestOverall, changeFrequency: 'monthly', priority: 1 },
+    { url: `${baseUrl}/de`, changeFrequency: 'monthly', priority: 0.9 },
     { url: `${baseUrl}/about`, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${baseUrl}/projects`, lastModified: latestProject, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${baseUrl}/notebook`, lastModified: latestPost, changeFrequency: 'weekly', priority: 0.8 },

@@ -475,7 +475,7 @@ describe('generateHomepageStructuredData', () => {
 
     expect(result['@context']).toBe('https://schema.org');
     expect(Array.isArray(result['@graph'])).toBe(true);
-    expect(result['@graph']).toHaveLength(2);
+    expect(result['@graph']).toHaveLength(3);
   });
 
   it('should include a Person entity with role, url and image', () => {
@@ -484,7 +484,7 @@ describe('generateHomepageStructuredData', () => {
 
     expect(person).toBeDefined();
     expect(person.name).toBe('Edris Husein');
-    expect(person.jobTitle).toBe('Full-Stack Web Developer');
+    expect(person.jobTitle).toBe('Web Developer');
     expect(person.url).toBe('https://edrishusein.com');
     expect(person.image).toBe('https://edrishusein.com/images/Edris-Husein-Hero.png');
   });
@@ -506,6 +506,29 @@ describe('generateHomepageStructuredData', () => {
     expect(website).toBeDefined();
     expect(website.url).toBe('https://edrishusein.com');
     expect(website.publisher).toEqual({ '@id': 'https://edrishusein.com/#person' });
+  });
+  it('should include a ProfessionalService for local search, founded by the Person', () => {
+    const result = generateHomepageStructuredData() as any;
+    const service = result['@graph'].find((n: any) => n['@type'] === 'ProfessionalService');
+
+    expect(service).toBeDefined();
+    expect(service['@id']).toBe('https://edrishusein.com/#service');
+    expect(service.url).toBe('https://edrishusein.com');
+    expect(service.founder).toEqual({ '@id': 'https://edrishusein.com/#person' });
+    expect(service.address.addressLocality).toBe('Dornbirn');
+    expect(service.address.addressRegion).toBe('Vorarlberg');
+    expect(service.areaServed.map((a: any) => a.name)).toEqual(
+      expect.arrayContaining(['Vorarlberg', 'Austria', 'Switzerland', 'Germany'])
+    );
+    expect(service.knowsLanguage).toEqual(['de', 'en']);
+  });
+
+  it('should never publish a price or hourly rate in the service schema', () => {
+    const result = generateHomepageStructuredData() as any;
+    const service = result['@graph'].find((n: any) => n['@type'] === 'ProfessionalService');
+
+    expect(service.priceRange).toBeUndefined();
+    expect(JSON.stringify(service)).not.toMatch(/€|\bEUR\b|\/h\b|per hour|stunde/i);
   });
 });
 

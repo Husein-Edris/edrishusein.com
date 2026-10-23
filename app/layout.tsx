@@ -23,13 +23,13 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://edrishusein.com"),
   // No global canonical here: it would leak "/" onto every page that does not
   // override alternates. Each page declares its own self-canonical instead.
-  title: "Edris Husein - Full-Stack Web Developer, Austria",
-  description: "Edris Husein is a full-stack web developer in Dornbirn, Austria, building fast websites and web apps with Next.js, React, TypeScript and WordPress.",
-  keywords: "Edris Husein, full-stack developer, web developer Austria, React, Next.js, WordPress, TypeScript",
+  title: "Edris Husein - Web Developer & WordPress, Vorarlberg",
+  description: "Web developer in Dornbirn, Vorarlberg. I build, fix and maintain WordPress sites and web apps for businesses and agencies in Austria, Switzerland and Germany.",
+  keywords: "Edris Husein, web developer Vorarlberg, WordPress developer Austria, WordPress Entwickler Vorarlberg, Webentwickler Dornbirn, WordPress maintenance, Next.js",
   robots: "index, follow",
   openGraph: {
-    title: "Edris Husein - Full-Stack Web Developer, Austria",
-    description: "Full-stack web developer in Austria building fast websites and web apps with Next.js, React and WordPress.",
+    title: "Edris Husein - Web Developer & WordPress, Vorarlberg",
+    description: "Web developer in Dornbirn, Vorarlberg. WordPress sites, maintenance, fixes and web apps for businesses and agencies.",
     url: "/",
     type: "website",
     locale: "en_US",
@@ -40,14 +40,14 @@ export const metadata: Metadata = {
         url: "/images/Edris-Husein-Hero.png",
         width: 450,
         height: 450,
-        alt: "Edris Husein - Full-Stack Web Developer",
+        alt: "Edris Husein - Web Developer",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Edris Husein - Full-Stack Web Developer, Austria",
-    description: "Full-stack web developer in Austria building fast websites and web apps with Next.js, React and WordPress.",
+    title: "Edris Husein - Web Developer & WordPress, Vorarlberg",
+    description: "Web developer in Dornbirn, Vorarlberg. WordPress sites, maintenance, fixes and web apps for businesses and agencies.",
     images: ["/images/Edris-Husein-Hero.png"],
   },
 };

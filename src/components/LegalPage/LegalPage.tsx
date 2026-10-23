@@ -95,7 +95,7 @@ function generateLegalMetadata(data: LegalPageData, canonicalPath?: string): Met
           url: '/images/Edris-Husein-Hero.png',
           width: 450,
           height: 450,
-          alt: 'Edris Husein - Full-Stack Web Developer',
+          alt: 'Edris Husein - Web Developer',
         },
       ],
     },

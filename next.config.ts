@@ -62,6 +62,17 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    // The CMS frontend forwards its own page URLs to this domain; the German
+    // landing page's WordPress slug lives at /de here.
+    return [
+      {
+        source: '/wordpress-entwickler-vorarlberg',
+        destination: '/de',
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

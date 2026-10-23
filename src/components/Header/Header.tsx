@@ -3,10 +3,21 @@
 import { FC, useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
+import { GERMAN_LANDING_PATH } from '@/src/lib/german-landing';
 import './Header.scss';
+
+// Keep in sync with $nav-collapse in Header.scss.
+const NAV_COLLAPSE_MAX = 1279;
 
 const Header: FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  // Language switch: the German landing page links back to the English
+  // homepage, every other page links to the German landing page.
+  const isGerman = usePathname() === GERMAN_LANDING_PATH;
+  const langSwitch = isGerman
+    ? { href: '/', label: 'EN', hrefLang: 'en', title: 'English version' }
+    : { href: GERMAN_LANDING_PATH, label: 'DE', hrefLang: 'de', title: 'Deutsche Version' };
   const toggleRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -59,6 +70,18 @@ const Header: FC = () => {
       setInert(false);
     };
   }, [isMenuOpen]);
+
+  // Close the menu when the window grows past the collapse width
+  // ($nav-collapse in Header.scss); the hidden menu would otherwise keep the
+  // body scroll lock and the inert page.
+  useEffect(() => {
+    const desktop = window.matchMedia(`(min-width: ${NAV_COLLAPSE_MAX + 1}px)`);
+    const onChange = (e: MediaQueryListEvent) => {
+      if (e.matches) setIsMenuOpen(false);
+    };
+    desktop.addEventListener('change', onChange);
+    return () => desktop.removeEventListener('change', onChange);
+  }, []);
 
   // Move focus into the menu on open, and back to the toggle on close, so
   // keyboard and screen-reader users are placed in (and returned from) the overlay.
@@ -141,6 +164,19 @@ const Header: FC = () => {
               <li className="navItem">
                 <Link href="/tech-stack" className="navLink" onClick={closeMenu}>
                   <span className="navText">TECH STACK</span>
+                </Link>
+              </li>
+              <li className="navItem navItem--lang">
+                <Link
+                  href={langSwitch.href}
+                  hrefLang={langSwitch.hrefLang}
+                  lang={langSwitch.hrefLang}
+                  aria-label={langSwitch.title}
+                  title={langSwitch.title}
+                  className="navLink navLink--lang"
+                  onClick={closeMenu}
+                >
+                  <span className="navText">{langSwitch.label}</span>
                 </Link>
               </li>
               <li className="navItem navItem--cta">
