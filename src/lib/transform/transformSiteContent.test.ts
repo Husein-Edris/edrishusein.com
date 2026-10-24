@@ -3,7 +3,9 @@ import {
   PROJECT_CARD_LABEL_DEFAULTS,
   fillLabel,
   SITE_CONTENT_DEFAULTS,
+  SITE_CONTENT_DEFAULTS_DE,
   galleryLightboxLabels,
+  siteContentFlatDefaults,
   projectCardLabels,
   toParagraphs,
   transformSiteContent,
@@ -84,6 +86,9 @@ describe('transformSiteContent', () => {
       footer: SITE_CONTENT_DEFAULTS.footer,
       notFound: SITE_CONTENT_DEFAULTS.notFound,
       cookieBanner: SITE_CONTENT_DEFAULTS.cookieBanner,
+      nav: SITE_CONTENT_DEFAULTS.nav,
+      chrome: SITE_CONTENT_DEFAULTS.chrome,
+      meta: SITE_CONTENT_DEFAULTS.meta,
     });
   });
 
@@ -262,5 +267,65 @@ describe('toParagraphs', () => {
   it('drops empty paragraphs', () => {
     expect(toParagraphs('\n\nOnly\n\n\n\n')).toEqual(['Only']);
     expect(toParagraphs('')).toEqual([]);
+  });
+});
+
+describe('transformSiteContent languages and new keys', () => {
+  it('maps the navigation, chrome and meta keys', () => {
+    const result = transformSiteContent({
+      nav_projects: 'Work',
+      nav_tech_stack: 'Tools',
+      breadcrumb_home: 'Start',
+      skip_to_content: 'Skip',
+      meta_home_title: 'Home title',
+      meta_cookie_settings_description: 'Cookies',
+    });
+    expect(result.nav).toEqual({ ...SITE_CONTENT_DEFAULTS.nav, projects: 'Work', techStack: 'Tools' });
+    expect(result.chrome).toEqual({ breadcrumbHome: 'Start', skipToContent: 'Skip' });
+    expect(result.meta.homeTitle).toBe('Home title');
+    expect(result.meta.cookieSettingsDescription).toBe('Cookies');
+    expect(result.meta.aboutTitle).toBe(SITE_CONTENT_DEFAULTS.meta.aboutTitle);
+  });
+
+  it('keeps the English defaults equal to the text the pages rendered before', () => {
+    const d = transformSiteContent({});
+    expect(d.meta.homeTitle).toBe('Edris Husein - Web Developer & WordPress, Vorarlberg');
+    expect(d.chrome.skipToContent).toBe('Skip to main content');
+    expect(d.nav.techStack).toBe('Tech Stack');
+  });
+
+  it('renders the German defaults for blank fields on German pages', () => {
+    expect(transformSiteContent({}, 'de')).toEqual(SITE_CONTENT_DEFAULTS_DE);
+    const result = transformSiteContent({ nav_about: 'Über uns' }, 'de');
+    expect(result.nav.about).toBe('Über uns');
+    expect(result.nav.projects).toBe('Projekte');
+    expect(result.meta.homeTitle).toBe('WordPress-Entwickler in Vorarlberg | Edris Husein, Dornbirn');
+  });
+
+  it('has a German default for every English key, and no em dash in either', () => {
+    const en = siteContentFlatDefaults('en');
+    const de = siteContentFlatDefaults('de');
+    expect(Object.keys(de).sort()).toEqual(Object.keys(en).sort());
+    for (const value of [...Object.values(en), ...Object.values(de)]) {
+      expect(value.trim()).not.toBe('');
+      expect(value).not.toContain('—');
+    }
+  });
+});
+
+describe('siteContentFlatDefaults', () => {
+  it('lists every REST option name once with its English default', () => {
+    const flat = siteContentFlatDefaults();
+    // 64 options existed before the German site; 24 were added with it.
+    expect(Object.keys(flat)).toHaveLength(88);
+    expect(flat.projects_archive_title).toBe('PROJECTS');
+    expect(flat.case_study_lightbox_counter_format).toBe('{current} / {total}');
+    expect(flat.nav_tech_stack).toBe('Tech Stack');
+    expect(flat.meta_cookie_settings_title).toBe('Cookie Settings - Edris Husein');
+  });
+
+  it('round-trips: the flat defaults transform back into the code defaults', () => {
+    expect(transformSiteContent(siteContentFlatDefaults('en'))).toEqual(SITE_CONTENT_DEFAULTS);
+    expect(transformSiteContent(siteContentFlatDefaults('de'), 'de')).toEqual(SITE_CONTENT_DEFAULTS_DE);
   });
 });
