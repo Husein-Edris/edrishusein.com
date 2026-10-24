@@ -9,7 +9,9 @@ import {
   type RestTestimonialPost,
 } from './transform/transformTestimonials';
 import { transformProjects, type RestProjectListItem } from './transform/transformProjects';
-import { transformPostListItem, type RestPost, type PostListItem } from './transform/transformPost';
+import { localizedPostListItem, type RestPost, type PostListItem } from './transform/transformPost';
+import { localizeRestItem } from './i18n/localize';
+import { DEFAULT_LANG, type Lang } from './i18n/lang';
 
 // Fallback data when WordPress is unavailable
 const FALLBACK_HOMEPAGE_DATA: HomepageSections = {
@@ -130,7 +132,10 @@ export class DataFetcher {
     }
   }
 
-  static async getHomepageData(): Promise<FetchResult<HomepageSections>> {
+  // Every getter takes the page language. The CMS request is the same for both
+  // languages (one cached response); German text is picked from the
+  // `<field>_de` values after the fetch (src/lib/i18n/localize.ts).
+  static async getHomepageData(lang: Lang = DEFAULT_LANG): Promise<FetchResult<HomepageSections>> {
     return this.fetchWithFallback(
       async () => {
         const pages = await cmsRest<Array<{ acf_fields?: unknown }>>(
@@ -142,12 +147,13 @@ export class DataFetcher {
         }
 
 
-        const acfFields = pages[0].acf_fields;
+        const page = localizeRestItem(pages[0], lang);
+        const acfFields = page.acf_fields;
         const testimonials = await fetchSelectedTestimonials(selectedTestimonialIds(acfFields));
 
         return {
-          ...transformHomepage(pages[0]),
-          testimonialsSection: transformTestimonials(acfFields, testimonials),
+          ...transformHomepage(page, lang),
+          testimonialsSection: transformTestimonials(acfFields, testimonials, lang),
         };
       },
       FALLBACK_HOMEPAGE_DATA,
@@ -155,7 +161,7 @@ export class DataFetcher {
     );
   }
 
-  static async getProjectsData(limit: number = 6): Promise<FetchResult<ProjectsResponse>> {
+  static async getProjectsData(limit: number = 6, lang: Lang = DEFAULT_LANG): Promise<FetchResult<ProjectsResponse>> {
     return this.fetchWithFallback<ProjectsResponse>(
       async () => {
         const projects = await cmsRest<RestProjectListItem[]>(
@@ -167,7 +173,7 @@ export class DataFetcher {
         }
 
 
-        return transformProjects(projects);
+        return transformProjects(projects.map((project) => localizeRestItem(project, lang)));
       },
       FALLBACK_PROJECTS_DATA,
       'Error fetching projects data'
@@ -175,7 +181,8 @@ export class DataFetcher {
   }
 
   static async getPostsData(
-    limit: number = 6
+    limit: number = 6,
+    lang: Lang = DEFAULT_LANG
   ): Promise<FetchResult<{ posts: { nodes: PostListItem[] } }>> {
     return this.fetchWithFallback(
       async () => {
@@ -188,7 +195,7 @@ export class DataFetcher {
         }
 
 
-        return { posts: { nodes: posts.map(transformPostListItem) } };
+        return { posts: { nodes: posts.map((post) => localizedPostListItem(post, lang)) } };
       },
       FALLBACK_POSTS_DATA,
       'Error fetching posts data'
@@ -197,17 +204,17 @@ export class DataFetcher {
 
   // Batch fetch for homepage. Promise.all, not allSettled: a transient CMS
   // failure in any part must reject the render so ISR keeps the last good page.
-  static async getHomepageBundle(): Promise<{
+  static async getHomepageBundle(lang: Lang = DEFAULT_LANG): Promise<{
     homepage: FetchResult<HomepageSections>;
     projects: FetchResult<ProjectsResponse>;
     posts: FetchResult<{ posts: { nodes: PostListItem[] } }>;
   }> {
     const [homepage, projects, posts] = await Promise.all([
-      this.getHomepageData(),
+      this.getHomepageData(lang),
       // Same request as /projects (shared data cache): the hero strip picks from
       // the full list, the projects section then shows three (section-registry).
-      this.getProjectsData(20),
-      this.getPostsData(3),    // Show only 3 newest posts on homepage
+      this.getProjectsData(20, lang),
+      this.getPostsData(3, lang),    // Show only 3 newest posts on homepage
     ]);
 
     return { homepage, projects, posts };

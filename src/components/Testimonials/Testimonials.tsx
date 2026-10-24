@@ -8,6 +8,9 @@ import {
   type Testimonial,
   type TestimonialsSection,
 } from '@/src/lib/transform/transformTestimonials';
+import { useLang } from '@/src/components/LangProvider/LangProvider';
+import { DICTIONARY, dictionary, type Dictionary } from '@/src/lib/i18n/dictionary';
+import { fillLabel } from '@/src/lib/transform/transformSiteContent';
 
 interface TestimonialsProps {
   /** From DataFetcher.getHomepageData() as `testimonialsSection`; absent = code defaults. */
@@ -34,9 +37,9 @@ export function hostOf(url: string): string {
 }
 
 /** "Leon Heuser, Managing Director, ReviewForest, opens reviewforest.org in a new tab" */
-export function attributionLabel(item: Testimonial): string {
+export function attributionLabel(item: Testimonial, text: Dictionary = DICTIONARY.en): string {
   const host = hostOf(item.websiteUrl);
-  return [item.name, item.context, host ? `opens ${host} in a new tab` : 'opens in a new tab']
+  return [item.name, item.context, host ? fillLabel(text.opensHostInNewTab, { host }) : text.opensInNewTab]
     .filter(Boolean)
     .join(', ');
 }
@@ -59,7 +62,7 @@ function Logo({ logo }: { logo: NonNullable<Testimonial['logo']> }) {
 }
 
 // Logo, then two rows: name, then role and company. Links to the client site when set.
-function Attribution({ item }: { item: Testimonial }) {
+function Attribution({ item, text }: { item: Testimonial; text: Dictionary }) {
   const body = (
     <>
       {item.logo && <Logo logo={item.logo} />}
@@ -80,7 +83,7 @@ function Attribution({ item }: { item: Testimonial }) {
           href={item.websiteUrl}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label={attributionLabel(item)}
+          aria-label={attributionLabel(item, text)}
         >
           {body}
         </a>
@@ -96,6 +99,9 @@ function Attribution({ item }: { item: Testimonial }) {
 // No autoplay. The Home page picks and orders the items (ACF relationship).
 const Testimonials = ({ data }: TestimonialsProps) => {
   const { title, prevLabel, nextLabel, items: shown } = data ?? DEFAULT_TESTIMONIALS_SECTION;
+  const lang = useLang();
+  const text = dictionary(lang).testimonials;
+  const attributionText = dictionary(lang);
   const [active, setActive] = useState(0);
   const ready = useHasJs();
   const [moved, setMoved] = useState(false);
@@ -133,13 +139,13 @@ const Testimonials = ({ data }: TestimonialsProps) => {
                 onClick={() => go(-1)}
               >
                 <span aria-hidden="true">&larr;</span> {prevLabel}
-                <span className="sr-only"> quote</span>
+                <span className="sr-only"> {text.quote}</span>
               </button>
               <p className="testimonials__count">
-                <span className="sr-only">Quote </span>
+                <span className="sr-only">{text.counterPrefix} </span>
                 {active + 1}
                 <span aria-hidden="true"> / </span>
-                <span className="sr-only"> of </span>
+                <span className="sr-only"> {text.counterOf} </span>
                 {total}
               </p>
               <button
@@ -149,7 +155,7 @@ const Testimonials = ({ data }: TestimonialsProps) => {
                 onClick={() => go(1)}
               >
                 {nextLabel}
-                <span className="sr-only"> quote</span> <span aria-hidden="true">&rarr;</span>
+                <span className="sr-only"> {text.quote}</span> <span aria-hidden="true">&rarr;</span>
               </button>
             </div>
           )}
@@ -164,7 +170,7 @@ const Testimonials = ({ data }: TestimonialsProps) => {
               <blockquote className="testimonial__quote" lang={item.lang}>
                 <p>{item.quote}</p>
               </blockquote>
-              {(item.name || item.context || item.logo) && <Attribution item={item} />}
+              {(item.name || item.context || item.logo) && <Attribution item={item} text={attributionText} />}
             </figure>
           ))}
         </div>

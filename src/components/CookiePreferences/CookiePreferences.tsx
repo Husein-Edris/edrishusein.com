@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import { cookieDatabase, getCookiesByCategory, getActiveCookies, type CookieInfo } from '@/src/data/cookies';
 import CookieList from '@/src/components/CookieList/CookieList';
 import { notifyConsentChange } from '@/src/lib/consent';
+import { useLang } from '@/src/components/LangProvider/LangProvider';
+import { localePath } from '@/src/lib/i18n/paths';
+import { dictionary } from '@/src/lib/i18n/dictionary';
 import './CookiePreferences.scss';
 
 interface CookieConsent {
@@ -26,6 +29,10 @@ const CookiePreferences: React.FC<CookiePreferencesProps> = ({
   onCancel 
 }) => {
   const router = useRouter();
+  const lang = useLang();
+  const dict = dictionary(lang);
+  const text = dict.cookiePreferences;
+  const home = localePath('/', lang);
   const [consent, setConsent] = useState<CookieConsent>({
     essential: true, // Always true, can't be disabled
     analytics: false,
@@ -123,16 +130,16 @@ const CookiePreferences: React.FC<CookiePreferencesProps> = ({
         onSave();
       } else if (isStandalone) {
         // Show success message and redirect or stay on page
-        alert('Your cookie preferences have been saved.');
-        router.push('/');
+        alert(text.savedAlert);
+        router.push(home);
       }
     } catch (error) {
       console.error('Error saving consent:', error);
       
       // Show error but still allow navigation
       if (isStandalone) {
-        alert('There was an issue saving your preferences, but they have been applied for this session.');
-        router.push('/');
+        alert(text.errorAlert);
+        router.push(home);
       } else if (onSave) {
         onSave();
       }
@@ -150,18 +157,15 @@ const CookiePreferences: React.FC<CookiePreferencesProps> = ({
 
   // Prevent hydration mismatch by showing loading state until mounted
   if (!isMounted || !isLoaded) {
-    return <div className="cookie-preferences-loading">Loading preferences...</div>;
+    return <div className="cookie-preferences-loading">{text.loading}</div>;
   }
 
   return (
     <div className={`cookie-preferences ${isStandalone ? 'standalone' : ''}`}>
       <div className="cookie-preferences-content">
         <div className="cookie-preferences-header">
-          <h3 className="cookie-preferences-title">Cookie Preferences</h3>
-          <p className="cookie-preferences-description">
-            Choose which cookies you want to accept. You can change these settings at any time.
-            Essential cookies are required for the website to function and cannot be disabled.
-          </p>
+          <h3 className="cookie-preferences-title">{text.title}</h3>
+          <p className="cookie-preferences-description">{text.description}</p>
           
 {/* Toggle temporarily hidden */}
           {/* <div className="cookie-display-options">
@@ -194,7 +198,7 @@ const CookiePreferences: React.FC<CookiePreferencesProps> = ({
                       onChange={() => toggleConsent(category.id as keyof CookieConsent)}
                     />
                     <span className="cookie-toggle-slider"></span>
-                    <span className="cookie-toggle-label">{category.title}</span>
+                    <span className="cookie-toggle-label">{dict.cookieCategories[category.id].title}</span>
                   </label>
                   <span className={`cookie-status ${
                     category.id === 'essential' 
@@ -202,13 +206,13 @@ const CookiePreferences: React.FC<CookiePreferencesProps> = ({
                       : categoryConsent ? 'enabled' : 'disabled'
                   }`}>
                     {category.id === 'essential' 
-                      ? 'Required' 
-                      : categoryConsent ? 'Enabled' : 'Disabled'
+                      ? text.required 
+                      : categoryConsent ? text.enabled : text.disabled
                     }
                   </span>
                 </div>
                 <p className="cookie-category-description">
-                  {category.description}
+                  {dict.cookieCategories[category.id].description}
                 </p>
                 
 {/* Cookie list temporarily hidden */}
@@ -229,13 +233,13 @@ const CookiePreferences: React.FC<CookiePreferencesProps> = ({
               className="cookie-btn cookie-btn-accept-all"
               onClick={handleAcceptAll}
             >
-              Accept All Cookies
+              {text.acceptAll}
             </button>
             <button
               className="cookie-btn cookie-btn-reject-all"
               onClick={handleRejectAll}
             >
-              Reject All Optional
+              {text.rejectAll}
             </button>
           </div>
           
@@ -244,14 +248,14 @@ const CookiePreferences: React.FC<CookiePreferencesProps> = ({
               className="cookie-btn cookie-btn-save primary"
               onClick={handleAcceptSelected}
             >
-              Save My Preferences
+              {text.save}
             </button>
             {!isStandalone && onCancel && (
               <button
                 className="cookie-btn cookie-btn-cancel"
                 onClick={onCancel}
               >
-                Cancel
+                {text.cancel}
               </button>
             )}
           </div>

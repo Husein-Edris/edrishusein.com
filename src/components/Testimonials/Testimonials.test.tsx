@@ -3,6 +3,9 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
 import Testimonials, { attributionLabel, hostOf } from './Testimonials';
 import type { Testimonial } from '@/src/lib/transform/transformTestimonials';
+import LangProvider from '@/src/components/LangProvider/LangProvider';
+import { DICTIONARY } from '@/src/lib/i18n/dictionary';
+import { SITE_CONTENT_DEFAULTS_DE } from '@/src/lib/transform/transformSiteContent';
 
 const base: Testimonial = {
   quote: 'Ok.',
@@ -126,5 +129,29 @@ describe('Testimonials attribution', () => {
     expect(attributionLabel({ ...base, name: 'Chloé Kuhlow', context: 'Owner, Campzilla', websiteUrl: 'https://campzilla-shop.com/' })).toBe(
       'Chloé Kuhlow, Owner, Campzilla, opens campzilla-shop.com in a new tab'
     );
+  });
+});
+
+describe('Testimonials on German pages', () => {
+  it('translates the screen-reader text of the controls', () => {
+    const items = [
+      { quote: 'One.', name: 'A', context: '', lang: 'en' as const, logo: null, websiteUrl: '' },
+      { quote: 'Zwei.', name: 'B', context: '', lang: 'de' as const, logo: null, websiteUrl: '' },
+    ];
+    const { container } = render(
+      <LangProvider lang="de" nav={SITE_CONTENT_DEFAULTS_DE.nav}>
+        <Testimonials data={{ title: 'Das sagen Kunden', prevLabel: 'Zurück', nextLabel: 'Weiter', items }} />
+      </LangProvider>
+    );
+    const srText = Array.from(container.querySelectorAll('.sr-only')).map((node) => node.textContent?.trim());
+    expect(srText).toContain('Zitat');
+    expect(srText).toContain('von');
+    expect(container.textContent).not.toContain('quote');
+  });
+
+  it('names the new tab in German in the attribution label', () => {
+    const item = { quote: 'Q', name: 'Leon', context: 'CEO', lang: 'en' as const, logo: null, websiteUrl: 'https://www.example.org/' };
+    expect(attributionLabel(item, DICTIONARY.de)).toBe('Leon, CEO, öffnet example.org in einem neuen Tab');
+    expect(attributionLabel(item)).toBe('Leon, CEO, opens example.org in a new tab');
   });
 });

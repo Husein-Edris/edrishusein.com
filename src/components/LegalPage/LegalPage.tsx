@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Link from 'next/link';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
 import BackToTopButton from './BackToTopButton';
@@ -6,6 +7,12 @@ import CookieSettingsLink from '@/src/components/CookieSettingsLink/CookieSettin
 import { notFound } from 'next/navigation';
 import { detectContentLanguage } from '@/src/lib/detect-language';
 import { cmsRest, isTransientCmsError } from '@/src/lib/rest-client';
+import { getSiteContentOrDefaults } from '@/src/lib/site-content';
+import { alternatesFor, localePath } from '@/src/lib/i18n/paths';
+import { DATE_LOCALE, DEFAULT_LANG, OG_LOCALE, otherLang, type Lang } from '@/src/lib/i18n/lang';
+import { dictionary } from '@/src/lib/i18n/dictionary';
+import { localizeRestItem } from '@/src/lib/i18n/localize';
+import { fillLabel } from '@/src/lib/transform/transformSiteContent';
 import './LegalPage.scss';
 
 interface LegalPageProps {
@@ -14,6 +21,7 @@ interface LegalPageProps {
   lastUpdated?: string;
   breadcrumb?: string;
   showCookieSettings?: boolean;
+  lang?: Lang;
 }
 
 interface LegalPageData {
@@ -36,6 +44,7 @@ interface RestLegalPage {
   title?: { rendered?: string };
   content?: { rendered?: string };
   yoast_head_json?: { title?: string; description?: string };
+  acf_fields?: unknown;
 }
 
 // Fetch a legal page from WordPress.
@@ -44,7 +53,11 @@ interface RestLegalPage {
 // imprint whenever the CMS hiccuped. A transient CMS failure throws out of
 // cmsRest, so ISR keeps serving the last good page; a page the CMS does not
 // have is a real 404.
-async function getLegalPageData(slug: string, fallbackType: 'imprint' | 'privacy'): Promise<LegalPageData> {
+async function getLegalPageData(
+  slug: string,
+  fallbackType: 'imprint' | 'privacy',
+  lang: Lang = DEFAULT_LANG
+): Promise<LegalPageData> {
   let pages: RestLegalPage[];
   try {
     pages = await cmsRest<RestLegalPage[]>(`/pages?slug=${encodeURIComponent(slug)}`);
@@ -57,7 +70,8 @@ async function getLegalPageData(slug: string, fallbackType: 'imprint' | 'privacy
     notFound();
   }
 
-  const page = pages[0];
+  // The legal texts are German originals; title_de/content_de win on /de when set.
+  const page = localizeRestItem(pages[0], lang);
   const typeLabel = fallbackType.charAt(0).toUpperCase() + fallbackType.slice(1);
 
   return {
@@ -74,46 +88,50 @@ async function getLegalPageData(slug: string, fallbackType: 'imprint' | 'privacy
   };
 }
 
-// Generate metadata for legal pages
-function generateLegalMetadata(data: LegalPageData, canonicalPath?: string): Metadata {
+// Generate metadata for legal pages. `path` is the English path; the German
+// page gets /de + path as canonical, and both name each other as hreflang.
+function generateLegalMetadata(data: LegalPageData, path?: string, lang: Lang = DEFAULT_LANG): Metadata {
+  const text = dictionary(lang);
+  const description = data.page.seo?.metaDesc || fillLabel(text.legalFallbackDescription, { title: data.page.title });
   return {
     title: data.page.seo?.title || data.page.title,
-    description: data.page.seo?.metaDesc || `${data.page.title} - Edris Husein`,
-    ...(canonicalPath ? { alternates: { canonical: canonicalPath } } : {}),
+    description,
+    ...(path ? { alternates: alternatesFor(path, lang) } : {}),
     robots: {
       index: true,
       follow: true,
     },
     openGraph: {
       title: data.page.seo?.title || data.page.title,
-      description: data.page.seo?.metaDesc || `${data.page.title} - Edris Husein`,
-      ...(canonicalPath ? { url: canonicalPath } : {}),
+      description,
+      ...(path ? { url: localePath(path, lang) } : {}),
       type: 'article',
-      locale: 'en_US',
+      locale: OG_LOCALE[lang],
+      alternateLocale: [OG_LOCALE[otherLang(lang)]],
       images: [
         {
           url: '/images/Edris-Husein-Hero.png',
           width: 450,
           height: 450,
-          alt: 'Edris Husein - Web Developer',
+          alt: text.ogImageAlt,
         },
       ],
     },
     twitter: {
       card: 'summary',
       title: data.page.seo?.title || data.page.title,
-      description: data.page.seo?.metaDesc || `${data.page.title} - Edris Husein`,
+      description,
     },
   };
 }
 
 // Format date helper
-function formatDate(dateString?: string): string {
+function formatDate(dateString: string | undefined, lang: Lang): string {
   if (!dateString) return '';
   
   try {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString(DATE_LOCALE[lang], {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
@@ -124,18 +142,29 @@ function formatDate(dateString?: string): string {
 }
 
 // Legal page component
-export default function LegalPage({ title, content, lastUpdated, breadcrumb, showCookieSettings = true }: LegalPageProps) {
+export default async function LegalPage({
+  title,
+  content,
+  lastUpdated,
+  breadcrumb,
+  showCookieSettings = true,
+  lang = DEFAULT_LANG,
+}: LegalPageProps) {
+  const siteContent = await getSiteContentOrDefaults(lang);
+  const text = dictionary(lang);
+  const contentLang = detectContentLanguage(content);
+
   return (
     <>
       <Header />
       <main id="main-content" tabIndex={-1} className="legal-page">
         {/* Breadcrumb */}
         {breadcrumb && (
-          <nav className="breadcrumb" aria-label="Breadcrumb">
+          <nav className="breadcrumb" aria-label={text.breadcrumbLabel}>
             <div className="container">
               <ol className="breadcrumb-list">
                 <li className="breadcrumb-item">
-                  <a href="/">Home</a>
+                  <Link href={localePath('/', lang)}>{siteContent.chrome.breadcrumbHome}</Link>
                 </li>
                 <li className="breadcrumb-item" aria-current="page">
                   {breadcrumb}
@@ -152,7 +181,7 @@ export default function LegalPage({ title, content, lastUpdated, breadcrumb, sho
               <h1 className="legal-title">{title}</h1>
               {lastUpdated && (
                 <p className="last-updated">
-                  Last updated: {formatDate(lastUpdated)}
+                  {text.lastUpdated} {formatDate(lastUpdated, lang)}
                 </p>
               )}
             </div>
@@ -165,9 +194,9 @@ export default function LegalPage({ title, content, lastUpdated, breadcrumb, sho
             <div className="content-wrapper">
               <article
                 className="legal-article"
-                // Legal texts come from the CMS in German; mark the subtree so
-                // it is not announced/indexed as English (site default lang).
-                lang={detectContentLanguage(content) === 'de' ? 'de' : undefined}
+                // Legal texts come from the CMS in German; mark the subtree when
+                // its language differs from the page so it is announced correctly.
+                lang={contentLang !== lang ? contentLang : undefined}
                 dangerouslySetInnerHTML={{ __html: content }}
               />
               
@@ -175,9 +204,9 @@ export default function LegalPage({ title, content, lastUpdated, breadcrumb, sho
               {showCookieSettings && (
                 <div className="cookie-settings-section">
                   <p>
-                    You can manage your cookie preferences at any time by clicking{' '}
+                    {text.legalCookieNotice}{' '}
                     <CookieSettingsLink>
-                      <strong>Cookie Settings</strong>
+                      <strong>{siteContent.footer.cookieSettingsLabel}</strong>
                     </CookieSettingsLink>.
                   </p>
                 </div>
@@ -191,7 +220,7 @@ export default function LegalPage({ title, content, lastUpdated, breadcrumb, sho
           </div>
         </section>
       </main>
-      <Footer />
+      <Footer lang={lang} />
     </>
   );
 }

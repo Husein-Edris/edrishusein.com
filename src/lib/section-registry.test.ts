@@ -534,3 +534,46 @@ describe('SectionFactory', () => {
     });
   });
 });
+
+describe('SectionFactory on German pages', () => {
+  const sections = () =>
+    SectionFactory.createHomepageSections(
+      { ...mockHomepageSections, notebookSection: { title: '', viewAllLabel: '', viewAllUrl: '' } },
+      mockProjectsResponse,
+      mockPostsResponse,
+      'de'
+    );
+
+  it('links notebook cards, teaser cards and view-all to the German pages', () => {
+    const result = sections();
+    const notebook = result.find((s) => s.id === 'notebook');
+    const cards = notebook?.props.cards as Array<{ link: string }>;
+    expect(cards.every((card) => card.link.startsWith('/de/notebook/'))).toBe(true);
+    expect(notebook?.props.viewMoreLink).toBe('/de/notebook');
+    expect(notebook?.props.viewMoreText).toBe('ALLE ARTIKEL ANSEHEN');
+    expect(notebook?.props.sectionTitle).toBe('NOTIZBUCH');
+
+    const teasers = result.find((s) => s.id === 'info-cards')?.props.cards as Array<{ link: string }>;
+    expect(teasers.map((card) => card.link)).toEqual(['/de/bookshelf', '/de/tech-stack']);
+  });
+
+  it('passes the language to the components that render their own defaults', () => {
+    for (const id of ['hero', 'about', 'contact', 'info-cards', 'notebook']) {
+      expect(sections().find((s) => s.id === id)?.props.lang).toBe('de');
+    }
+  });
+
+  it('does not prefix a CMS view-all URL twice', () => {
+    const result = SectionFactory.createHomepageSections(
+      { ...mockHomepageSections, notebookSection: { title: 'N', viewAllLabel: 'ALL', viewAllUrl: '/de/notebook' } },
+      mockProjectsResponse,
+      mockPostsResponse,
+      'de'
+    );
+    expect(result.find((s) => s.id === 'notebook')?.props.viewMoreLink).toBe('/de/notebook');
+  });
+
+  it('uses German teaser defaults without homepage data', () => {
+    expect(SectionTransformers.createStaticInfoCards('de').map((card) => card.title)).toEqual(['BÜCHERREGAL', 'TECHNOLOGIEN']);
+  });
+});

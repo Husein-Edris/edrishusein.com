@@ -1,4 +1,5 @@
 import type { Lang } from './lang';
+import { SITE_URL, localePath } from './paths';
 
 // German text from the CMS. Every ACF text field `x` has a sibling `x_de` in the
 // same object of REST `acf_fields` (groups and repeater rows included), and the
@@ -35,10 +36,32 @@ export function localizeAcf<T>(value: T): T {
   return out as T;
 }
 
+// href="/path" or href="https://edrishusein.com/path" in CMS HTML; file links
+// (anything with an extension in the last segment) are left alone.
+const SITE_LINK = new RegExp(`(href=["'])(?:${SITE_URL.replace(/[.]/g, '\\.')})?(/[^"'#?]*)([^"']*["'])`, 'g');
+
+/** Point the site links inside CMS HTML at the pages of `lang` (German: /de/...). */
+export function localizeContentLinks(html: string, lang: Lang): string {
+  if (lang !== 'de') return html;
+  return html.replace(SITE_LINK, (match, open: string, path: string, rest: string) => {
+    if (path.startsWith('//') || /\.[a-z0-9]+$/i.test(path)) return match;
+    const localized = localePath(path, lang);
+    return match.startsWith(`${open}${SITE_URL}`) ? `${open}${SITE_URL}${localized}${rest}` : `${open}${localized}${rest}`;
+  });
+}
+
 function withRendered(field: unknown, text: string | null): unknown {
   if (text === null) return field;
   if (isPlainObject(field)) return { ...field, rendered: text };
   return text;
+}
+
+function withLocalizedLinks(field: unknown, lang: Lang): unknown {
+  if (typeof field === 'string') return localizeContentLinks(field, lang);
+  if (isPlainObject(field) && typeof field.rendered === 'string') {
+    return { ...field, rendered: localizeContentLinks(field.rendered, lang) };
+  }
+  return field;
 }
 
 /**
@@ -56,6 +79,8 @@ export function localizeRestItem<T>(item: T, lang: Lang): T {
   for (const field of ['title', 'excerpt', 'content'] as const) {
     if (field in item) out[field] = withRendered(item[field], germanText(translations[`${field}${DE_SUFFIX}`]));
   }
+  // Site links inside the body point at the German pages.
+  if ('content' in item) out.content = withLocalizedLinks(out.content, lang);
   if ('acf_fields' in item) out.acf_fields = localizeAcf(acf);
   if ('acf' in item) out.acf = localizeAcf(item.acf);
 

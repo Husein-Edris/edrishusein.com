@@ -7,7 +7,8 @@ import ShowcaseVideo from './ShowcaseVideo';
 import HeroCopyText from './HeroCopyText';
 import HeroStrip from './HeroStrip';
 import { autoLinkHeroCopy, parseHeroCopy, type HeroCopyLink } from './heroCopy';
-import { isInternalPath, resolveHeroContent } from './heroContent';
+import { HERO_FALLBACK_COPY, isInternalPath, resolveHeroContent } from './heroContent';
+import { DEFAULT_LANG, type Lang } from '@/src/lib/i18n/lang';
 import './Hero.scss';
 
 interface HeroProps {
@@ -15,9 +16,8 @@ interface HeroProps {
   frames?: HeroFrame[];
   /** Project names in the paragraph linked to their live sites while the CMS copy has no links. */
   copyLinks?: HeroCopyLink[];
+  lang?: Lang;
 }
-
-const FALLBACK_COPY = 'I build and look after websites and web solutions for businesses and agencies.';
 
 // Rendered widths of the strip (Hero.scss): a swipe row of 82% wide frames under
 // 640px, three columns (1fr 1.4fr 1fr) above it, in a 1200px row on desktop.
@@ -81,10 +81,10 @@ function HeroFrameCard({ frame }: { frame: HeroFrame }) {
   );
 }
 
-const Hero = ({ data, frames = [], copyLinks = [] }: HeroProps) => {
+const Hero = ({ data, frames = [], copyLinks = [], lang = DEFAULT_LANG }: HeroProps) => {
   const parsedCopy = parseHeroCopy(data?.heroCopy);
-  const copy = autoLinkHeroCopy(parsedCopy.length > 0 ? parsedCopy : parseHeroCopy(FALLBACK_COPY), copyLinks);
-  const { eyebrow, heading, primaryCta, secondaryCta } = resolveHeroContent(data);
+  const copy = autoLinkHeroCopy(parsedCopy.length > 0 ? parsedCopy : parseHeroCopy(HERO_FALLBACK_COPY[lang]), copyLinks);
+  const { eyebrow, heading, primaryCta, secondaryCta } = resolveHeroContent(data, lang);
 
   return (
     <section className="hero">

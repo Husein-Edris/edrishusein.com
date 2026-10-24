@@ -36,6 +36,27 @@ describe('resolveHeroContent', () => {
   });
 });
 
+describe('resolveHeroContent on German pages', () => {
+  it('renders German defaults and links site paths to the German pages', () => {
+    expect(resolveHeroContent(undefined, 'de')).toEqual({
+      eyebrow: 'Edris Husein, Dornbirn, Österreich',
+      heading: 'Servus. Ich baue Websites, repariere sie und helfe Ihnen zu planen, was als Nächstes kommt.',
+      primaryCta: { label: 'E-Mail schreiben', url: 'mailto:kontakt@edrishusein.com' },
+      secondaryCta: { label: 'Alle Projekte ansehen', url: '/de/projects' },
+    });
+  });
+
+  it('localizes CMS site paths and leaves external links alone', () => {
+    const result = resolveHeroContent(
+      { heading: 'Überschrift', primaryCtaUrl: 'https://cal.com/edris', secondaryCtaUrl: '/notebook' },
+      'de'
+    );
+    expect(result.heading).toBe('Überschrift');
+    expect(result.primaryCta.url).toBe('https://cal.com/edris');
+    expect(result.secondaryCta.url).toBe('/de/notebook');
+  });
+});
+
 describe('isInternalPath', () => {
   it('treats site paths as internal and everything else as external', () => {
     expect(isInternalPath('/projects')).toBe(true);

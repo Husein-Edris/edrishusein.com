@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { toSitemapEntries, fetchSitemapContent, latestModified } from './sitemap-content';
+import { toSitemapEntries, fetchSitemapContent, latestModified, withLanguageVersions } from './sitemap-content';
 
 describe('toSitemapEntries', () => {
   const items = [
@@ -86,5 +86,39 @@ describe('fetchSitemapContent', () => {
   it('returns [] when the response is not an array', async () => {
     mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ error: 'x' }) });
     expect(await fetchSitemapContent('/posts')).toEqual([]);
+  });
+});
+
+describe('withLanguageVersions', () => {
+  const base = 'https://edrishusein.com';
+
+  it('adds the German twin of every entry with hreflang alternates on both', () => {
+    const entries = withLanguageVersions(
+      [
+        { url: base, priority: 1 },
+        { url: `${base}/notebook/first-post`, priority: 0.7, changeFrequency: 'weekly' },
+      ],
+      base
+    );
+
+    expect(entries.map((entry) => entry.url)).toEqual([
+      base,
+      `${base}/de`,
+      `${base}/notebook/first-post`,
+      `${base}/de/notebook/first-post`,
+    ]);
+    expect(entries[1].alternates).toEqual({ languages: { en: base, de: `${base}/de`, 'x-default': base } });
+    expect(entries[3]).toMatchObject({
+      priority: 0.7,
+      changeFrequency: 'weekly',
+      alternates: {
+        languages: {
+          en: `${base}/notebook/first-post`,
+          de: `${base}/de/notebook/first-post`,
+          'x-default': `${base}/notebook/first-post`,
+        },
+      },
+    });
+    expect(entries[2].alternates).toEqual(entries[3].alternates);
   });
 });

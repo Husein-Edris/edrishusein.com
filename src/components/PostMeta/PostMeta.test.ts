@@ -12,3 +12,11 @@ describe('formatPostDate', () => {
     expect(formatPostDate('2026-13-01')).toBe('');
   });
 });
+
+describe('formatPostDate on German pages', () => {
+  it('formats the calendar date in de-AT', () => {
+    expect(formatPostDate('2026-08-13T19:36:23', 'de')).toBe('13. Aug. 2026');
+    expect(formatPostDate('2026-01-05T00:10:00', 'de')).toBe('5. Jän. 2026');
+    expect(formatPostDate('2026-13-01', 'de')).toBe('');
+  });
+});

@@ -3,6 +3,8 @@ import { truncateExcerpt } from '../InfoCards/truncateExcerpt';
 import { selectRelatedByRotation } from '@/src/lib/related-content';
 import type { WordPressProject } from '@/src/types/wordpress';
 import type { ProjectCardLabels } from '@/src/lib/transform/transformSiteContent';
+import { localePath } from '@/src/lib/i18n/paths';
+import { DEFAULT_LANG, type Lang } from '@/src/lib/i18n/lang';
 
 interface MoreProjectsProps {
   currentProjectSlug: string;
@@ -11,6 +13,7 @@ interface MoreProjectsProps {
   title?: string;
   /** Card link labels; CMS Site Content > Project cards. */
   labels?: ProjectCardLabels;
+  lang?: Lang;
 }
 
 interface InfoCardProps {
@@ -28,6 +31,7 @@ export default function MoreProjects({
   allProjects = [],
   title = 'More Projects',
   labels,
+  lang = DEFAULT_LANG,
 }: MoreProjectsProps) {
   // Rotate rather than always taking the first 3 in menu_order. The old slice
   // funnelled every sibling link into the same 3 projects, so the rest of the
@@ -38,10 +42,10 @@ export default function MoreProjects({
     title: project.title,
     description: truncateExcerpt(project.excerpt, 120),
     image: project.featuredImage?.node?.sourceUrl || '/images/Blog-sample-img.png',
-    link: `/projects/${project.slug}`,
+    link: localePath(`/projects/${project.slug}`, lang),
     variant: 'dark' as const,
     visitLink: project.caseStudy?.projectLinks?.liveSite || null,
-    caseStudyLink: `/projects/${project.slug}`
+    caseStudyLink: localePath(`/projects/${project.slug}`, lang)
   }));
 
   // If no projects available, don't render anything
@@ -57,6 +61,7 @@ export default function MoreProjects({
       columns={3}
       cards={projectCards}
       labels={labels}
+      lang={lang}
     />
   );
 }

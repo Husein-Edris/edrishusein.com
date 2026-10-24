@@ -354,4 +354,72 @@ describe('DataFetcher', () => {
       await expect(DataFetcher.getHomepageData()).rejects.toThrow(/500/);
     });
   });
+
+  describe('German pages', () => {
+    const ok = (body: unknown) => ({ ok: true, json: () => Promise.resolve(body) });
+
+    it('renders the _de values of the home page and German section defaults', async () => {
+      mockFetch.mockResolvedValueOnce(
+        ok([
+          {
+            id: 1,
+            acf_fields: {
+              hero_section: { hero_title: 'Servus. I build websites', hero_title_de: 'Servus. Ich baue Websites', hero_copy: 'Copy' },
+              about_me_section: { title: 'About me', title_de: '' },
+            },
+          },
+        ])
+      );
+
+      const result = await DataFetcher.getHomepageData('de');
+
+      expect(result.data?.heroSection?.heading).toBe('Servus. Ich baue Websites');
+      expect(result.data?.heroSection?.heroCopy).toBe('Copy');
+      expect(result.data?.aboutSection?.title).toBe('About me');
+      expect(result.data?.notebookSection?.title).toBe('NOTIZBUCH');
+      expect(result.data?.testimonialsSection?.title).toBe('Das sagen Kunden');
+    });
+
+    it('renders project titles from title_de, English when empty', async () => {
+      mockFetch.mockResolvedValueOnce(
+        ok([
+          { ...mockRESTProjects[0], acf_fields: { title_de: 'Projekt eins' } },
+          { ...mockRESTProjects[0], id: 2, slug: 'two', acf_fields: { title_de: '' } },
+        ])
+      );
+
+      const result = await DataFetcher.getProjectsData(20, 'de');
+
+      expect(result.data?.projects.nodes.map((node) => node.title)).toEqual(['Projekt eins', 'REST Project 1']);
+    });
+
+    it('labels a post German when it has content_de, else keeps the detected language', async () => {
+      mockFetch.mockResolvedValueOnce(
+        ok([
+          {
+            ...mockRESTPosts[0],
+            title: { rendered: 'Why the build is slow and how to fix it' },
+            acf_fields: { title_de: 'Warum der Build langsam ist', content_de: '<p>Der Text auf Deutsch.</p>' },
+          },
+          { ...mockRESTPosts[0], id: 2, slug: 'en-only', title: { rendered: 'This is only in English and it is fine' } },
+        ])
+      );
+
+      const result = await DataFetcher.getPostsData(3, 'de');
+      const [german, english] = result.data?.posts.nodes ?? [];
+
+      expect(german.title).toBe('Warum der Build langsam ist');
+      expect(german.language).toBe('de');
+      expect(english.title).toBe('This is only in English and it is fine');
+      expect(english.language).toBe('en');
+    });
+
+    it('leaves English pages on the original text', async () => {
+      mockFetch.mockResolvedValueOnce(ok([{ ...mockRESTProjects[0], acf_fields: { title_de: 'Projekt eins' } }]));
+
+      const result = await DataFetcher.getProjectsData(20);
+
+      expect(result.data?.projects.nodes[0].title).toBe('REST Project 1');
+    });
+  });
 });

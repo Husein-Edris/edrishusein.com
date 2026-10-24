@@ -4,12 +4,32 @@ import { rendered } from './transformProjects';
 import { decodeEntities } from './decodeEntities';
 import { asArray } from './asArray';
 import { cmsText } from '../cms-text';
+import type { Lang } from '../i18n/lang';
 
 // Code fallbacks for About page fields (theme inc/acf-fields/about-page.php,
 // same strings as the fields' default_value). Map: docs/acf-content-map.md.
 export const ABOUT_TEXT_DEFAULTS = {
   technologiesLabel: 'Technologies:',
   hobbiesTitle: 'Interests & Hobbies',
+} as const;
+
+// Code defaults per language for the section titles and labels.
+const ABOUT_DEFAULTS = {
+  en: {
+    ...ABOUT_TEXT_DEFAULTS,
+    title: 'About',
+    experienceTitle: 'Experience',
+    skillsTitle: 'Skills & Technologies',
+    personalTitle: 'Personal',
+  },
+  de: {
+    technologiesLabel: 'Technologien:',
+    hobbiesTitle: 'Interessen und Hobbys',
+    title: 'Über mich',
+    experienceTitle: 'Berufserfahrung',
+    skillsTitle: 'Fähigkeiten und Technologien',
+    personalTitle: 'Persönliches',
+  },
 } as const;
 
 interface RelationPost {
@@ -146,15 +166,17 @@ function techNamesFor(
  */
 export function transformAbout(
   page: RestAboutPage,
-  techNames: Map<number, string> = new Map()
+  techNames: Map<number, string> = new Map(),
+  lang: Lang = 'en'
 ): AboutPageData {
+  const defaults = ABOUT_DEFAULTS[lang];
   const acf = page.acf_fields ?? page.acf ?? {};
   const featured = page._embedded?.['wp:featuredmedia']?.[0];
 
   return {
     page: {
       id: String(page.id ?? 'about'),
-      title: decodeEntities(rendered(page.title)) || 'About',
+      title: decodeEntities(rendered(page.title)) || defaults.title,
       content: rendered(page.content),
       featuredImage: transformMedia(featured as never),
       aboutPageFields: {
@@ -162,8 +184,8 @@ export function transformAbout(
         aboutHeroSubtitle: acf.about_hero_subtitle ?? '',
         aboutHeroImage: transformMedia(acf.about_hero_image),
         experienceSection: {
-          sectionTitle: acf.experience_section_title || 'Experience',
-          technologiesLabel: cmsText(acf.experience_technologies_label, ABOUT_TEXT_DEFAULTS.technologiesLabel),
+          sectionTitle: acf.experience_section_title || defaults.experienceTitle,
+          technologiesLabel: cmsText(acf.experience_technologies_label, defaults.technologiesLabel),
           experienceItems: asArray<RestExperienceItem>(acf.experience_items).map((item) => ({
             company_name: item.company_name ?? '',
             position: item.position ?? '',
@@ -173,14 +195,14 @@ export function transformAbout(
           })),
         },
         skillsSection: {
-          sectionTitle: acf.skills_section_title || 'Skills & Technologies',
+          sectionTitle: acf.skills_section_title || defaults.skillsTitle,
           selectedSkills: mapRelation(acf.selected_skills),
         },
         personalSection: {
-          sectionTitle: acf.personal_section_title || 'Personal',
+          sectionTitle: acf.personal_section_title || defaults.personalTitle,
           personalContent: acf.personal_content ?? '',
           personalImage: transformMedia(acf.personal_image),
-          hobbiesTitle: cmsText(acf.hobbies_section_title, ABOUT_TEXT_DEFAULTS.hobbiesTitle),
+          hobbiesTitle: cmsText(acf.hobbies_section_title, defaults.hobbiesTitle),
           selectedHobbies: mapRelation(acf.selected_hobbies),
         },
       },

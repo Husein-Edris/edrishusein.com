@@ -5,6 +5,8 @@ import { decodeEntities } from './decodeEntities';
 import { asArray } from './asArray';
 import { resolveReadingTime } from '../reading-time';
 import { detectContentLanguage, type ContentLanguage } from '../detect-language';
+import { hasTranslatedContent, localizeRestItem } from '../i18n/localize';
+import type { Lang } from '../i18n/lang';
 
 interface RestTerm { name?: string; slug?: string; taxonomy?: string }
 
@@ -121,4 +123,20 @@ export function transformPostDetail(post: RestPost): PostDetail {
         }
       : null,
   };
+}
+
+/**
+ * A post in a page language. On German pages a post with a German body
+ * (acf_fields.content_de) renders that text and is labelled German; without one
+ * it keeps its original text and the language detected from it.
+ */
+export function localizedPostListItem(post: RestPost, lang: Lang): PostListItem {
+  const item = transformPostListItem(localizeRestItem(post, lang));
+  return lang === 'de' && hasTranslatedContent(post) ? { ...item, language: 'de' } : item;
+}
+
+/** Same as localizedPostListItem, for the article page. */
+export function localizedPostDetail(post: RestPost, lang: Lang): PostDetail {
+  const detail = transformPostDetail(localizeRestItem(post, lang));
+  return lang === 'de' && hasTranslatedContent(post) ? { ...detail, language: 'de' } : detail;
 }

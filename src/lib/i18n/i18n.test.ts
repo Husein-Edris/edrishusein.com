@@ -9,6 +9,7 @@ import {
   isLang,
   localePath,
   localizeAcf,
+  localizeContentLinks,
   localizeRestItem,
   localizeSiteContent,
   stripLocale,
@@ -268,5 +269,27 @@ describe('localizeSiteContent', () => {
   it('treats a non-object response as empty', () => {
     expect(localizeSiteContent(null, 'de')).toEqual({});
     expect(localizeSiteContent([], 'de')).toEqual({});
+  });
+});
+
+describe('localizeContentLinks', () => {
+  it('points site links in CMS HTML at the German pages', () => {
+    const html =
+      '<a href="/contact">C</a> <a href="https://edrishusein.com/notebook/x#part">N</a> <a href="https://edrishusein.com">H</a>';
+    expect(localizeContentLinks(html, 'de')).toBe(
+      '<a href="/de/contact">C</a> <a href="https://edrishusein.com/de/notebook/x#part">N</a> <a href="https://edrishusein.com">H</a>'
+    );
+  });
+
+  it('leaves files, external, mailto, already German links and English pages alone', () => {
+    const html =
+      '<a href="/images/a.png">i</a><a href="https://example.com/about">e</a><a href="mailto:a@b.c">m</a><a href="/de/about">d</a>';
+    expect(localizeContentLinks(html, 'de')).toBe(html);
+    expect(localizeContentLinks('<a href="/contact">C</a>', 'en')).toBe('<a href="/contact">C</a>');
+  });
+
+  it('is applied to the body by localizeRestItem on German pages', () => {
+    const item = { content: { rendered: '<a href="/contact">C</a>' }, acf_fields: {} };
+    expect(localizeRestItem(item, 'de').content.rendered).toBe('<a href="/de/contact">C</a>');
   });
 });

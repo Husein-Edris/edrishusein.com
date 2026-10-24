@@ -5,8 +5,11 @@
 // keyboard focus could land on a frame that is mostly off screen. Scrolling the
 // focused frame into view here keeps keyboard users on the visible frame.
 import type { FocusEvent, ReactNode } from 'react';
+import { useLang } from '@/src/components/LangProvider/LangProvider';
+import { dictionary } from '@/src/lib/i18n/dictionary';
 
 export default function HeroStrip({ children }: { children: ReactNode }) {
+  const label = dictionary(useLang()).selectedProjects;
   const handleFocus = (event: FocusEvent<HTMLUListElement>) => {
     const strip = event.currentTarget;
     if (strip.scrollWidth <= strip.clientWidth) return;
@@ -15,7 +18,7 @@ export default function HeroStrip({ children }: { children: ReactNode }) {
   };
 
   return (
-    <ul className="hero__strip" aria-label="Selected projects" onFocus={handleFocus}>
+    <ul className="hero__strip" aria-label={label} onFocus={handleFocus}>
       {children}
     </ul>
   );

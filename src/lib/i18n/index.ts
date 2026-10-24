@@ -7,5 +7,5 @@ export {
   stripLocale,
   type LanguageAlternates,
 } from './paths';
-export { hasTranslatedContent, localizeAcf, localizeRestItem, localizeSiteContent } from './localize';
+export { hasTranslatedContent, localizeAcf, localizeContentLinks, localizeRestItem, localizeSiteContent } from './localize';
 export { DICTIONARY, LANG_SWITCH, dictionary, type Dictionary } from './dictionary';

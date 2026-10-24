@@ -342,3 +342,8 @@ $nav-collapse: 1279px;
     }
   }
 }
+// Page names come from Site Content in title case (the footer shows them as
+// written); the header has always shown them in capitals.
+.header .navText {
+  text-transform: uppercase;
+}

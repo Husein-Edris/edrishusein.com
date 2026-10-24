@@ -2,6 +2,7 @@ import { asArray } from './asArray';
 import { cmsText } from '@/src/lib/cms-text';
 import { decodeEntities } from './decodeEntities';
 import { transformMedia, type RestMedia } from './transformMedia';
+import type { Lang } from '../i18n/lang';
 
 export type TestimonialLang = 'en' | 'de';
 
@@ -125,6 +126,14 @@ export const DEFAULT_TESTIMONIALS_SECTION: TestimonialsSection = {
   ],
 };
 
+// Section labels on German pages. The quotes themselves are never translated:
+// each stays in the words the client wrote (its own `lang`).
+export const TESTIMONIALS_LABELS_DE = {
+  title: 'Das sagen Kunden',
+  prevLabel: 'Zurück',
+  nextLabel: 'Weiter',
+} as const;
+
 /** One post from /wp-json/wp/v2/testimonial (custom `acf_fields` key). */
 export interface RestTestimonialPost {
   id?: unknown;
@@ -229,7 +238,8 @@ export function selectedTestimonialIds(acfFields: unknown): number[] {
  */
 export function transformTestimonials(
   acfFields: unknown,
-  posts: RestTestimonialPost[] = []
+  posts: RestTestimonialPost[] = [],
+  lang: Lang = 'en'
 ): TestimonialsSection {
   const group = sectionOf(acfFields);
   const byId = new Map<number, RestTestimonialPost>();
@@ -243,11 +253,12 @@ export function transformTestimonials(
     .map(toItem)
     .filter((entry): entry is Testimonial => entry !== null);
   const defaults = DEFAULT_TESTIMONIALS_SECTION;
+  const labels = lang === 'de' ? TESTIMONIALS_LABELS_DE : defaults;
 
   return {
-    title: cmsText(group.section_title, defaults.title),
-    prevLabel: cmsText(group.prev_label, defaults.prevLabel),
-    nextLabel: cmsText(group.next_label, defaults.nextLabel),
+    title: cmsText(group.section_title, labels.title),
+    prevLabel: cmsText(group.prev_label, labels.prevLabel),
+    nextLabel: cmsText(group.next_label, labels.nextLabel),
     items: items.length > 0 ? items : defaults.items,
   };
 }
