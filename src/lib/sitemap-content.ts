@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { cmsRest, isTransientCmsError } from './rest-client';
+import { localePath } from './i18n/paths';
 
 export interface SitemapContentItem {
   slug: string;
@@ -61,4 +62,22 @@ export function toSitemapEntries(
       changeFrequency,
       priority,
     }));
+}
+
+/**
+ * Each English sitemap entry plus its German twin (/de + same path), both
+ * naming each other and x-default (English) under alternates.languages, which
+ * Next renders as xhtml:link hreflang entries.
+ */
+export function withLanguageVersions(entries: MetadataRoute.Sitemap, baseUrl: string): MetadataRoute.Sitemap {
+  return entries.flatMap((entry) => {
+    const path = entry.url.startsWith(baseUrl) ? entry.url.slice(baseUrl.length) || '/' : entry.url;
+    const en = `${baseUrl}${path === '/' ? '' : localePath(path, 'en')}`;
+    const de = `${baseUrl}${localePath(path, 'de')}`;
+    const alternates = { languages: { en, de, 'x-default': en } };
+    return [
+      { ...entry, url: en, alternates },
+      { ...entry, url: de, alternates },
+    ];
+  });
 }

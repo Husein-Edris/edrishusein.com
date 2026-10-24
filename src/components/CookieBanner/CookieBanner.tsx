@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { notifyConsentChange } from '@/src/lib/consent';
 import { SITE_CONTENT_DEFAULTS, type CookieBannerContent } from '@/src/lib/transform/transformSiteContent';
+import { useLang } from '@/src/components/LangProvider/LangProvider';
+import { localePath } from '@/src/lib/i18n/paths';
+import { dictionary } from '@/src/lib/i18n/dictionary';
 import './CookieBanner.scss';
 
 interface CookieConsent {
@@ -20,6 +23,7 @@ interface CookieBannerProps {
 
 const CookieBanner = ({ copy = SITE_CONTENT_DEFAULTS.cookieBanner }: CookieBannerProps) => {
   const [isVisible, setIsVisible] = useState(false);
+  const lang = useLang();
 
   useEffect(() => {
     const checkConsent = () => {
@@ -122,11 +126,11 @@ const CookieBanner = ({ copy = SITE_CONTENT_DEFAULTS.cookieBanner }: CookieBanne
   if (!isVisible) return null;
 
   return (
-    <div className="cookie-banner" role="region" aria-label="Cookie consent">
+    <div className="cookie-banner" role="region" aria-label={dictionary(lang).cookieConsentRegion}>
       <div className="cookie-banner-content">
         <p className="cookie-description">
           {copy.text}{' '}
-          <Link href="/privacy-policy" className="cookie-link">
+          <Link href={localePath('/privacy-policy', lang)} className="cookie-link">
             {copy.privacyLinkLabel}
           </Link>
         </p>
@@ -137,7 +141,7 @@ const CookieBanner = ({ copy = SITE_CONTENT_DEFAULTS.cookieBanner }: CookieBanne
           <button type="button" className="cookie-btn cookie-btn-accept" onClick={handleAcceptAll}>
             {copy.acceptLabel}
           </button>
-          <Link href="/cookie-settings" className="cookie-settings-link">
+          <Link href={localePath('/cookie-settings', lang)} className="cookie-settings-link">
             {copy.settingsLabel}
           </Link>
         </div>

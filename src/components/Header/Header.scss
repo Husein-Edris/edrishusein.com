@@ -262,6 +262,8 @@ $nav-collapse: 1279px;
             align-items: center;
             min-height: 44px;
             position: relative;
+            // Two-word labels (ÜBER MICH) stay on one line.
+            white-space: nowrap;
 
             &::after {
               content: "";
@@ -341,4 +343,9 @@ $nav-collapse: 1279px;
       height: $spacing-3xl;
     }
   }
+}
+// Page names come from Site Content in title case (the footer shows them as
+// written); the header has always shown them in capitals.
+.header .navText {
+  text-transform: uppercase;
 }

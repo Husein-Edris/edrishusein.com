@@ -5,6 +5,9 @@ import {
   generateBreadcrumbStructuredData,
   generateHomepageStructuredData,
   generateCollectionPageStructuredData,
+  generateContactPageStructuredData,
+  generateProfilePageStructuredData,
+  pageOpenGraph,
   metaDescriptionFrom,
   safeJsonLd,
   type RankMathSEO,
@@ -695,5 +698,44 @@ describe('metaDescriptionFrom', () => {
 
   it('returns an empty string for markup with no text', () => {
     expect(metaDescriptionFrom('<p> </p>\n')).toBe('');
+  });
+});
+
+describe('German pages', () => {
+  it('generateEnhancedMetadata sets the German canonical, hreflang pair and de_AT locale', () => {
+    const result = generateEnhancedMetadata(null, { title: 'T', path: '/about', lang: 'de' });
+    expect(result.alternates?.canonical).toBe('https://edrishusein.com/de/about');
+    expect(result.alternates?.languages).toEqual({ en: '/about', de: '/de/about', 'x-default': '/about' });
+    expect((result.openGraph as { locale?: string }).locale).toBe('de_AT');
+  });
+
+  it('pageOpenGraph localizes the URL and locale', () => {
+    const og = pageOpenGraph({ title: 'T', description: 'D', path: '/projects', lang: 'de' });
+    expect(og.url).toBe('/de/projects');
+    expect(og.locale).toBe('de_AT');
+    expect(og.alternateLocale).toEqual(['en_US']);
+    expect(pageOpenGraph({ title: 'T', description: 'D', path: '/projects' }).locale).toBe('en_US');
+  });
+
+  it('adds a German WebPage node to the homepage graph only on /de', () => {
+    const de = generateHomepageStructuredData('de') as { '@graph': Array<Record<string, unknown>> };
+    const en = generateHomepageStructuredData() as { '@graph': Array<Record<string, unknown>> };
+    expect(de['@graph'].find((node) => node['@type'] === 'WebPage')).toMatchObject({ inLanguage: 'de-AT', url: 'https://edrishusein.com/de' });
+    expect(en['@graph'].some((node) => node['@type'] === 'WebPage')).toBe(false);
+  });
+
+  it('profile, contact and collection pages carry the German URL and inLanguage', () => {
+    expect(generateProfilePageStructuredData({ title: 'T', description: 'D', lang: 'de' })).toMatchObject({
+      url: 'https://edrishusein.com/de/about',
+      inLanguage: 'de',
+    });
+    expect(generateContactPageStructuredData('D', { lang: 'de', name: 'Kontakt' })).toMatchObject({
+      url: 'https://edrishusein.com/de/contact',
+      name: 'Kontakt',
+      inLanguage: 'de',
+    });
+    expect(
+      generateCollectionPageStructuredData({ name: 'N', description: 'D', path: '/de/notebook', items: [], lang: 'de' })
+    ).toMatchObject({ url: 'https://edrishusein.com/de/notebook', inLanguage: 'de' });
   });
 });

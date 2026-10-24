@@ -1,4 +1,6 @@
 import { Metadata } from 'next';
+import { alternatesFor, absoluteUrl, localePath } from './i18n/paths';
+import { DEFAULT_LANG, OG_LOCALE, otherLang, type Lang } from './i18n/lang';
 
 // Enhanced SEO types for RankMath
 export interface RankMathSEO {
@@ -43,14 +45,16 @@ interface FallbackData {
   description?: string;
   path: string;
   type?: 'website' | 'article';
+  /** Page language; `path` is the English path. */
+  lang?: Lang;
 }
 
 export function generateEnhancedMetadata(
   seoData: RankMathSEO | null, 
   fallbackData: FallbackData
 ): Metadata {
-  const baseUrl = 'https://edrishusein.com';
-  const canonicalUrl = seoData?.canonical || `${baseUrl}${fallbackData.path}`;
+  const lang = fallbackData.lang ?? DEFAULT_LANG;
+  const canonicalUrl = seoData?.canonical || absoluteUrl(fallbackData.path, lang);
   
   return {
     title: seoData?.title || fallbackData.title,
@@ -59,6 +63,7 @@ export function generateEnhancedMetadata(
     keywords: seoData?.focusKeywords?.join(', '),
     alternates: {
       canonical: canonicalUrl,
+      languages: alternatesFor(fallbackData.path, lang).languages,
     },
     openGraph: {
       title: seoData?.social?.facebook?.title || seoData?.title || fallbackData.title,
@@ -70,6 +75,8 @@ export function generateEnhancedMetadata(
         alt: seoData.opengraphImage.altText || fallbackData.title,
       }] : [],
       type: fallbackData.type === 'article' ? 'article' : 'website',
+      locale: OG_LOCALE[lang],
+      alternateLocale: [OG_LOCALE[otherLang(lang)]],
     },
     twitter: {
       card: (seoData?.social?.twitter?.cardType as any) || 'summary_large_image',
@@ -133,6 +140,7 @@ export function generateStructuredData(type: string, data: any): object {
         name: data.title,
         description: data.description,
         url: data.canonical,
+        ...(data.inLanguage ? { inLanguage: data.inLanguage } : {}),
         // Minimal stub of the Person entity declared fully in the homepage
         // @graph. The shared @id joins them site-wide; name/url keep the node
         // resolvable when Google parses this page on its own.
@@ -154,6 +162,7 @@ export function generateStructuredData(type: string, data: any): object {
           name: "Edris Husein"
         },
         url: data.canonical,
+        ...(data.inLanguage ? { inLanguage: data.inLanguage } : {}),
         image: data.featuredImage?.node?.sourceUrl,
         dateCreated: data.date,
         genre: "Web Development"
@@ -172,7 +181,22 @@ export function generateStructuredData(type: string, data: any): object {
 // never published.
 const SITE_URL = 'https://edrishusein.com';
 
-export function generateHomepageStructuredData(): object {
+export function generateHomepageStructuredData(lang: Lang = DEFAULT_LANG): object {
+  // The German homepage adds its own WebPage node (inLanguage de-AT), tied to
+  // the shared WebSite and service entities.
+  const germanPage =
+    lang === 'de'
+      ? [
+          {
+            "@type": "WebPage",
+            "@id": `${SITE_URL}/de#webpage`,
+            url: `${SITE_URL}/de`,
+            inLanguage: "de-AT",
+            isPartOf: { "@id": `${SITE_URL}/#website` },
+            about: { "@id": `${SITE_URL}/#service` },
+          },
+        ]
+      : [];
   return {
     "@context": "https://schema.org",
     "@graph": [
@@ -233,7 +257,8 @@ export function generateHomepageStructuredData(): object {
         name: "Edris Husein",
         url: SITE_URL,
         publisher: { "@id": `${SITE_URL}/#person` }
-      }
+      },
+      ...germanPage
     ]
   };
 }
@@ -242,19 +267,28 @@ export function generateHomepageStructuredData(): object {
 // the root layout's whole openGraph object (Next merges metadata per top-level
 // key), so a page adding just og:url would silently lose the shared image and
 // locale; this helper keeps every required tag together.
-export function pageOpenGraph(data: { title: string; description: string; path: string }) {
+export function pageOpenGraph(data: {
+  title: string;
+  description: string;
+  /** English path; localized with `lang`. */
+  path: string;
+  lang?: Lang;
+  imageAlt?: string;
+}) {
+  const lang = data.lang ?? DEFAULT_LANG;
   return {
     title: data.title,
     description: data.description,
-    url: data.path,
+    url: localePath(data.path, lang),
     type: 'website' as const,
-    locale: 'en_US',
+    locale: OG_LOCALE[lang],
+    alternateLocale: [OG_LOCALE[otherLang(lang)]],
     images: [
       {
         url: '/images/Edris-Husein-Hero.png',
         width: 450,
         height: 450,
-        alt: 'Edris Husein - Web Developer',
+        alt: data.imageAlt ?? 'Edris Husein - Web Developer',
       },
     ],
   };
@@ -274,26 +308,31 @@ function personRef(): object {
 
 // ProfilePage for /about: the strongest "this page is about this person" signal
 // schema.org offers, and the join point between the site and the name SERP.
-export function generateProfilePageStructuredData(data: { title: string; description: string }): object {
+export function generateProfilePageStructuredData(data: { title: string; description: string; lang?: Lang }): object {
   return {
     "@context": "https://schema.org",
     "@type": "ProfilePage",
     name: data.title,
     description: data.description,
-    url: `${SITE_URL}/about`,
+    url: absoluteUrl('/about', data.lang),
+    ...(data.lang ? { inLanguage: data.lang } : {}),
     isPartOf: { "@id": `${SITE_URL}/#website` },
     mainEntity: personRef(),
   };
 }
 
 // ContactPage for /contact, tied to the same Person entity.
-export function generateContactPageStructuredData(description: string): object {
+export function generateContactPageStructuredData(
+  description: string,
+  options: { lang?: Lang; name?: string } = {}
+): object {
   return {
     "@context": "https://schema.org",
     "@type": "ContactPage",
-    name: "Contact Edris Husein",
+    name: options.name ?? "Contact Edris Husein",
     description,
-    url: `${SITE_URL}/contact`,
+    url: absoluteUrl('/contact', options.lang),
+    ...(options.lang ? { inLanguage: options.lang } : {}),
     isPartOf: { "@id": `${SITE_URL}/#website` },
     mainEntity: personRef(),
   };
@@ -311,6 +350,8 @@ export interface CollectionListing {
   /** Site-relative path of the listing page itself, e.g. "/notebook". */
   path: string;
   items: CollectionListingItem[];
+  /** Page language; adds inLanguage. Paths are passed already localized. */
+  lang?: Lang;
 }
 
 // Build a meta description from CMS-rendered HTML (post/project excerpts).
@@ -341,6 +382,7 @@ export interface CollectionPageLd {
   name: string;
   description: string;
   url: string;
+  inLanguage?: string;
   isPartOf: { "@id": string };
   mainEntity: {
     "@type": "ItemList";
@@ -349,7 +391,7 @@ export interface CollectionPageLd {
   };
 }
 
-function absoluteUrl(path: string): string {
+function siteRelativeUrl(path: string): string {
   return path.startsWith('http') ? path : `${SITE_URL}${path}`;
 }
 
@@ -364,7 +406,8 @@ export function generateCollectionPageStructuredData(listing: CollectionListing)
     "@type": "CollectionPage",
     name: listing.name,
     description: listing.description,
-    url: absoluteUrl(listing.path),
+    url: siteRelativeUrl(listing.path),
+    ...(listing.lang ? { inLanguage: listing.lang } : {}),
     isPartOf: { "@id": `${SITE_URL}/#website` },
     mainEntity: {
       "@type": "ItemList",
@@ -373,7 +416,7 @@ export function generateCollectionPageStructuredData(listing: CollectionListing)
         "@type": "ListItem",
         position: index + 1,
         name: item.title,
-        url: absoluteUrl(item.path),
+        url: siteRelativeUrl(item.path),
       })),
     },
   };

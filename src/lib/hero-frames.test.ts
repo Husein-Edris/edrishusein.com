@@ -94,6 +94,13 @@ describe('buildHeroFrames', () => {
   });
 });
 
+describe('buildHeroFrames on German pages', () => {
+  it('links each frame to the German case study', () => {
+    const [frame] = buildHeroFrames([project('own', { highlighted: true })], 'de');
+    expect(frame.href).toBe('/de/projects/own');
+  });
+});
+
 describe('buildHeroCopyLinks', () => {
   it('maps the three project names to their live sites', () => {
     expect(buildHeroCopyLinks(PROD_ORDER)).toEqual([

@@ -4,7 +4,10 @@ import { FC, useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { GERMAN_LANDING_PATH } from '@/src/lib/german-landing';
+import { useLang, useNavLabels } from '@/src/components/LangProvider/LangProvider';
+import { localePath, stripLocale } from '@/src/lib/i18n/paths';
+import { otherLang } from '@/src/lib/i18n/lang';
+import { LANG_SWITCH, dictionary } from '@/src/lib/i18n/dictionary';
 import './Header.scss';
 
 // Keep in sync with $nav-collapse in Header.scss.
@@ -12,12 +15,19 @@ const NAV_COLLAPSE_MAX = 1279;
 
 const Header: FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  // Language switch: the German landing page links back to the English
-  // homepage, every other page links to the German landing page.
-  const isGerman = usePathname() === GERMAN_LANDING_PATH;
-  const langSwitch = isGerman
-    ? { href: '/', label: 'EN', hrefLang: 'en', title: 'English version' }
-    : { href: GERMAN_LANDING_PATH, label: 'DE', hrefLang: 'de', title: 'Deutsche Version' };
+  const lang = useLang();
+  const nav = useNavLabels();
+  const text = dictionary(lang);
+  // Language switch: the same page in the other language (same path, with or
+  // without /de). stripLocale also covers the internal /en/... path in case the
+  // rewritten pathname reaches this hook during server rendering.
+  const targetLang = otherLang(lang);
+  const langSwitch = {
+    href: localePath(stripLocale(usePathname()).path, targetLang),
+    hrefLang: targetLang,
+    ...LANG_SWITCH[targetLang],
+  };
+  const href = (path: string) => localePath(path, lang);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -116,10 +126,10 @@ const Header: FC = () => {
   return (
     <header className="header">
       <div className="container">
-        <Link href="/" className="logo">
+        <Link href={href('/')} className="logo">
           <Image
             src="/edrishusein-logo.svg"
-            alt="Edris Husein Logo"
+            alt={text.logoAlt}
             width={80}
             height={40}
             priority
@@ -136,34 +146,34 @@ const Header: FC = () => {
         >
           <nav
             className="main-nav"
-            aria-label="Primary"
+            aria-label={text.primaryNavLabel}
             onClick={(e) => e.stopPropagation()}
             onTouchMove={(e) => e.stopPropagation()} // Allow navigation area to be touchable
           >
             <ul className="navList">
               <li className="navItem">
-                <Link href="/projects" className="navLink" onClick={closeMenu}>
-                  <span className="navText">PROJECTS</span>
+                <Link href={href('/projects')} className="navLink" onClick={closeMenu}>
+                  <span className="navText">{nav.projects}</span>
                 </Link>
               </li>
               <li className="navItem">
-                <Link href="/about" className="navLink" onClick={closeMenu}>
-                  <span className="navText">ABOUT</span>
+                <Link href={href('/about')} className="navLink" onClick={closeMenu}>
+                  <span className="navText">{nav.about}</span>
                 </Link>
               </li>
               <li className="navItem">
-                <Link href="/bookshelf" className="navLink" onClick={closeMenu}>
-                  <span className="navText">BOOKSHELF</span>
+                <Link href={href('/bookshelf')} className="navLink" onClick={closeMenu}>
+                  <span className="navText">{nav.bookshelf}</span>
                 </Link>
               </li>
               <li className="navItem">
-                <Link href="/notebook" className="navLink" onClick={closeMenu}>
-                  <span className="navText">NOTEBOOK</span>
+                <Link href={href('/notebook')} className="navLink" onClick={closeMenu}>
+                  <span className="navText">{nav.notebook}</span>
                 </Link>
               </li>
               <li className="navItem">
-                <Link href="/tech-stack" className="navLink" onClick={closeMenu}>
-                  <span className="navText">TECH STACK</span>
+                <Link href={href('/tech-stack')} className="navLink" onClick={closeMenu}>
+                  <span className="navText">{nav.techStack}</span>
                 </Link>
               </li>
               <li className="navItem navItem--lang">
@@ -180,8 +190,8 @@ const Header: FC = () => {
                 </Link>
               </li>
               <li className="navItem navItem--cta">
-                <Link href="/contact" className="navLink navLink--cta" onClick={closeMenu}>
-                  <span className="navText">CONTACT</span>
+                <Link href={href('/contact')} className="navLink navLink--cta" onClick={closeMenu}>
+                  <span className="navText">{nav.contact}</span>
                 </Link>
               </li>
             </ul>
@@ -192,7 +202,7 @@ const Header: FC = () => {
           ref={toggleRef}
           className="menu-toggle"
           onClick={toggleMenu}
-          aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+          aria-label={isMenuOpen ? text.closeMenu : text.openMenu}
           aria-expanded={isMenuOpen}
           aria-controls="mobile-menu"
         >

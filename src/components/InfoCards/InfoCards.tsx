@@ -7,6 +7,8 @@ import SectionHeader from '../SectionHeader/SectionHeader';
 import { truncateExcerpt } from './truncateExcerpt';
 import TiltMedia from './TiltMedia';
 import { PROJECT_CARD_LABEL_DEFAULTS, type ProjectCardLabels } from '@/src/lib/transform/transformSiteContent';
+import { dictionary, type Dictionary } from '@/src/lib/i18n/dictionary';
+import { DEFAULT_LANG, type Lang } from '@/src/lib/i18n/lang';
 
 type CardVariant = 'dark' | 'light';
 type CardSkin = 'projects' | 'blog' | 'default' | 'bookshelf' | 'techstack';
@@ -41,6 +43,8 @@ interface InfoCardsProps {
   restTitle?: string;
   /** Projects skin: CMS-editable card labels (Site Content options page). */
   labels?: ProjectCardLabels;
+  /** Page language for screen-reader text; card links arrive already localized. */
+  lang?: Lang;
 }
 
 interface CardProps {
@@ -48,17 +52,18 @@ interface CardProps {
   skin: CardSkin;
   variant: CardVariant;
   labels: ProjectCardLabels;
+  text: Dictionary;
 }
 
 function hasLiveSite(card: InfoCardProps): boolean {
   return Boolean(card.visitLink && card.visitLink !== '#');
 }
 
-function LiveSiteLink({ href, label }: { href: string; label: string }) {
+function LiveSiteLink({ href, label, text }: { href: string; label: string; text: Dictionary }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer" className="project-link visit-site-link">
       {label}
-      <span className="sr-only"> (opens in a new tab)</span>
+      <span className="sr-only"> ({text.opensInNewTab})</span>
     </a>
   );
 }
@@ -67,10 +72,12 @@ function FeaturedProjectCard({
   card,
   index,
   labels,
+  text,
 }: {
   card: InfoCardProps;
   index: number;
   labels: ProjectCardLabels;
+  text: Dictionary;
 }) {
   const href = card.caseStudyLink || card.link || '#';
 
@@ -100,7 +107,7 @@ function FeaturedProjectCard({
         </h3>
         <div className="card-description" dangerouslySetInnerHTML={{ __html: card.description }} />
         {card.tags && card.tags.length > 0 && (
-          <ul className="card-tags" aria-label="Technologies">
+          <ul className="card-tags" aria-label={text.technologiesLabel}>
             {card.tags.map((tag) => (
               <li key={tag} className="card-tag">
                 {tag}
@@ -112,14 +119,14 @@ function FeaturedProjectCard({
           <span className="project-link case-study-link" aria-hidden="true">
             {labels.readCaseStudyLabel}
           </span>
-          {hasLiveSite(card) && <LiveSiteLink href={card.visitLink as string} label={labels.visitLiveSiteLabel} />}
+          {hasLiveSite(card) && <LiveSiteLink href={card.visitLink as string} label={labels.visitLiveSiteLabel} text={text} />}
         </div>
       </div>
     </TiltMedia>
   );
 }
 
-function ProjectCard({ card, variant, labels }: Omit<CardProps, 'skin'>) {
+function ProjectCard({ card, variant, labels, text }: Omit<CardProps, 'skin'>) {
   const href = card.caseStudyLink || card.link || '#';
 
   return (
@@ -148,7 +155,7 @@ function ProjectCard({ card, variant, labels }: Omit<CardProps, 'skin'>) {
             <span className="project-link case-study-link" aria-hidden="true">
               {labels.readCaseStudyLabel}
             </span>
-            {hasLiveSite(card) && <LiveSiteLink href={card.visitLink as string} label={labels.visitLiveSiteLabel} />}
+            {hasLiveSite(card) && <LiveSiteLink href={card.visitLink as string} label={labels.visitLiveSiteLabel} text={text} />}
           </div>
         </div>
       </div>
@@ -156,7 +163,7 @@ function ProjectCard({ card, variant, labels }: Omit<CardProps, 'skin'>) {
   );
 }
 
-function LinkCard({ card, skin, variant }: Omit<CardProps, 'labels'>) {
+function LinkCard({ card, skin, variant }: Omit<CardProps, 'labels' | 'text'>) {
   return (
     <Link href={card.link || '#'} className={`card ${card.variant || variant}`}>
       <div className="card-content">
@@ -187,17 +194,17 @@ function LinkCard({ card, skin, variant }: Omit<CardProps, 'labels'>) {
   );
 }
 
-function Card({ card, skin, variant, labels }: CardProps) {
-  if (skin === 'projects') return <ProjectCard card={card} variant={variant} labels={labels} />;
+function Card({ card, skin, variant, labels, text }: CardProps) {
+  if (skin === 'projects') return <ProjectCard card={card} variant={variant} labels={labels} text={text} />;
   if (!card.link) return null;
   return <LinkCard card={card} skin={skin} variant={variant} />;
 }
 
-function ViewMore({ href, text, className }: { href: string; text?: string; className: string }) {
+function ViewMore({ href, text, fallback, className }: { href: string; text?: string; fallback: string; className: string }) {
   return (
     <div className={`view-more-inline ${className}`}>
       <Link href={href} className="view-more-link">
-        {text || 'VIEW MORE'}
+        {text || fallback}
       </Link>
     </div>
   );
@@ -216,7 +223,9 @@ function InfoCards({
   featuredCount = 0,
   restTitle,
   labels = PROJECT_CARD_LABEL_DEFAULTS,
+  lang = DEFAULT_LANG,
 }: InfoCardsProps) {
+  const text = dictionary(lang);
   const allCards = cards ?? [];
   const featureLimit = skin === 'projects' ? featuredCount : 0;
   const featuredCards = allCards.slice(0, featureLimit).map((card) => ({
@@ -234,7 +243,7 @@ function InfoCards({
         {(sectionNumber || sectionTitle) && (
           <div className="section-header-wrapper">
             <SectionHeader number={sectionNumber || ''} title={sectionTitle || ''} variant={variant} hideNumber />
-            {viewMoreLink && <ViewMore href={viewMoreLink} text={viewMoreText} className="view-more-desktop" />}
+            {viewMoreLink && <ViewMore href={viewMoreLink} text={viewMoreText} fallback={text.viewMore} className="view-more-desktop" />}
           </div>
         )}
         {featuredCards.length > 0 && (
@@ -245,6 +254,7 @@ function InfoCards({
                 card={card}
                 index={index}
                 labels={labels}
+                text={text}
               />
             ))}
           </div>
@@ -258,10 +268,11 @@ function InfoCards({
               skin={skin}
               variant={variant}
               labels={labels}
+              text={text}
             />
           ))}
         </div>
-        {viewMoreLink && <ViewMore href={viewMoreLink} text={viewMoreText} className="view-more-mobile" />}
+        {viewMoreLink && <ViewMore href={viewMoreLink} text={viewMoreText} fallback={text.viewMore} className="view-more-mobile" />}
       </div>
     </section>
   );

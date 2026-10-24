@@ -1,9 +1,15 @@
 import { cmsText } from '../cms-text';
+import type { Lang } from '../i18n/lang';
 
 // Template and archive text from the CMS "Site Content" options page
 // (theme inc/acf-fields/site-content.php, REST /wp-json/headless/v1/site-content).
 // Each default below renders until its field is filled in WP admin, and matches
 // the field's default_value there. Map: docs/acf-content-map.md.
+//
+// Every key has a German sibling `<key>_de` (rendered on /de, see
+// localizeSiteContent). SITE_CONTENT_DEFAULTS_DE holds the German code defaults.
+// docs/i18n/site-content-en.json and site-content-de-defaults.json are flat
+// exports of both (siteContentFlatDefaults), written into the CMS database.
 export const SITE_CONTENT_DEFAULTS = {
   projectsArchive: {
     title: 'PROJECTS',
@@ -99,128 +105,357 @@ export const SITE_CONTENT_DEFAULTS = {
     acceptLabel: 'Accept all',
     settingsLabel: 'Settings',
   },
+  // Page names in the header and footer navigation. The header shows them in
+  // capitals through CSS (Header.scss .navText), the footer as written.
+  nav: {
+    projects: 'Projects',
+    about: 'About',
+    bookshelf: 'Bookshelf',
+    notebook: 'Notebook',
+    techStack: 'Tech Stack',
+    contact: 'Contact',
+  },
+  chrome: {
+    breadcrumbHome: 'Home',
+    skipToContent: 'Skip to main content',
+  },
+  // <title> and meta description per page.
+  meta: {
+    homeTitle: 'Edris Husein - Web Developer & WordPress, Vorarlberg',
+    homeDescription:
+      'Web developer in Dornbirn, Vorarlberg. I build, fix and maintain WordPress sites and web apps for businesses and agencies in Austria, Switzerland and Germany.',
+    aboutTitle: 'About Edris Husein - Web Developer in Vorarlberg, Austria',
+    aboutDescription:
+      'About Edris Husein, a web developer from Dornbirn, Vorarlberg, building and maintaining WordPress sites and web apps for businesses and agencies.',
+    projectsTitle: 'Web Development Projects & Case Studies - Edris Husein',
+    projectsDescription:
+      'Web development projects and case studies by Edris Husein: client websites and web apps built with Next.js, React and WordPress in Austria and Germany.',
+    notebookTitle: 'Notebook: Web Development Articles - Edris Husein',
+    notebookDescription:
+      'Web development articles and notes by Edris Husein: Next.js, React, WordPress and SEO, written from real client projects in Austria and Germany.',
+    bookshelfTitle: 'Bookshelf: Books That Shaped How I Build - Edris Husein',
+    bookshelfDescription:
+      'The bookshelf of Edris Husein: books on software craft, design and thinking that shaped how he structures systems and writes readable code.',
+    techStackTitle: 'Tech Stack: Next.js, React & WordPress - Edris Husein',
+    techStackDescription:
+      'The tech stack Edris Husein builds with: Next.js, React, TypeScript and WordPress, plus the tools, apps and devices behind his web development work.',
+    contactTitle: 'Contact Edris Husein - Web Developer in Vorarlberg',
+    contactDescription:
+      'Contact Edris Husein, a freelance web developer in Vorarlberg, Austria, for WordPress sites, maintenance, fixes and Next.js projects. Replies within a day.',
+    cookieSettingsTitle: 'Cookie Settings - Edris Husein',
+    cookieSettingsDescription: 'Manage your cookie preferences and privacy settings.',
+  },
 } as const;
 
 type Strings<T> = { readonly [K in keyof T]: string };
+type Sections = typeof SITE_CONTENT_DEFAULTS;
+type SiteContentShape = { readonly [S in keyof Sections]: Strings<Sections[S]> };
 
-export interface SiteContent {
-  projectsArchive: Strings<typeof SITE_CONTENT_DEFAULTS.projectsArchive>;
-  projectCards: Strings<typeof SITE_CONTENT_DEFAULTS.projectCards>;
-  caseStudy: Strings<typeof SITE_CONTENT_DEFAULTS.caseStudy>;
-  contactPage: Strings<typeof SITE_CONTENT_DEFAULTS.contactPage>;
-  notebookPage: Strings<typeof SITE_CONTENT_DEFAULTS.notebookPage>;
-  bookshelfPage: Strings<typeof SITE_CONTENT_DEFAULTS.bookshelfPage>;
-  techStackPage: Strings<typeof SITE_CONTENT_DEFAULTS.techStackPage>;
-  articleTemplate: Strings<typeof SITE_CONTENT_DEFAULTS.articleTemplate>;
-  footer: Strings<typeof SITE_CONTENT_DEFAULTS.footer>;
-  notFound: Strings<typeof SITE_CONTENT_DEFAULTS.notFound>;
-  cookieBanner: Strings<typeof SITE_CONTENT_DEFAULTS.cookieBanner>;
-}
+// German code defaults (register: Sie). Same keys as the English ones.
+export const SITE_CONTENT_DEFAULTS_DE: SiteContentShape = {
+  projectsArchive: {
+    title: 'PROJEKTE',
+    subtitle: 'Fallstudien aus der Webentwicklung: Next.js, WordPress und mehr',
+    countLabel: 'Fallstudien',
+    featuredLabel: 'Ausgewähltes Projekt',
+    moreProjectsHeading: 'Weitere Projekte',
+  },
+  projectCards: {
+    readCaseStudyLabel: 'Fallstudie lesen',
+    visitLiveSiteLabel: 'Website ansehen',
+  },
+  caseStudy: {
+    challengeHeading: 'Die Herausforderung',
+    solutionHeading: 'Die Lösung',
+    factsHeading: 'Projektdaten',
+    factsClientLabel: 'Kunde',
+    factsRoleLabel: 'Rolle',
+    factsYearLabel: 'Jahr',
+    factsBuiltAtLabel: 'Umgesetzt bei',
+    factsStackLabel: 'Technologien',
+    factsLiveSiteLabel: 'Website',
+    factsGithubLabel: 'GitHub',
+    keyFeaturesHeading: 'Wichtigste Funktionen',
+    galleryHeading: 'Projektgalerie',
+    moreProjectsHeading: 'Weitere Projekte',
+    lightboxCloseLabel: 'Schließen',
+    lightboxPreviousLabel: 'Vorheriges Bild',
+    lightboxNextLabel: 'Nächstes Bild',
+    lightboxCounterFormat: '{current} / {total}',
+  },
+  contactPage: {
+    subtitle: 'Freelance-Arbeit mit WordPress und Next.js',
+    heading: 'Projekt starten',
+    intro:
+      'Ich bin offen für Freelance-Projekte, Zusammenarbeit oder einfach ein Gespräch über Webentwicklung. Ich baue WordPress-Websites, Headless-Setups und Anwendungen mit React oder Next.js, meist für Agenturen und kleine Teams in Österreich und Deutschland, arbeite aber auch gerne remote. Wenn Sie mir zu einem Projekt schreiben, helfen mir ein grober Umfang und ein Zeitrahmen, Ihnen eine brauchbare Antwort statt einer vagen zu geben. Ich antworte in der Regel innerhalb eines Tages.',
+    email: 'kontakt@edrishusein.com',
+  },
+  notebookPage: {
+    title: 'NOTIZBUCH',
+    subtitle: 'Artikel und Notizen zu Next.js, WordPress und dem Web',
+    emptyMessage: 'Im Moment sind keine Beiträge verfügbar. Bitte schauen Sie später wieder vorbei.',
+    readingTimeFormat: '{minutes} Min. Lesezeit',
+    languageDeLabel: 'DE',
+    languageEnLabel: 'EN',
+  },
+  bookshelfPage: {
+    title: 'BÜCHERREGAL',
+    lead: 'Bücher und Gedanken, die ich gerne gelesen habe',
+    intro:
+      'Das meiste, was ich über Softwareentwicklung weiß, habe ich bei der Arbeit selbst gelernt. Diese Bücher haben aber geprägt, wie ich darüber denke: wie man ein System strukturiert und wie man etwas schreibt, das eine Kollegin oder ein Kollege auch sechs Monate später noch lesen kann.' +
+      '\n\n' +
+      'Die Liste umfasst Software und Design, dazu ein paar Bücher, die mit beidem nichts zu tun haben. Ich ergänze sie, wenn sich ein Buch seinen Platz verdient.',
+    emptyMessage: 'Das Bücherregal wird gerade aktualisiert. Bitte schauen Sie später wieder vorbei.',
+  },
+  techStackPage: {
+    title: 'TECHNOLOGIEN',
+    intro: 'Die Entwicklungswerkzeuge, Apps, Geräte und Spiele, die ich nutze',
+    emptyMessage: 'Die Übersicht wird gerade aktualisiert. Bitte schauen Sie später wieder vorbei.',
+    filterLabel: 'Werkzeuge nach Kategorie filtern',
+    allLabel: 'Alle',
+    otherLabel: 'Sonstige',
+    statusFormat: '{count} Werkzeuge angezeigt',
+    countNone: 'Noch keine Fallstudie',
+    countOne: '1 Fallstudie',
+    countMany: '{count} Fallstudien',
+  },
+  articleTemplate: {
+    authorHeading: 'Über den Autor',
+    authorBioFallback: 'Full-Stack-Entwickler mit Leidenschaft für moderne Webtechnologien.',
+    tagsHeading: 'Schlagwörter',
+    moreArticlesHeading: 'Weitere Artikel',
+    tocHeading: 'Auf dieser Seite',
+  },
+  footer: {
+    imprintLabel: 'Impressum',
+    privacyPolicyLabel: 'Datenschutzerklärung',
+    cookieSettingsLabel: 'Cookie-Einstellungen',
+  },
+  notFound: {
+    heading: 'Seite nicht gefunden',
+    text: 'Die angeforderte Seite gibt es nicht.',
+    homeLinkLabel: 'Zur Startseite',
+  },
+  cookieBanner: {
+    text: 'Analyse-Cookies nur mit Ihrer Zustimmung.',
+    privacyLinkLabel: 'Datenschutzerklärung',
+    rejectLabel: 'Alle ablehnen',
+    acceptLabel: 'Alle akzeptieren',
+    settingsLabel: 'Einstellungen',
+  },
+  nav: {
+    projects: 'Projekte',
+    about: 'Über mich',
+    // Short labels: the German nav has to fit on one line from 1280px up.
+    bookshelf: 'Bücher',
+    notebook: 'Notizbuch',
+    techStack: 'Tech-Stack',
+    contact: 'Kontakt',
+  },
+  chrome: {
+    breadcrumbHome: 'Startseite',
+    skipToContent: 'Zum Hauptinhalt springen',
+  },
+  meta: {
+    homeTitle: 'WordPress-Entwickler in Vorarlberg | Edris Husein, Dornbirn',
+    homeDescription:
+      'Webentwickler in Dornbirn: Ich erstelle WordPress-Websites in Vorarlberg, übernehme Wartung und Updates in ganz Österreich und repariere bestehende Seiten.',
+    aboutTitle: 'Über Edris Husein - Webentwickler in Vorarlberg, Österreich',
+    aboutDescription:
+      'Über Edris Husein, Webentwickler aus Dornbirn in Vorarlberg: WordPress-Websites und Webanwendungen für Unternehmen und Agenturen, gebaut und betreut.',
+    projectsTitle: 'Projekte und Fallstudien zur Webentwicklung - Edris Husein',
+    projectsDescription:
+      'Projekte und Fallstudien von Edris Husein: Kundenwebsites und Webanwendungen mit Next.js, React und WordPress in Österreich und Deutschland.',
+    notebookTitle: 'Notizbuch: Artikel zur Webentwicklung - Edris Husein',
+    notebookDescription:
+      'Artikel und Notizen zur Webentwicklung von Edris Husein: Next.js, React, WordPress und SEO, geschrieben aus echten Kundenprojekten in Österreich und Deutschland.',
+    bookshelfTitle: 'Bücherregal: Bücher, die meine Arbeit geprägt haben - Edris Husein',
+    bookshelfDescription:
+      'Das Bücherregal von Edris Husein: Bücher über Softwarehandwerk, Design und Denken, die geprägt haben, wie er Systeme strukturiert und lesbaren Code schreibt.',
+    techStackTitle: 'Technologien: Next.js, React und WordPress - Edris Husein',
+    techStackDescription:
+      'Die Technologien, mit denen Edris Husein arbeitet: Next.js, React, TypeScript und WordPress, dazu die Werkzeuge, Apps und Geräte hinter seiner Arbeit.',
+    contactTitle: 'Kontakt - Edris Husein, Webentwickler in Vorarlberg',
+    contactDescription:
+      'Kontaktieren Sie Edris Husein, freiberuflicher Webentwickler in Vorarlberg, für WordPress-Websites, Wartung, Fehlerbehebung und Next.js-Projekte. Antwort innerhalb eines Tages.',
+    cookieSettingsTitle: 'Cookie-Einstellungen - Edris Husein',
+    cookieSettingsDescription: 'Verwalten Sie Ihre Cookie-Einstellungen und Datenschutzoptionen.',
+  },
+};
+
+// The REST option name of every field (flat ACF names on the options page).
+export const SITE_CONTENT_FIELDS: { readonly [S in keyof Sections]: Strings<Sections[S]> } = {
+  projectsArchive: {
+    title: 'projects_archive_title',
+    subtitle: 'projects_archive_subtitle',
+    countLabel: 'projects_archive_count_label',
+    featuredLabel: 'projects_archive_featured_label',
+    moreProjectsHeading: 'projects_archive_more_heading',
+  },
+  projectCards: {
+    readCaseStudyLabel: 'project_card_read_case_study_label',
+    visitLiveSiteLabel: 'project_card_visit_live_site_label',
+  },
+  caseStudy: {
+    challengeHeading: 'case_study_challenge_heading',
+    solutionHeading: 'case_study_solution_heading',
+    factsHeading: 'case_study_facts_heading',
+    factsClientLabel: 'case_study_facts_client_label',
+    factsRoleLabel: 'case_study_facts_role_label',
+    factsYearLabel: 'case_study_facts_year_label',
+    factsBuiltAtLabel: 'case_study_facts_built_at_label',
+    factsStackLabel: 'case_study_facts_stack_label',
+    factsLiveSiteLabel: 'case_study_facts_live_site_label',
+    factsGithubLabel: 'case_study_facts_github_label',
+    keyFeaturesHeading: 'case_study_features_heading',
+    galleryHeading: 'case_study_gallery_heading',
+    moreProjectsHeading: 'case_study_more_projects_heading',
+    lightboxCloseLabel: 'case_study_lightbox_close_label',
+    lightboxPreviousLabel: 'case_study_lightbox_previous_label',
+    lightboxNextLabel: 'case_study_lightbox_next_label',
+    lightboxCounterFormat: 'case_study_lightbox_counter_format',
+  },
+  contactPage: {
+    subtitle: 'contact_page_subtitle',
+    heading: 'contact_page_heading',
+    intro: 'contact_page_intro',
+    email: 'contact_page_email',
+  },
+  notebookPage: {
+    title: 'notebook_page_title',
+    subtitle: 'notebook_page_subtitle',
+    emptyMessage: 'notebook_page_empty_message',
+    readingTimeFormat: 'notebook_page_reading_time_format',
+    languageDeLabel: 'notebook_page_language_de_label',
+    languageEnLabel: 'notebook_page_language_en_label',
+  },
+  bookshelfPage: {
+    title: 'bookshelf_page_title',
+    lead: 'bookshelf_page_lead',
+    intro: 'bookshelf_page_intro',
+    emptyMessage: 'bookshelf_page_empty_message',
+  },
+  techStackPage: {
+    title: 'tech_stack_page_title',
+    intro: 'tech_stack_page_intro',
+    emptyMessage: 'tech_stack_page_empty_message',
+    filterLabel: 'tech_stack_page_filter_label',
+    allLabel: 'tech_stack_page_all_label',
+    otherLabel: 'tech_stack_page_other_label',
+    statusFormat: 'tech_stack_page_status_format',
+    countNone: 'tech_stack_page_count_none',
+    countOne: 'tech_stack_page_count_one',
+    countMany: 'tech_stack_page_count_many',
+  },
+  articleTemplate: {
+    authorHeading: 'article_author_heading',
+    authorBioFallback: 'article_author_bio_fallback',
+    tagsHeading: 'article_tags_heading',
+    moreArticlesHeading: 'article_more_articles_heading',
+    tocHeading: 'article_toc_heading',
+  },
+  footer: {
+    imprintLabel: 'footer_imprint_label',
+    privacyPolicyLabel: 'footer_privacy_policy_label',
+    cookieSettingsLabel: 'footer_cookie_settings_label',
+  },
+  notFound: {
+    heading: 'not_found_heading',
+    text: 'not_found_text',
+    homeLinkLabel: 'not_found_home_link_label',
+  },
+  cookieBanner: {
+    text: 'cookie_banner_text',
+    privacyLinkLabel: 'cookie_banner_privacy_link_label',
+    rejectLabel: 'cookie_banner_reject_label',
+    acceptLabel: 'cookie_banner_accept_label',
+    settingsLabel: 'cookie_banner_settings_label',
+  },
+  nav: {
+    projects: 'nav_projects',
+    about: 'nav_about',
+    bookshelf: 'nav_bookshelf',
+    notebook: 'nav_notebook',
+    techStack: 'nav_tech_stack',
+    contact: 'nav_contact',
+  },
+  chrome: {
+    breadcrumbHome: 'breadcrumb_home',
+    skipToContent: 'skip_to_content',
+  },
+  meta: {
+    homeTitle: 'meta_home_title',
+    homeDescription: 'meta_home_description',
+    aboutTitle: 'meta_about_title',
+    aboutDescription: 'meta_about_description',
+    projectsTitle: 'meta_projects_title',
+    projectsDescription: 'meta_projects_description',
+    notebookTitle: 'meta_notebook_title',
+    notebookDescription: 'meta_notebook_description',
+    bookshelfTitle: 'meta_bookshelf_title',
+    bookshelfDescription: 'meta_bookshelf_description',
+    techStackTitle: 'meta_tech_stack_title',
+    techStackDescription: 'meta_tech_stack_description',
+    contactTitle: 'meta_contact_title',
+    contactDescription: 'meta_contact_description',
+    cookieSettingsTitle: 'meta_cookie_settings_title',
+    cookieSettingsDescription: 'meta_cookie_settings_description',
+  },
+};
+
+export type SiteContent = SiteContentShape;
 
 export type FooterContent = SiteContent['footer'];
 export type CookieBannerContent = SiteContent['cookieBanner'];
+export type NavContent = SiteContent['nav'];
 
 /** Raw REST shape: flat ACF option names. Any key may be missing, '' or null. */
 export type RestSiteContent = Partial<Record<string, unknown>>;
+
+const SECTION_KEYS = Object.keys(SITE_CONTENT_FIELDS) as Array<keyof Sections>;
+
+function defaultsFor(lang: Lang): SiteContentShape {
+  return lang === 'de' ? SITE_CONTENT_DEFAULTS_DE : SITE_CONTENT_DEFAULTS;
+}
 
 function text(raw: RestSiteContent, name: string, fallback: string): string {
   const value = raw[name];
   return cmsText(typeof value === 'string' ? value : undefined, fallback);
 }
 
-export function transformSiteContent(input: unknown): SiteContent {
+/**
+ * Map the flat REST options to the nested view model. Blank fields take the
+ * code default of `lang`. For German pass the response through
+ * localizeSiteContent first, so `<key>_de` values replace the English ones.
+ */
+export function transformSiteContent(input: unknown, lang: Lang = 'en'): SiteContent {
   const raw: RestSiteContent =
     input && typeof input === 'object' && !Array.isArray(input) ? (input as RestSiteContent) : {};
-  const d = SITE_CONTENT_DEFAULTS;
+  const defaults = defaultsFor(lang);
 
-  return {
-    projectsArchive: {
-      title: text(raw, 'projects_archive_title', d.projectsArchive.title),
-      subtitle: text(raw, 'projects_archive_subtitle', d.projectsArchive.subtitle),
-      countLabel: text(raw, 'projects_archive_count_label', d.projectsArchive.countLabel),
-      featuredLabel: text(raw, 'projects_archive_featured_label', d.projectsArchive.featuredLabel),
-      moreProjectsHeading: text(raw, 'projects_archive_more_heading', d.projectsArchive.moreProjectsHeading),
-    },
-    projectCards: {
-      readCaseStudyLabel: text(raw, 'project_card_read_case_study_label', d.projectCards.readCaseStudyLabel),
-      visitLiveSiteLabel: text(raw, 'project_card_visit_live_site_label', d.projectCards.visitLiveSiteLabel),
-    },
-    caseStudy: {
-      challengeHeading: text(raw, 'case_study_challenge_heading', d.caseStudy.challengeHeading),
-      solutionHeading: text(raw, 'case_study_solution_heading', d.caseStudy.solutionHeading),
-      factsHeading: text(raw, 'case_study_facts_heading', d.caseStudy.factsHeading),
-      factsClientLabel: text(raw, 'case_study_facts_client_label', d.caseStudy.factsClientLabel),
-      factsRoleLabel: text(raw, 'case_study_facts_role_label', d.caseStudy.factsRoleLabel),
-      factsYearLabel: text(raw, 'case_study_facts_year_label', d.caseStudy.factsYearLabel),
-      factsBuiltAtLabel: text(raw, 'case_study_facts_built_at_label', d.caseStudy.factsBuiltAtLabel),
-      factsStackLabel: text(raw, 'case_study_facts_stack_label', d.caseStudy.factsStackLabel),
-      factsLiveSiteLabel: text(raw, 'case_study_facts_live_site_label', d.caseStudy.factsLiveSiteLabel),
-      factsGithubLabel: text(raw, 'case_study_facts_github_label', d.caseStudy.factsGithubLabel),
-      keyFeaturesHeading: text(raw, 'case_study_features_heading', d.caseStudy.keyFeaturesHeading),
-      galleryHeading: text(raw, 'case_study_gallery_heading', d.caseStudy.galleryHeading),
-      moreProjectsHeading: text(raw, 'case_study_more_projects_heading', d.caseStudy.moreProjectsHeading),
-      lightboxCloseLabel: text(raw, 'case_study_lightbox_close_label', d.caseStudy.lightboxCloseLabel),
-      lightboxPreviousLabel: text(raw, 'case_study_lightbox_previous_label', d.caseStudy.lightboxPreviousLabel),
-      lightboxNextLabel: text(raw, 'case_study_lightbox_next_label', d.caseStudy.lightboxNextLabel),
-      lightboxCounterFormat: text(raw, 'case_study_lightbox_counter_format', d.caseStudy.lightboxCounterFormat),
-    },
-    contactPage: {
-      subtitle: text(raw, 'contact_page_subtitle', d.contactPage.subtitle),
-      heading: text(raw, 'contact_page_heading', d.contactPage.heading),
-      intro: text(raw, 'contact_page_intro', d.contactPage.intro),
-      email: text(raw, 'contact_page_email', d.contactPage.email),
-    },
-    notebookPage: {
-      title: text(raw, 'notebook_page_title', d.notebookPage.title),
-      subtitle: text(raw, 'notebook_page_subtitle', d.notebookPage.subtitle),
-      emptyMessage: text(raw, 'notebook_page_empty_message', d.notebookPage.emptyMessage),
-      readingTimeFormat: text(raw, 'notebook_page_reading_time_format', d.notebookPage.readingTimeFormat),
-      languageDeLabel: text(raw, 'notebook_page_language_de_label', d.notebookPage.languageDeLabel),
-      languageEnLabel: text(raw, 'notebook_page_language_en_label', d.notebookPage.languageEnLabel),
-    },
-    bookshelfPage: {
-      title: text(raw, 'bookshelf_page_title', d.bookshelfPage.title),
-      lead: text(raw, 'bookshelf_page_lead', d.bookshelfPage.lead),
-      intro: text(raw, 'bookshelf_page_intro', d.bookshelfPage.intro),
-      emptyMessage: text(raw, 'bookshelf_page_empty_message', d.bookshelfPage.emptyMessage),
-    },
-    techStackPage: {
-      title: text(raw, 'tech_stack_page_title', d.techStackPage.title),
-      intro: text(raw, 'tech_stack_page_intro', d.techStackPage.intro),
-      emptyMessage: text(raw, 'tech_stack_page_empty_message', d.techStackPage.emptyMessage),
-      filterLabel: text(raw, 'tech_stack_page_filter_label', d.techStackPage.filterLabel),
-      allLabel: text(raw, 'tech_stack_page_all_label', d.techStackPage.allLabel),
-      otherLabel: text(raw, 'tech_stack_page_other_label', d.techStackPage.otherLabel),
-      statusFormat: text(raw, 'tech_stack_page_status_format', d.techStackPage.statusFormat),
-      countNone: text(raw, 'tech_stack_page_count_none', d.techStackPage.countNone),
-      countOne: text(raw, 'tech_stack_page_count_one', d.techStackPage.countOne),
-      countMany: text(raw, 'tech_stack_page_count_many', d.techStackPage.countMany),
-    },
-    articleTemplate: {
-      authorHeading: text(raw, 'article_author_heading', d.articleTemplate.authorHeading),
-      authorBioFallback: text(raw, 'article_author_bio_fallback', d.articleTemplate.authorBioFallback),
-      tagsHeading: text(raw, 'article_tags_heading', d.articleTemplate.tagsHeading),
-      moreArticlesHeading: text(raw, 'article_more_articles_heading', d.articleTemplate.moreArticlesHeading),
-      tocHeading: text(raw, 'article_toc_heading', d.articleTemplate.tocHeading),
-    },
-    footer: {
-      imprintLabel: text(raw, 'footer_imprint_label', d.footer.imprintLabel),
-      privacyPolicyLabel: text(raw, 'footer_privacy_policy_label', d.footer.privacyPolicyLabel),
-      cookieSettingsLabel: text(raw, 'footer_cookie_settings_label', d.footer.cookieSettingsLabel),
-    },
-    notFound: {
-      heading: text(raw, 'not_found_heading', d.notFound.heading),
-      text: text(raw, 'not_found_text', d.notFound.text),
-      homeLinkLabel: text(raw, 'not_found_home_link_label', d.notFound.homeLinkLabel),
-    },
-    cookieBanner: {
-      text: text(raw, 'cookie_banner_text', d.cookieBanner.text),
-      privacyLinkLabel: text(raw, 'cookie_banner_privacy_link_label', d.cookieBanner.privacyLinkLabel),
-      rejectLabel: text(raw, 'cookie_banner_reject_label', d.cookieBanner.rejectLabel),
-      acceptLabel: text(raw, 'cookie_banner_accept_label', d.cookieBanner.acceptLabel),
-      settingsLabel: text(raw, 'cookie_banner_settings_label', d.cookieBanner.settingsLabel),
-    },
-  };
+  const sections = SECTION_KEYS.map((section) => {
+    const fields = SITE_CONTENT_FIELDS[section] as Record<string, string>;
+    const sectionDefaults = defaults[section] as Record<string, string>;
+    const values = Object.fromEntries(
+      Object.entries(fields).map(([key, name]) => [key, text(raw, name, sectionDefaults[key])]),
+    );
+    return [section, values];
+  });
+
+  return Object.fromEntries(sections) as SiteContent;
+}
+
+/** Every REST option name with its code default in `lang`, flat (CMS seed files). */
+export function siteContentFlatDefaults(lang: Lang = 'en'): Record<string, string> {
+  const defaults = defaultsFor(lang);
+  return Object.fromEntries(
+    SECTION_KEYS.flatMap((section) =>
+      Object.entries(SITE_CONTENT_FIELDS[section] as Record<string, string>).map(([key, name]) => [
+        name,
+        (defaults[section] as Record<string, string>)[key],
+      ]),
+    ),
+  );
 }
 
 /**

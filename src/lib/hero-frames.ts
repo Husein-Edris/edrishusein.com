@@ -1,6 +1,8 @@
 import type { WordPressImage, WordPressProject } from '@/src/types/wordpress';
 import { HERO_FALLBACK_SLUGS } from './featured-projects';
 import { linkText } from './case-study-facts';
+import { localePath } from './i18n/paths';
+import { DEFAULT_LANG, type Lang } from './i18n/lang';
 
 // Projects shown in the homepage hero strip (design H9): projects flagged
 // `highlighted` in the CMS (menu order, at most three). Until any project is
@@ -35,12 +37,12 @@ export function selectHeroProjects(projects: readonly WordPressProject[]): WordP
   );
 }
 
-function toHeroFrame(project: WordPressProject, isLead: boolean): HeroFrame {
+function toHeroFrame(project: WordPressProject, isLead: boolean, lang: Lang): HeroFrame {
   const live = liveSiteUrl(project);
   return {
     slug: project.slug,
     title: project.title,
-    href: `/projects/${project.slug}`,
+    href: localePath(`/projects/${project.slug}`, lang),
     domain: live ? linkText(live) : '',
     builtAt: project.builtAt?.trim() ?? '',
     image: project.featuredImage?.node ?? null,
@@ -49,11 +51,11 @@ function toHeroFrame(project: WordPressProject, isLead: boolean): HeroFrame {
   };
 }
 
-export function buildHeroFrames(projects: readonly WordPressProject[]): HeroFrame[] {
+export function buildHeroFrames(projects: readonly WordPressProject[], lang: Lang = DEFAULT_LANG): HeroFrame[] {
   const selected = selectHeroProjects(projects);
   // DOM order is lead first, so keyboard and phone swipe order match; the
   // desktop grid moves the lead to the middle column in CSS (Hero.scss).
-  return selected.map((project, index) => toHeroFrame(project, index === 0));
+  return selected.map((project, index) => toHeroFrame(project, index === 0, lang));
 }
 
 // Hero paragraph auto-links (used only while Home > Hero > Hero Copy has no

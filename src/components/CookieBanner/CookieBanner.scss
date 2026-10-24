@@ -124,7 +124,10 @@
       padding: 0 $spacing-sm;
       font-size: 11px;
       letter-spacing: 0.03em;
-      white-space: nowrap;
+      // German labels (ALLE AKZEPTIEREN) are wider than the cell at 375px.
+      white-space: normal;
+      line-height: 1.2;
+      text-align: center;
     }
 
     &:hover,

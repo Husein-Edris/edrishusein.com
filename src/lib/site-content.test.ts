@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { getSiteContent, getSiteContentOrDefaults, SITE_CONTENT_URL } from './site-content';
-import { SITE_CONTENT_DEFAULTS } from './transform/transformSiteContent';
+import { SITE_CONTENT_DEFAULTS, SITE_CONTENT_DEFAULTS_DE } from './transform/transformSiteContent';
 import { CmsRequestError } from './rest-client';
 
 const mockFetch = vi.fn();
@@ -74,5 +74,47 @@ describe('getSiteContentOrDefaults', () => {
     mockFetch.mockResolvedValue({ ok: false, status: 500, json: () => Promise.resolve({}) });
 
     await expect(getSiteContentOrDefaults()).resolves.toEqual(SITE_CONTENT_DEFAULTS);
+  });
+});
+
+describe('getSiteContent in German', () => {
+  beforeEach(() => {
+    mockFetch.mockReset();
+    global.fetch = mockFetch as unknown as typeof fetch;
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('reads <key>_de, then the English value, then the German default', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          nav_about: 'About',
+          nav_about_de: 'Über uns',
+          footer_imprint_label: 'Legal notice',
+          footer_imprint_label_de: '',
+          nav_projects: '',
+          nav_projects_de: '',
+        }),
+    });
+
+    const content = await getSiteContent('de');
+
+    expect(content.nav.about).toBe('Über uns');
+    expect(content.footer.imprintLabel).toBe('Legal notice');
+    expect(content.nav.projects).toBe('Projekte');
+  });
+
+  it('renders the German defaults when the route is missing or the CMS is down', async () => {
+    mockFetch.mockResolvedValue({ ok: false, status: 404, json: () => Promise.resolve({}) });
+    await expect(getSiteContent('de')).resolves.toEqual(SITE_CONTENT_DEFAULTS_DE);
+
+    mockFetch.mockResolvedValue({ ok: false, status: 500, json: () => Promise.resolve({}) });
+    await expect(getSiteContentOrDefaults('de')).resolves.toEqual(SITE_CONTENT_DEFAULTS_DE);
   });
 });
