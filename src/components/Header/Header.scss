@@ -262,6 +262,8 @@ $nav-collapse: 1279px;
             align-items: center;
             min-height: 44px;
             position: relative;
+            // Two-word labels (ÜBER MICH) stay on one line.
+            white-space: nowrap;
 
             &::after {
               content: "";

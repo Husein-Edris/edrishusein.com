@@ -19,7 +19,7 @@ describe('dictionary', () => {
     for (const lang of ['en', 'de'] as const) {
       for (const [key, text] of leaves(DICTIONARY[lang])) {
         expect(text.trim(), `${lang}.${key}`).not.toBe('');
-        expect(text, `${lang}.${key}`).not.toContain('—');
+        expect(text, `${lang}.${key}`).not.toContain('\u2014');
       }
     }
   });

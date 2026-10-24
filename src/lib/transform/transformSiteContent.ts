@@ -246,9 +246,10 @@ export const SITE_CONTENT_DEFAULTS_DE: SiteContentShape = {
   nav: {
     projects: 'Projekte',
     about: 'Über mich',
-    bookshelf: 'Bücherregal',
+    // Short labels: the German nav has to fit on one line from 1280px up.
+    bookshelf: 'Bücher',
     notebook: 'Notizbuch',
-    techStack: 'Technologien',
+    techStack: 'Tech-Stack',
     contact: 'Kontakt',
   },
   chrome: {
