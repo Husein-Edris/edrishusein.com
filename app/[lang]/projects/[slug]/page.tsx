@@ -17,10 +17,19 @@ import { transformProjects } from '@/src/lib/transform/transformProjects';
 import { transformMedia } from '@/src/lib/transform/transformMedia';
 import { generateStructuredData, generateBreadcrumbStructuredData, safeJsonLd, metaDescriptionFrom } from '@/src/lib/seo-utils';
 import type { WordPressImage } from '@/src/types/wordpress';
+import { absoluteUrl, alternatesFor, localePath } from '@/src/lib/i18n/paths';
+import { OG_LOCALE, otherLang, type Lang } from '@/src/lib/i18n/lang';
+import { localizeRestItem } from '@/src/lib/i18n/localize';
+import { dictionary } from '@/src/lib/i18n/dictionary';
+import { langFromParams } from '@/src/lib/i18n/route';
+import { fillLabel } from '@/src/lib/transform/transformSiteContent';
 import '@/src/styles/pages/CaseStudy.scss';
 
-// Generate static params for all projects. If the CMS is unreachable at build
-// time, nothing is prerendered and each page renders on its first request.
+type ProjectParams = { params: Promise<{ lang: string; slug: string }> };
+
+// Generate static params for all projects (called once per language by the
+// [lang] segment). If the CMS is unreachable at build time, nothing is
+// prerendered and each page renders on its first request.
 export async function generateStaticParams() {
   try {
     const projects = await cmsRest<Array<{ slug: string }>>('/project?per_page=100&_fields=slug');
@@ -33,28 +42,33 @@ export async function generateStaticParams() {
 }
 
 // Generate metadata for SEO
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+export async function generateMetadata({ params }: ProjectParams) {
   const { slug } = await params;
+  const lang = await langFromParams(params);
+  const text = dictionary(lang);
 
-  const project = await getProject(slug);
+  const project = await getProject(slug, lang);
 
   if (!project) {
     return {
-      title: 'Project | Projects - Edris Husein',
-      description: 'View this project by Edris Husein',
+      title: text.projectFallbackTitle,
+      description: text.projectFallbackDescription,
     };
   }
 
+  const path = `/projects/${slug}`;
   return {
     title: `${project.title} - Edris Husein`,
-    description: metaDescriptionFrom(project.excerpt) || `${project.title} - A project by Edris Husein`,
-    alternates: { canonical: `/projects/${slug}` },
+    description: metaDescriptionFrom(project.excerpt) || `${project.title} - Edris Husein`,
+    alternates: alternatesFor(path, lang),
     openGraph: {
       title: project.title,
       description: metaDescriptionFrom(project.excerpt),
-      url: `/projects/${slug}`,
+      url: localePath(path, lang),
       images: project.featuredImage?.node?.sourceUrl ? [project.featuredImage.node.sourceUrl] : [],
       type: 'website',
+      locale: OG_LOCALE[lang],
+      alternateLocale: [OG_LOCALE[otherLang(lang)]],
     },
     twitter: {
       card: 'summary_large_image',
@@ -75,14 +89,15 @@ interface RawGalleryImage {
 
 // ACF gallery items -> lightbox images. Items without a URL are dropped; the
 // caption falls back to the editor's alt text, never to the generated one.
-function galleryImages(gallery: readonly RawGalleryImage[], projectTitle: string): GalleryImage[] {
+function galleryImages(gallery: readonly RawGalleryImage[], projectTitle: string, lang: Lang): GalleryImage[] {
+  const altFormat = dictionary(lang).galleryImageAlt;
   return gallery
     .filter((image) => typeof image.url === 'string' && image.url.trim() !== '')
     .map((image, index) => {
       const alt = decodeEntities(image.alt?.trim() ?? '');
       return {
         url: image.url as string,
-        alt: alt || `${projectTitle} gallery image ${index + 1}`,
+        alt: alt || fillLabel(altFormat, { title: projectTitle, index: index + 1 }),
         caption: decodeEntities(image.caption?.trim() ?? '') || alt,
         width: image.width || 400,
         height: image.height || 300,
@@ -91,7 +106,7 @@ function galleryImages(gallery: readonly RawGalleryImage[], projectTitle: string
 }
 
 // Fetch all projects for "More Projects" section
-async function getAllProjectsForMoreProjects() {
+async function getAllProjectsForMoreProjects(lang: Lang) {
   try {
     const projects = await cmsRest<unknown[]>(
       // per_page=100, not 10: there are 11 projects, so the last one was never
@@ -99,7 +114,7 @@ async function getAllProjectsForMoreProjects() {
       '/project?_embed&per_page=100&orderby=menu_order&order=asc&acf_format=standard'
     );
     if (!Array.isArray(projects)) return null;
-    return rewriteImageUrls(transformProjects(projects as never));
+    return rewriteImageUrls(transformProjects(projects.map((project) => localizeRestItem(project, lang)) as never));
   } catch (error) {
     if (isTransientCmsError(error)) throw error;
     console.error('Error fetching projects for MoreProjects:', error);
@@ -134,28 +149,29 @@ async function resolveTechImages(ids: number[]): Promise<Map<number, WordPressIm
 // deliberately left to propagate: it means the CMS could not answer at all, and
 // treating that as a 404 is what let a transient database error get baked into
 // the static build as a permanently empty page.
-async function getProject(slug: string) {
+async function getProject(slug: string, lang: Lang) {
   const projects = await cmsRest<unknown[]>(
     `/project?slug=${encodeURIComponent(slug)}&_embed&acf_format=standard`
   );
   if (!Array.isArray(projects) || projects.length === 0) return null;
 
-  const project = projects[0] as never;
+  const project = localizeRestItem(projects[0], lang) as never;
   const techImages = await resolveTechImages(extractTechIds(project));
 
   return rewriteImageUrls(transformProject(project, techImages));
 }
 
 // Server Component
-export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function ProjectPage({ params }: ProjectParams) {
   const { slug } = await params;
+  const lang = await langFromParams(params);
 
   // Fetch both current project and all projects for "More Projects" section
   // Template headings and labels: CMS "Site Content" options page.
   const [project, allProjectsData, siteContent] = await Promise.all([
-    getProject(slug),
-    getAllProjectsForMoreProjects(),
-    getSiteContent(),
+    getProject(slug, lang),
+    getAllProjectsForMoreProjects(lang),
+    getSiteContent(lang),
   ]);
   const copy = siteContent.caseStudy;
 
@@ -169,17 +185,18 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
   // Structured data: mark the case study as a CreativeWork and expose a
   // Home > Projects > Title breadcrumb trail (project pages previously had none).
-  const canonical = `https://edrishusein.com/projects/${slug}`;
+  const canonical = absoluteUrl(`/projects/${slug}`, lang);
   const structuredData = generateStructuredData('CreativeWork', {
     title: project.title,
     description: metaDescriptionFrom(project.excerpt),
     canonical,
     date: project.date,
     featuredImage: project.featuredImage,
+    inLanguage: lang,
   });
   const breadcrumbData = generateBreadcrumbStructuredData([
-    { text: 'Home', url: 'https://edrishusein.com' },
-    { text: 'Projects', url: 'https://edrishusein.com/projects' },
+    { text: siteContent.chrome.breadcrumbHome, url: absoluteUrl('/', lang) },
+    { text: siteContent.nav.projects, url: absoluteUrl('/projects', lang) },
     { text: project.title, url: canonical },
   ]);
 
@@ -277,7 +294,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
               <section className="project-gallery">
                 <h2>{copy.galleryHeading}</h2>
                 <GalleryLightbox
-                  images={galleryImages(project.caseStudy.projectGallery, project.title)}
+                  images={galleryImages(project.caseStudy.projectGallery, project.title, lang)}
                   labels={galleryLightboxLabels(siteContent)}
                 />
               </section>
@@ -291,9 +308,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           allProjects={allProjects}
           title={copy.moreProjectsHeading}
           labels={projectCardLabels(siteContent)}
+          lang={lang}
         />
       </main>
-      <Footer />
+      <Footer lang={lang} />
 
       {/* Structured Data for SEO */}
       <script

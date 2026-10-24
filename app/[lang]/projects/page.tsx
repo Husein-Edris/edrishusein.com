@@ -1,4 +1,4 @@
-// app/projects/page.tsx
+// app/[lang]/projects/page.tsx
 import type { Metadata } from 'next';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
@@ -8,30 +8,33 @@ import { selectFeaturedProjects } from '@/src/lib/featured-projects';
 import { getSiteContent } from '@/src/lib/site-content';
 import { projectCardLabels } from '@/src/lib/transform/transformSiteContent';
 import { generateCollectionPageStructuredData, pageOpenGraph, safeJsonLd } from '@/src/lib/seo-utils';
+import { alternatesFor, localePath } from '@/src/lib/i18n/paths';
+import { langFromParams, type LangParams } from '@/src/lib/i18n/route';
 import '@/src/styles/pages/Projects.scss';
 
 // ISR: cached render refreshed at most once per 60s (keep in sync with CMS_REVALIDATE = 60).
 export const revalidate = 60;
 
-export const metadata: Metadata = {
-  title: 'Web Development Projects & Case Studies - Edris Husein',
-  description: 'Web development projects and case studies by Edris Husein: client websites and web apps built with Next.js, React and WordPress in Austria and Germany.',
-  alternates: { canonical: '/projects' },
-  openGraph: pageOpenGraph({
-    title: 'Web Development Projects & Case Studies - Edris Husein',
-    description: 'Web development projects and case studies by Edris Husein: client websites and web apps built with Next.js, React and WordPress in Austria and Germany.',
-    path: '/projects',
-  }),
-};
+export async function generateMetadata({ params }: LangParams): Promise<Metadata> {
+  const lang = await langFromParams(params);
+  const { meta } = await getSiteContent(lang);
+  return {
+    title: meta.projectsTitle,
+    description: meta.projectsDescription,
+    alternates: alternatesFor('/projects', lang),
+    openGraph: pageOpenGraph({ title: meta.projectsTitle, description: meta.projectsDescription, path: '/projects', lang }),
+  };
+}
 
-export default async function ProjectsPage() {
+export default async function ProjectsPage({ params }: LangParams) {
+  const lang = await langFromParams(params);
   // A transient CMS failure throws out of DataFetcher, so ISR keeps serving the
   // last good list instead of caching an empty or placeholder one.
   // Page text lives on the CMS "Site Content" options page, Projects page tab
   // (the CMS has no page for /projects). See docs/acf-content-map.md.
   const [{ data: projectsData }, siteContent] = await Promise.all([
-    DataFetcher.getProjectsData(20), // Get more projects for the full list
-    getSiteContent(),
+    DataFetcher.getProjectsData(20, lang), // Get more projects for the full list
+    getSiteContent(lang),
   ]);
   const archive = siteContent.projectsArchive;
 
@@ -42,7 +45,7 @@ export default async function ProjectsPage() {
     image: project.featuredImage?.node?.sourceUrl || '/images/Blog-sample-img.png',
     variant: 'dark' as 'dark' | 'light',
     visitLink: project.caseStudy?.projectLinks?.liveSite || '#',
-    caseStudyLink: `/projects/${project.slug}`
+    caseStudyLink: localePath(`/projects/${project.slug}`, lang)
   });
   const transformedProjects = projectNodes.map(toCard);
 
@@ -53,9 +56,10 @@ export default async function ProjectsPage() {
   const orderedProjects = [...featuredCards, ...rest.map(toCard)];
 
   const collectionJsonLd = generateCollectionPageStructuredData({
-    name: 'Projects',
-    description: 'Web development projects and case studies by Edris Husein: client websites and web apps built with Next.js, React and WordPress in Austria and Germany.',
-    path: '/projects',
+    name: siteContent.nav.projects,
+    description: siteContent.meta.projectsDescription,
+    path: localePath('/projects', lang),
+    lang,
     items: transformedProjects.map((project) => ({
       title: project.title,
       path: project.caseStudyLink,
@@ -90,9 +94,10 @@ export default async function ProjectsPage() {
           restTitle={archive.moreProjectsHeading}
           labels={projectCardLabels(siteContent)}
           cards={orderedProjects}
+          lang={lang}
         />
       </main>
-      <Footer />
+      <Footer lang={lang} />
     </>
   );
 }

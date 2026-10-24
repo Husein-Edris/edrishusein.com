@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useLang } from '@/src/components/LangProvider/LangProvider';
+import { dictionary } from '@/src/lib/i18n/dictionary';
 
 export default function Error({
   error,
@@ -9,6 +11,8 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const text = dictionary(useLang()).error;
+
   useEffect(() => {
     console.error('Application error:', error);
   }, [error]);
@@ -16,13 +20,13 @@ export default function Error({
   return (
     <div className="error-page">
       <div className="container">
-        <h2>Something went wrong!</h2>
-        <p>We encountered an error while loading the page.</p>
+        <h2>{text.heading}</h2>
+        <p>{text.text}</p>
         <button
           onClick={() => reset()}
           className="retry-button"
         >
-          Try again
+          {text.retry}
         </button>
       </div>
     </div>

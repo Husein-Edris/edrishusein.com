@@ -10,30 +10,34 @@ import { decodeEntities } from '@/src/lib/transform/decodeEntities';
 import { getSiteContent } from '@/src/lib/site-content';
 import { toParagraphs } from '@/src/lib/transform/transformSiteContent';
 import { generateStructuredData, pageOpenGraph, safeJsonLd } from '@/src/lib/seo-utils';
+import { absoluteUrl, alternatesFor } from '@/src/lib/i18n/paths';
+import type { Lang } from '@/src/lib/i18n/lang';
+import { localizeRestItem } from '@/src/lib/i18n/localize';
+import { langFromParams, type LangParams } from '@/src/lib/i18n/route';
 import '@/src/styles/pages/Bookshelf.scss';
 
 // ISR: cached render refreshed at most once per 60s (keep in sync with CMS_REVALIDATE = 60).
 export const revalidate = 60;
 
-export const metadata: Metadata = {
-  title: 'Bookshelf: Books That Shaped How I Build - Edris Husein',
-  description: 'The bookshelf of Edris Husein: books on software craft, design and thinking that shaped how he structures systems and writes readable code.',
-  alternates: { canonical: '/bookshelf' },
-  openGraph: pageOpenGraph({
-    title: 'Bookshelf: Books That Shaped How I Build - Edris Husein',
-    description: 'The bookshelf of Edris Husein: books on software craft, design and thinking that shaped how he structures systems and writes readable code.',
-    path: '/bookshelf',
-  }),
-};
+export async function generateMetadata({ params }: LangParams): Promise<Metadata> {
+  const lang = await langFromParams(params);
+  const { meta } = await getSiteContent(lang);
+  return {
+    title: meta.bookshelfTitle,
+    description: meta.bookshelfDescription,
+    alternates: alternatesFor('/bookshelf', lang),
+    openGraph: pageOpenGraph({ title: meta.bookshelfTitle, description: meta.bookshelfDescription, path: '/bookshelf', lang }),
+  };
+}
 
-async function getBooksData() {
+async function getBooksData(lang: Lang) {
   try {
     const books = await cmsRest<Array<{ id: number | string; title?: unknown; excerpt?: unknown; _embedded?: { 'wp:featuredmedia'?: unknown[] } }>>(
       '/book?_embed&per_page=100'
     );
     if (!Array.isArray(books)) return [];
     return rewriteImageUrls(
-      books.map((book) => ({
+      books.map((raw) => localizeRestItem(raw, lang)).map((book) => ({
         id: String(book.id),
         title: decodeEntities(rendered(book.title as never)),
         excerpt: rendered(book.excerpt as never),
@@ -49,14 +53,16 @@ async function getBooksData() {
   }
 }
 
-export default async function BookshelfPage() {
-  const [books, siteContent] = await Promise.all([getBooksData(), getSiteContent()]);
+export default async function BookshelfPage({ params }: LangParams) {
+  const lang = await langFromParams(params);
+  const [books, siteContent] = await Promise.all([getBooksData(lang), getSiteContent(lang)]);
   const copy = siteContent.bookshelfPage;
 
   const webPageJsonLd = generateStructuredData('WebPage', {
-    title: 'Bookshelf: Books That Shaped How I Build - Edris Husein',
-    description: 'Books on software craft, design and thinking that shaped how Edris Husein structures systems and writes readable code.',
-    canonical: 'https://edrishusein.com/bookshelf',
+    title: siteContent.meta.bookshelfTitle,
+    description: siteContent.meta.bookshelfDescription,
+    canonical: absoluteUrl('/bookshelf', lang),
+    inLanguage: lang,
   });
 
   return (
@@ -116,7 +122,7 @@ export default async function BookshelfPage() {
           </section>
         </div>
       </main>
-      <Footer />
+      <Footer lang={lang} />
     </>
   );
 }

@@ -1,4 +1,4 @@
-// app/about/page.tsx
+// app/[lang]/about/page.tsx
 import Image from 'next/image';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
@@ -18,6 +18,10 @@ import { decodeEntities } from '@/src/lib/transform/decodeEntities';
 import { DataFetcher } from '@/src/lib/data-fetcher';
 import { PORTRAIT_FALLBACK, resolvePortrait, type Portrait } from '@/src/lib/portrait';
 import type { WordPressImage } from '@/src/types/wordpress';
+import { getSiteContent } from '@/src/lib/site-content';
+import { localizeRestItem } from '@/src/lib/i18n/localize';
+import type { Lang } from '@/src/lib/i18n/lang';
+import { langFromParams, type LangParams } from '@/src/lib/i18n/route';
 import '@/src/styles/pages/About.scss';
 
 // ISR: cached render refreshed at most once per 60s (keep in sync with CMS_REVALIDATE = 60).
@@ -38,9 +42,68 @@ async function resolveTechNames(ids: number[]): Promise<Map<number, string>> {
   );
 }
 
+interface RelationPost {
+  ID?: number;
+  id?: number;
+  post_title?: string;
+  post_excerpt?: string;
+}
+
+interface RelationTranslation {
+  id: number;
+  acf_fields?: { title_de?: unknown; excerpt_de?: unknown } | unknown[];
+}
+
+const germanText = (value: unknown): string | null =>
+  typeof value === 'string' && value.trim() !== '' ? value : null;
+
+// Skills and hobbies arrive as embedded post objects (post_title, post_excerpt)
+// without their own acf_fields, so their German title/excerpt is looked up by ID
+// from the skill and hobby post types. A permanent CMS error keeps English.
+async function translateRelations(items: unknown, postType: 'skill' | 'hobby'): Promise<unknown> {
+  if (!Array.isArray(items) || items.length === 0) return items;
+  const ids = items.map((item: RelationPost) => Number(item?.ID ?? item?.id)).filter((id) => id > 0);
+  if (ids.length === 0) return items;
+
+  let translations: RelationTranslation[];
+  try {
+    translations = await cmsRest<RelationTranslation[]>(
+      `/${postType}?include=${ids.join(',')}&per_page=100&_fields=id,acf_fields`
+    );
+  } catch (error: unknown) {
+    if (isTransientCmsError(error)) throw error;
+    return items;
+  }
+
+  const byId = new Map(asArray<RelationTranslation>(translations).map((entry) => [Number(entry.id), entry.acf_fields]));
+  return items.map((item: RelationPost) => {
+    const acf = byId.get(Number(item?.ID ?? item?.id));
+    if (!acf || Array.isArray(acf)) return item;
+    return {
+      ...item,
+      post_title: germanText(acf.title_de) ?? item.post_title,
+      post_excerpt: germanText(acf.excerpt_de) ?? item.post_excerpt,
+    };
+  });
+}
+
+async function localizeAboutPage(page: RestAboutPage, lang: Lang): Promise<RestAboutPage> {
+  const localized = localizeRestItem(page, lang);
+  const acf = localized.acf_fields;
+  if (lang !== 'de' || !acf) return localized;
+  const [skills, hobbies] = await Promise.all([
+    translateRelations(acf.selected_skills, 'skill'),
+    translateRelations(acf.selected_hobbies, 'hobby'),
+  ]);
+  return {
+    ...localized,
+    acf_fields: { ...acf, selected_skills: skills as never, selected_hobbies: hobbies as never },
+  };
+}
+
 // No hardcoded fallback copy: a transient CMS failure throws out of cmsRest so
 // ISR keeps serving the last good page, and a missing about page is a real 404.
-async function getAboutPageData(): Promise<AboutPageData> {
+async function getAboutPageData(lang: Lang): Promise<AboutPageData> {
   let pages: RestAboutPage[];
   try {
     pages = await cmsRest<RestAboutPage[]>('/pages?slug=about-me&acf_format=standard&_embed');
@@ -52,44 +115,50 @@ async function getAboutPageData(): Promise<AboutPageData> {
     notFound();
   }
 
-  const techNames = await resolveTechNames(extractExperienceTechIds(pages[0]));
-  return rewriteImageUrls(transformAbout(pages[0], techNames));
+  const page = await localizeAboutPage(pages[0], lang);
+  const techNames = await resolveTechNames(extractExperienceTechIds(page));
+  return rewriteImageUrls(transformAbout(page, techNames, lang));
 }
 
 // The About page's own image wins; when it is empty, the same portrait as the
 // homepage hero (Home > Hero > Hero Image), then the static photo.
 async function getAboutPortrait(
   aboutImage: WordPressImage | null | undefined,
-  featuredImage: WordPressImage | null | undefined
+  featuredImage: WordPressImage | null | undefined,
+  lang: Lang
 ): Promise<Portrait> {
   const own = resolvePortrait(aboutImage, featuredImage);
   if (own !== PORTRAIT_FALLBACK) return own;
-  const { data: homepage } = await DataFetcher.getHomepageData();
+  const { data: homepage } = await DataFetcher.getHomepageData(lang);
   return resolvePortrait(homepage?.heroSection?.heroImage);
 }
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ params }: LangParams): Promise<Metadata> {
+  const lang = await langFromParams(params);
   // Fetched (deduped with the page render) so a missing page 404s here too.
-  await getAboutPageData();
+  const [, { meta }] = await Promise.all([getAboutPageData(lang), getSiteContent(lang)]);
 
   return generateEnhancedMetadata(null, {
-    title: 'About Edris Husein - Web Developer in Vorarlberg, Austria',
-    description: 'About Edris Husein, a web developer from Dornbirn, Vorarlberg, building and maintaining WordPress sites and web apps for businesses and agencies.',
+    title: meta.aboutTitle,
+    description: meta.aboutDescription,
     path: '/about',
     type: 'website',
+    lang,
   });
 }
 
-export default async function AboutPage() {
-  const data = await getAboutPageData();
+export default async function AboutPage({ params }: LangParams) {
+  const lang = await langFromParams(params);
+  const [data, { meta }] = await Promise.all([getAboutPageData(lang), getSiteContent(lang)]);
   const page = data.page;
   const fields = page.aboutPageFields;
-  const portrait = await getAboutPortrait(fields?.aboutHeroImage, page.featuredImage);
+  const portrait = await getAboutPortrait(fields?.aboutHeroImage, page.featuredImage, lang);
 
   // ProfilePage schema: /about is the page about the site's Person entity.
   const structuredData = generateProfilePageStructuredData({
     title: page.title,
-    description: 'About Edris Husein, web developer in Dornbirn, Vorarlberg, Austria.',
+    description: meta.aboutDescription,
+    lang,
   });
 
         return (
@@ -208,7 +277,7 @@ export default async function AboutPage() {
               </section>
             )}
           </main>
-          <Footer />
+          <Footer lang={lang} />
 
           {/* Structured Data for SEO */}
           <script

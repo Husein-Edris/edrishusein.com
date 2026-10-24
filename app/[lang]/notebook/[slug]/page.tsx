@@ -11,18 +11,22 @@ import { rewriteImageUrls } from '@/src/lib/image-utils';
 import { cmsRest, isTransientCmsError } from '@/src/lib/rest-client';
 import { safeJsonLd, metaDescriptionFrom, generateBreadcrumbStructuredData } from '@/src/lib/seo-utils';
 import { getSiteContent } from '@/src/lib/site-content';
-import { detectContentLanguage } from '@/src/lib/detect-language';
 import { buildArticleToc } from '@/src/lib/article-toc';
 import ArticleToc from '@/src/components/ArticleToc/ArticleToc';
 import PostMeta from '@/src/components/PostMeta/PostMeta';
 import { selectRelatedByRotation } from '@/src/lib/related-content';
 import {
-  transformPostDetail,
-  transformPostListItem,
-  languageSample,
+  localizedPostDetail,
+  localizedPostListItem,
   type PostDetail,
   type PostListItem,
 } from '@/src/lib/transform/transformPost';
+import { absoluteUrl, alternatesFor, localePath } from '@/src/lib/i18n/paths';
+import { OG_LOCALE, otherLang, type Lang } from '@/src/lib/i18n/lang';
+import { dictionary } from '@/src/lib/i18n/dictionary';
+import { langFromParams } from '@/src/lib/i18n/route';
+
+type PostParams = { params: Promise<{ lang: string; slug: string }> };
 
 // Generate static params for all blog posts (direct REST: no self-HTTP)
 export async function generateStaticParams() {
@@ -37,26 +41,31 @@ export async function generateStaticParams() {
 }
 
 // Generate metadata for SEO
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+export async function generateMetadata({ params }: PostParams) {
   const { slug } = await params;
+  const lang = await langFromParams(params);
+  const text = dictionary(lang);
 
-  const post = await getPost(slug);
+  const post = await getPost(slug, lang);
 
   if (!post) {
     return {
-      title: 'Article | Notebook - Edris Husein',
-      description: 'Read more on Edris Husein\'s notebook',
+      title: text.articleFallbackTitle,
+      description: text.articleFallbackDescription,
     };
   }
 
+  const path = `/notebook/${slug}`;
   return {
     title: `${post.title} - Edris Husein`,
-    description: metaDescriptionFrom(post.excerpt) || 'Read more on Edris Husein\'s notebook',
-    alternates: { canonical: `/notebook/${slug}` },
+    description: metaDescriptionFrom(post.excerpt) || text.articleFallbackDescription,
+    alternates: alternatesFor(path, lang),
     openGraph: {
       title: post.title,
       description: metaDescriptionFrom(post.excerpt),
-      url: `/notebook/${slug}`,
+      url: localePath(path, lang),
+      locale: OG_LOCALE[lang],
+      alternateLocale: [OG_LOCALE[otherLang(lang)]],
       images: post.featuredImage?.node?.sourceUrl ? [post.featuredImage.node.sourceUrl] : [],
       type: 'article',
       publishedTime: post.date,
@@ -77,22 +86,22 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 // deliberately left to propagate: it means the CMS could not answer at all, and
 // treating that as a 404 is what let a transient database error get baked into
 // the static build as a permanently empty page.
-async function getPost(slug: string): Promise<PostDetail | null> {
+async function getPost(slug: string, lang: Lang): Promise<PostDetail | null> {
   const posts = await cmsRest<unknown[]>(`/posts?slug=${encodeURIComponent(slug)}&_embed&acf_format=standard`);
   if (!Array.isArray(posts) || posts.length === 0) {
     return null;
   }
-  return rewriteImageUrls(transformPostDetail(posts[0] as never));
+  return rewriteImageUrls(localizedPostDetail(posts[0] as never, lang));
 }
 
-async function getMoreArticles(excludeSlug: string): Promise<PostListItem[]> {
+async function getMoreArticles(excludeSlug: string, lang: Lang): Promise<PostListItem[]> {
   try {
     // Fetch the whole archive, not just the newest 4. Slicing the 3 most recent
     // meant every post linked to the same 3 slugs, orphaning older posts from the
     // sibling link graph (measured inbound links: 8, 8, 8, 4, 1, 1, 1).
     const posts = await cmsRest<unknown[]>('/posts?_embed&per_page=100&orderby=date&order=desc');
     if (!Array.isArray(posts)) return [];
-    const all = posts.map((p) => transformPostListItem(p as never));
+    const all = posts.map((p) => localizedPostListItem(p as never, lang));
     return rewriteImageUrls(selectRelatedByRotation(all, excludeSlug, 3));
   } catch (error) {
     if (isTransientCmsError(error)) throw error;
@@ -102,13 +111,15 @@ async function getMoreArticles(excludeSlug: string): Promise<PostListItem[]> {
 }
 
 // Server Component
-export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function BlogPostPage({ params }: PostParams) {
   const { slug } = await params;
+  const lang = await langFromParams(params);
+  const text = dictionary(lang);
   
   const [post, moreArticles, siteContent] = await Promise.all([
-    getPost(slug),
-    getMoreArticles(slug),
-    getSiteContent(),
+    getPost(slug, lang),
+    getMoreArticles(slug, lang),
+    getSiteContent(lang),
   ]);
   const copy = siteContent.articleTemplate;
   const metaLabels = siteContent.notebookPage;
@@ -119,10 +130,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     notFound();
   }
 
-  // German articles must not claim inLanguage "en" (or render under a bare
-  // lang="en" subtree); detection is a stopword heuristic over the CMS text.
-  const articleLanguage = detectContentLanguage(languageSample(post.title, post.excerpt || '', post.content || ''));
-  const langAttr = articleLanguage === 'de' ? 'de' : undefined;
+  // The article's own language: German when it has a German body on /de
+  // (content_de), otherwise the stopword guess over the original CMS text. It
+  // sets inLanguage and a lang attribute where it differs from the page.
+  const articleLanguage = post.language;
+  const langAttr = articleLanguage !== lang ? articleLanguage : undefined;
+  const canonical = absoluteUrl(`/notebook/${slug}`, lang);
   // Ids on every h2 for the contents links; items stay empty below two headings.
   const toc = buildArticleToc(post.content || '');
 
@@ -139,7 +152,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       '@type': 'Person',
       '@id': 'https://edrishusein.com/#person',
       name: 'Edris Husein',
-      url: 'https://edrishusein.com/about',
+      url: absoluteUrl('/about', lang),
     },
     publisher: {
       '@type': 'Person',
@@ -148,14 +161,14 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `https://edrishusein.com/notebook/${slug}`,
+      '@id': canonical,
     },
   };
 
   const breadcrumbJsonLd = generateBreadcrumbStructuredData([
-    { text: 'Home', url: 'https://edrishusein.com' },
-    { text: 'Notebook', url: 'https://edrishusein.com/notebook' },
-    { text: post.title, url: `https://edrishusein.com/notebook/${slug}` },
+    { text: siteContent.chrome.breadcrumbHome, url: absoluteUrl('/', lang) },
+    { text: siteContent.nav.notebook, url: absoluteUrl('/notebook', lang) },
+    { text: post.title, url: canonical },
   ]);
 
   return (
@@ -175,12 +188,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         {/* Hero Section */}
         <div className="hero-section">
           <div className="container">
-            <nav className="breadcrumbs" aria-label="Breadcrumb">
-              <Link href="/">Home</Link>
+            <nav className="breadcrumbs" aria-label={text.breadcrumbLabel}>
+              <Link href={localePath('/', lang)}>{siteContent.chrome.breadcrumbHome}</Link>
               <span className="separator" aria-hidden="true">/</span>
-              <Link href="/notebook">Notebook</Link>
+              <Link href={localePath('/notebook', lang)}>{siteContent.nav.notebook}</Link>
               <span className="separator" aria-hidden="true">/</span>
-              <span className="current">{post.title || 'Post'}</span>
+              <span className="current" lang={langAttr}>{post.title || text.untitled}</span>
             </nav>
             <PostMeta
               className="article-header__meta"
@@ -188,6 +201,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               readingMinutes={post.readingMinutes}
               language={articleLanguage}
               labels={metaLabels}
+              lang={lang}
             />
             <h1 className="title" lang={langAttr}>
               {post.title}
@@ -270,16 +284,17 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             sectionTitle={copy.moreArticlesHeading}
             columns={3}
             cards={moreArticles.map((article) => ({
-              title: article.title || 'Untitled',
+              title: article.title || text.untitled,
               description: article.excerpt?.replace(/<[^>]*>/g, '').substring(0, 120) + '...' || '',
               image: article.featuredImage?.node?.sourceUrl || "/images/Blog-sample-img.png",
-              link: `/notebook/${article.slug}`,
+              link: localePath(`/notebook/${article.slug}`, lang),
               variant: 'dark' as const
             }))}
+            lang={lang}
           />
         )}
       </main>
-      <Footer />
+      <Footer lang={lang} />
     </>
   );
 }

@@ -1,5 +1,5 @@
 import { MetadataRoute } from 'next'
-import { fetchSitemapContent, toSitemapEntries, latestModified } from '@/src/lib/sitemap-content';
+import { fetchSitemapContent, toSitemapEntries, latestModified, withLanguageVersions } from '@/src/lib/sitemap-content';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://edrishusein.com';
@@ -22,7 +22,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // it rather than fake a build-time date, which would train Google to distrust it.
   const staticPages: MetadataRoute.Sitemap = [
     { url: baseUrl, lastModified: latestOverall, changeFrequency: 'monthly', priority: 1 },
-    { url: `${baseUrl}/de`, changeFrequency: 'monthly', priority: 0.9 },
     { url: `${baseUrl}/about`, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${baseUrl}/projects`, lastModified: latestProject, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${baseUrl}/notebook`, lastModified: latestPost, changeFrequency: 'weekly', priority: 0.8 },
@@ -36,5 +35,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const postPages = toSitemapEntries(posts, baseUrl, 'notebook', 'weekly', 0.7);
   const projectPages = toSitemapEntries(projects, baseUrl, 'projects', 'monthly', 0.8);
 
-  return [...staticPages, ...postPages, ...projectPages];
+  // Every page exists in English and German (/de + same path); each entry
+  // lists both with hreflang alternates.
+  return withLanguageVersions([...staticPages, ...postPages, ...projectPages], baseUrl);
 }

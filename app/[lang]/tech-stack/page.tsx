@@ -7,22 +7,26 @@ import { rewriteImageUrls } from '@/src/lib/image-utils';
 import { buildTechGrid } from '@/src/lib/tech-usage';
 import { getSiteContent } from '@/src/lib/site-content';
 import { generateStructuredData, pageOpenGraph, safeJsonLd } from '@/src/lib/seo-utils';
+import { absoluteUrl, alternatesFor } from '@/src/lib/i18n/paths';
+import type { Lang } from '@/src/lib/i18n/lang';
+import { localizeRestItem } from '@/src/lib/i18n/localize';
+import { langFromParams, type LangParams } from '@/src/lib/i18n/route';
 import '@/src/styles/pages/CaseStudy.scss';
 
 // ISR: the grid has a stable order (most used first), so the page is cached and
 // refreshed at most once per 60s. Static literal, keep in sync with CMS_REVALIDATE.
 export const revalidate = 60;
 
-export const metadata: Metadata = {
-  title: 'Tech Stack: Next.js, React & WordPress - Edris Husein',
-  description: 'The tech stack Edris Husein builds with: Next.js, React, TypeScript and WordPress, plus the tools, apps and devices behind his web development work.',
-  alternates: { canonical: '/tech-stack' },
-  openGraph: pageOpenGraph({
-    title: 'Tech Stack: Next.js, React & WordPress - Edris Husein',
-    description: 'The tech stack Edris Husein builds with: Next.js, React, TypeScript and WordPress, plus the tools, apps and devices behind his web development work.',
-    path: '/tech-stack',
-  }),
-};
+export async function generateMetadata({ params }: LangParams): Promise<Metadata> {
+  const lang = await langFromParams(params);
+  const { meta } = await getSiteContent(lang);
+  return {
+    title: meta.techStackTitle,
+    description: meta.techStackDescription,
+    alternates: alternatesFor('/tech-stack', lang),
+    openGraph: pageOpenGraph({ title: meta.techStackTitle, description: meta.techStackDescription, path: '/tech-stack', lang }),
+  };
+}
 
 // Tech posts with their logo (featured image), excerpt, categories and the optional usage_note.
 const TECHS_PATH =
@@ -44,14 +48,18 @@ const asList = (value: unknown): unknown[] => (Array.isArray(value) ? value : []
  * The three lists for the grid. A transient CMS failure rethrows so ISR keeps
  * the last good render instead of caching a grid where every count is zero.
  */
-async function getTechGridSources(): Promise<TechGridSources> {
+async function getTechGridSources(lang: Lang): Promise<TechGridSources> {
   try {
     const [techs, projects, categories] = await Promise.all([
       cmsRest<unknown>(TECHS_PATH),
       cmsRest<unknown>(PROJECTS_PATH),
       cmsRest<unknown>(CATEGORIES_PATH),
     ]);
-    return { techs: asList(techs), projects: asList(projects), categories: asList(categories) };
+    return {
+      techs: asList(techs).map((tech) => localizeRestItem(tech, lang)),
+      projects: asList(projects),
+      categories: asList(categories),
+    };
   } catch (error: unknown) {
     if (isTransientCmsError(error)) throw error;
     console.error('Error fetching tech stack:', error instanceof Error ? error.message : error);
@@ -59,15 +67,17 @@ async function getTechGridSources(): Promise<TechGridSources> {
   }
 }
 
-export default async function TechStackPage() {
-  const [{ techs, projects, categories }, siteContent] = await Promise.all([getTechGridSources(), getSiteContent()]);
+export default async function TechStackPage({ params }: LangParams) {
+  const lang = await langFromParams(params);
+  const [{ techs, projects, categories }, siteContent] = await Promise.all([getTechGridSources(lang), getSiteContent(lang)]);
   const copy = siteContent.techStackPage;
   const grid = rewriteImageUrls(buildTechGrid(techs, projects, categories, copy));
 
   const webPageJsonLd = generateStructuredData('WebPage', {
-    title: 'Tech Stack: Next.js, React & WordPress - Edris Husein',
-    description: 'The tech stack Edris Husein builds with: Next.js, React, TypeScript and WordPress.',
-    canonical: 'https://edrishusein.com/tech-stack',
+    title: siteContent.meta.techStackTitle,
+    description: siteContent.meta.techStackDescription,
+    canonical: absoluteUrl('/tech-stack', lang),
+    inLanguage: lang,
   });
 
   return (
@@ -98,7 +108,7 @@ export default async function TechStackPage() {
           </section>
         </div>
       </main>
-      <Footer />
+      <Footer lang={lang} />
     </>
   );
 }
