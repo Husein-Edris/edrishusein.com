@@ -1,6 +1,10 @@
 import { Metadata } from 'next';
 import { alternatesFor, absoluteUrl, localePath } from './i18n/paths';
 import { DEFAULT_LANG, OG_LOCALE, otherLang, type Lang } from './i18n/lang';
+import { decodeEntities } from './transform/decodeEntities';
+import { transformPostListItem, type RestPost } from './transform/transformPost';
+import { AREA_SERVED_KEYS, type AreaServedKey, type Service } from './transform/transformService';
+import { servicePath } from './services';
 
 // Enhanced SEO types for RankMath
 export interface RankMathSEO {
@@ -181,6 +185,21 @@ export function generateStructuredData(type: string, data: any): object {
 // never published.
 const SITE_URL = 'https://edrishusein.com';
 
+type AreaServedNode = Readonly<{ "@type": "AdministrativeArea" | "Country"; name: string }>;
+
+// The places the business serves, keyed by the service `area_served` checkbox
+// values. Shared by the homepage ProfessionalService and every Service node so
+// both state the same areas.
+export const AREA_SERVED: Readonly<Record<AreaServedKey, AreaServedNode>> = Object.freeze({
+  vorarlberg: Object.freeze({ "@type": "AdministrativeArea", name: "Vorarlberg" }),
+  austria: Object.freeze({ "@type": "Country", name: "Austria" }),
+  switzerland: Object.freeze({ "@type": "Country", name: "Switzerland" }),
+  germany: Object.freeze({ "@type": "Country", name: "Germany" }),
+});
+
+const SERVICE_ID = `${SITE_URL}/#service`;
+const SERVICE_NAME = "Edris Husein, Web Development";
+
 export function generateHomepageStructuredData(lang: Lang = DEFAULT_LANG): object {
   // The German homepage adds its own WebPage node (inLanguage de-AT), tied to
   // the shared WebSite and service entities.
@@ -224,8 +243,8 @@ export function generateHomepageStructuredData(lang: Lang = DEFAULT_LANG): objec
       },
       {
         "@type": "ProfessionalService",
-        "@id": `${SITE_URL}/#service`,
-        name: "Edris Husein, Web Development",
+        "@id": SERVICE_ID,
+        name: SERVICE_NAME,
         url: SITE_URL,
         image: `${SITE_URL}/images/Edris-Husein-Hero.png`,
         email: "kontakt@edrishusein.com",
@@ -238,12 +257,7 @@ export function generateHomepageStructuredData(lang: Lang = DEFAULT_LANG): objec
           postalCode: "6850",
           addressCountry: "AT"
         },
-        areaServed: [
-          { "@type": "AdministrativeArea", name: "Vorarlberg" },
-          { "@type": "Country", name: "Austria" },
-          { "@type": "Country", name: "Switzerland" },
-          { "@type": "Country", name: "Germany" }
-        ],
+        areaServed: AREA_SERVED_KEYS.map((key) => AREA_SERVED[key]),
         knowsAbout: ["WordPress", "WooCommerce", "Website maintenance", "Web Development", "Next.js", "React"],
         knowsLanguage: ["de", "en"],
         sameAs: [
@@ -354,19 +368,42 @@ export interface CollectionListing {
   lang?: Lang;
 }
 
+// Google shows about 155 characters of a meta description before it truncates.
+const META_DESCRIPTION_MAX = 155;
+
+// Plain text from CMS-rendered HTML. Tags collapse to a space so adjacent blocks
+// don't glue words together, and entities (`&#8217;`, `&amp;`) are decoded so
+// they neither show literally nor count toward a length limit.
+function plainTextFrom(html: string | null | undefined): string {
+  if (!html) return '';
+  return decodeEntities(html.replace(/<[^>]*>/g, ' '))
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 // Build a meta description from CMS-rendered HTML (post/project excerpts).
 // WordPress returns excerpts as `<p>text </p>\n`, so naively stripping tags left
 // a trailing newline inside the content attribute of every short excerpt.
-// Tags collapse to a space so adjacent blocks don't glue words together.
-export function metaDescriptionFrom(html: string | null | undefined, maxLength = 160): string {
-  if (!html) return '';
+// Longer text is cut on the last word boundary within the limit; a single word
+// longer than the limit is cut hard.
+export function metaDescriptionFrom(html: string | null | undefined, maxLength = META_DESCRIPTION_MAX): string {
+  const text = plainTextFrom(html);
+  if (text.length <= maxLength) return text;
 
-  const text = html
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
+  const window = text.slice(0, maxLength + 1);
+  const lastSpace = window.lastIndexOf(' ');
+  return (lastSpace > 0 ? window.slice(0, lastSpace) : text.slice(0, maxLength)).trimEnd();
+}
 
-  return text.length <= maxLength ? text : text.slice(0, maxLength).trimEnd();
+/**
+ * The languages an article exists in. A post whose own text (title, excerpt and
+ * the start of the content, the same guess the notebook cards use) is German has
+ * no English version: its English URL shows German text, so only `de` counts.
+ * Pass the REST post as fetched, before localizeRestItem, so a German
+ * translation of an English post is not mistaken for a German original.
+ */
+export function articleLanguageVersions(post: RestPost): Lang[] {
+  return transformPostListItem(post).language === 'de' ? ['de'] : ['en', 'de'];
 }
 
 export interface CollectionListItemLd {
@@ -433,5 +470,70 @@ export function generateBreadcrumbStructuredData(breadcrumbs: { text: string; ur
       name: breadcrumb.text,
       item: breadcrumb.url
     }))
+  };
+}
+
+export interface ServiceBreadcrumbLabels {
+  /** First crumb, e.g. Site Content chrome.breadcrumbHome. */
+  home: string;
+  /** Second crumb, the /services index name. */
+  services: string;
+}
+
+// Schema inLanguage per page language, same values as the homepage WebPage node.
+const SCHEMA_LANGUAGE: Readonly<Record<Lang, string>> = { en: 'en', de: 'de-AT' };
+
+/**
+ * One @graph for a service page: the Service (provided by the homepage
+ * ProfessionalService), a FAQPage when the page shows FAQ entries, and the
+ * BreadcrumbList. No offers, priceRange or ratings: prices are never published
+ * and there is no rating data. Serialize the result with safeJsonLd().
+ */
+export function generateServicePageStructuredData(
+  service: Service,
+  lang: Lang,
+  labels: ServiceBreadcrumbLabels
+): object {
+  const url = `${SITE_URL}${servicePath(service, lang)}`;
+  const description = service.seoDescription || metaDescriptionFrom(service.excerpt);
+
+  const serviceNode = {
+    "@type": "Service",
+    "@id": `${url}#service`,
+    name: service.headline,
+    ...(service.serviceType ? { serviceType: service.serviceType } : {}),
+    ...(description ? { description } : {}),
+    url,
+    inLanguage: SCHEMA_LANGUAGE[lang],
+    provider: { "@type": "ProfessionalService", "@id": SERVICE_ID, name: SERVICE_NAME, url: SITE_URL },
+    ...(service.areaServed.length > 0 ? { areaServed: service.areaServed.map((key) => AREA_SERVED[key]) } : {}),
+  };
+
+  const faqNode =
+    service.faq.length > 0
+      ? [
+          {
+            "@type": "FAQPage",
+            "@id": `${url}#faq`,
+            mainEntity: service.faq.map((entry) => ({
+              "@type": "Question",
+              name: entry.question,
+              acceptedAnswer: { "@type": "Answer", text: plainTextFrom(entry.answerHtml) },
+            })),
+          },
+        ]
+      : [];
+
+  // Inside a @graph the node inherits the graph's @context.
+  const breadcrumb = generateBreadcrumbStructuredData([
+    { text: labels.home, url: absoluteUrl('/', lang) },
+    { text: labels.services, url: absoluteUrl('/services', lang) },
+    { text: service.title, url },
+  ]);
+  const breadcrumbNode = Object.fromEntries(Object.entries(breadcrumb).filter(([key]) => key !== "@context"));
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [serviceNode, ...faqNode, breadcrumbNode],
   };
 }

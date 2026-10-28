@@ -84,6 +84,14 @@ describe('transformHomepage', () => {
     expect(mapped.notebookSection).toEqual({ title: 'NOTES', viewAllLabel: 'ALL NOTES', viewAllUrl: '/notes' });
   });
 
+  it('maps the services section group, empty while the CMS has no such fields', () => {
+    expect(result.servicesSection).toEqual({ title: '', text: '' });
+    const mapped = transformHomepage({
+      acf_fields: { services_section: { title: 'Services', text: 'What I build and look after.' } },
+    });
+    expect(mapped.servicesSection).toEqual({ title: 'Services', text: 'What I build and look after.' });
+  });
+
   it('falls back to light defaults when acf_fields is absent', () => {
     const empty = transformHomepage({});
     expect(empty.heroSection?.title).toBe('Edris Husein');

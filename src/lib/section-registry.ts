@@ -4,6 +4,8 @@ import { buildHeroCopyLinks, buildHeroFrames } from '@/src/lib/hero-frames';
 import { cmsText } from '@/src/lib/cms-text';
 import { localePath } from '@/src/lib/i18n/paths';
 import { DEFAULT_LANG, type Lang } from '@/src/lib/i18n/lang';
+import { servicePath } from '@/src/lib/services';
+import type { Service } from '@/src/lib/transform/transformService';
 
 // Code defaults of the homepage teaser cards and the notebook section, shown
 // while the matching Home page fields are empty.
@@ -15,6 +17,7 @@ const HOME_DEFAULTS = {
     techStackDescription: 'The dev tools, apps, devices, and games I use and play with',
     notebookTitle: 'NOTEBOOK',
     notebookViewAll: 'VIEW ALL ARTICLES',
+    servicesTitle: 'SERVICES',
     untitledProject: 'Untitled Project',
     untitledPost: 'Untitled Post',
     noDescription: 'No description available',
@@ -26,6 +29,7 @@ const HOME_DEFAULTS = {
     techStackDescription: 'Die Entwicklungswerkzeuge, Apps, Geräte und Spiele, die ich nutze',
     notebookTitle: 'NOTIZBUCH',
     notebookViewAll: 'ALLE ARTIKEL ANSEHEN',
+    servicesTitle: 'LEISTUNGEN',
     untitledProject: 'Projekt ohne Titel',
     untitledPost: 'Beitrag ohne Titel',
     noDescription: 'Keine Beschreibung vorhanden',
@@ -84,6 +88,15 @@ export class SectionTransformers {
     }));
   }
 
+  /** Service CPT entries as link cards to their pages in `lang`. */
+  static transformServices(services: Service[], lang: Lang = DEFAULT_LANG): InfoCardData[] {
+    return services.map((service) => ({
+      title: service.title,
+      description: service.excerpt,
+      link: servicePath(service, lang),
+    }));
+  }
+
   static createStaticInfoCards(lang: Lang = DEFAULT_LANG): InfoCardData[] {
     const text = HOME_DEFAULTS[lang];
     return [
@@ -139,7 +152,8 @@ export class SectionFactory {
     homepageData: HomepageSections | null,
     projectsData: unknown,
     postsData: unknown,
-    lang: Lang = DEFAULT_LANG
+    lang: Lang = DEFAULT_LANG,
+    services: Service[] = []
   ): SectionConfig[] {
     const text = HOME_DEFAULTS[lang];
     // Projects appear only as the hero strip (design H9); the separate homepage
@@ -148,6 +162,24 @@ export class SectionFactory {
     
     const postNodes = (postsData as any)?.posts?.nodes || [];
     const transformedPosts = SectionTransformers.transformPosts(postNodes, lang);
+
+    // Links to the service pages, only once the CMS has services: without them
+    // the section would be a heading over nothing, pointing at a 404 index.
+    const servicesSection =
+      services.length > 0
+        ? [
+            createSectionConfig('services', 'infocards', {
+              skin: 'default',
+              variant: 'dark',
+              sectionTitle: cmsText(homepageData?.servicesSection?.title, text.servicesTitle),
+              intro: homepageData?.servicesSection?.text?.trim() ?? '',
+              columns: 3,
+              cards: SectionTransformers.transformServices(services, lang),
+              viewMoreLink: localePath('/services', lang),
+              lang
+            }, 2.5),
+          ]
+        : [];
 
     return [
       createSectionConfig('hero', 'hero', {
@@ -161,6 +193,9 @@ export class SectionFactory {
       createSectionConfig('testimonials', 'testimonials', {
         data: homepageData?.testimonialsSection
       }, 2),
+
+      // Between the testimonials (2) and the about section (3).
+      ...servicesSection,
 
       createSectionConfig('about', 'about', {
         data: homepageData?.aboutSection,

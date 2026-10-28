@@ -4,8 +4,9 @@ import { FC, useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { useLang, useNavLabels } from '@/src/components/LangProvider/LangProvider';
-import { localePath, stripLocale } from '@/src/lib/i18n/paths';
+import { useLang, useNavLabels, useServiceSlugs } from '@/src/components/LangProvider/LangProvider';
+import { localePath } from '@/src/lib/i18n/paths';
+import { languageSwitchPath } from '@/src/lib/i18n/language-switch';
 import { otherLang } from '@/src/lib/i18n/lang';
 import { LANG_SWITCH, dictionary } from '@/src/lib/i18n/dictionary';
 import './Header.scss';
@@ -17,13 +18,16 @@ const Header: FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const lang = useLang();
   const nav = useNavLabels();
+  const serviceSlugs = useServiceSlugs();
+  const hasServices = serviceSlugs.length > 0;
   const text = dictionary(lang);
-  // Language switch: the same page in the other language (same path, with or
-  // without /de). stripLocale also covers the internal /en/... path in case the
-  // rewritten pathname reaches this hook during server rendering.
+  // Language switch: the same page in the other language (same path with or
+  // without /de; a service page gets the other language's slug). The helper also
+  // strips the internal /en/... path in case the rewritten pathname reaches this
+  // hook during server rendering.
   const targetLang = otherLang(lang);
   const langSwitch = {
-    href: localePath(stripLocale(usePathname()).path, targetLang),
+    href: languageSwitchPath(usePathname(), targetLang, serviceSlugs),
     hrefLang: targetLang,
     ...LANG_SWITCH[targetLang],
   };
@@ -151,6 +155,13 @@ const Header: FC = () => {
             onTouchMove={(e) => e.stopPropagation()} // Allow navigation area to be touchable
           >
             <ul className="navList">
+              {hasServices && (
+                <li className="navItem">
+                  <Link href={href('/services')} className="navLink" onClick={closeMenu}>
+                    <span className="navText">{nav.services}</span>
+                  </Link>
+                </li>
+              )}
               <li className="navItem">
                 <Link href={href('/projects')} className="navLink" onClick={closeMenu}>
                   <span className="navText">{nav.projects}</span>

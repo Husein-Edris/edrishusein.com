@@ -5,6 +5,7 @@ import SectionRenderer from '@/src/components/SectionRenderer/SectionRenderer';
 import Footer from '@/src/components/Footer/Footer';
 import { DataFetcher } from '@/src/lib/data-fetcher';
 import { SectionFactory } from '@/src/lib/section-registry';
+import { getServices } from '@/src/lib/services';
 import { generateHomepageStructuredData, safeJsonLd } from '@/src/lib/seo-utils';
 import { alternatesFor } from '@/src/lib/i18n/paths';
 import { langFromParams, type LangParams } from '@/src/lib/i18n/route';
@@ -26,8 +27,12 @@ export default async function HomePage({ params }: LangParams) {
   // No try/catch: a transient CMS failure must reject this render so ISR keeps
   // serving the last good homepage (DataFetcher rethrows those). The old catch
   // swapped in a hero-only page, which ISR then cached.
-  const { homepage, projects, posts } = await DataFetcher.getHomepageBundle(lang);
-  const sections = SectionFactory.createHomepageSections(homepage.data, projects.data, posts.data, lang);
+  // getServices rethrows the same way; no services renders no services section.
+  const [{ homepage, projects, posts }, services] = await Promise.all([
+    DataFetcher.getHomepageBundle(lang),
+    getServices(lang),
+  ]);
+  const sections = SectionFactory.createHomepageSections(homepage.data, projects.data, posts.data, lang, services);
 
   return (
     <>

@@ -15,6 +15,20 @@
     width: 100%;
   }
 
+  // Optional line under the section heading (homepage services section).
+  .section-intro {
+    max-width: 60ch;
+    margin: calc(-1 * $spacing-lg) 0 $spacing-2xl;
+    color: $text-light-gray;
+    font-size: $font-size-lg;
+    line-height: $line-height-base;
+
+    @include mobile {
+      margin: 0 0 $spacing-lg;
+      font-size: $font-size-base;
+    }
+  }
+
   .section-header-wrapper {
     display: flex;
     justify-content: space-between;

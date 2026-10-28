@@ -1,0 +1,71 @@
+{
+  "id": 412,
+  "slug": "website-redesign",
+  "modified": "2026-10-28T10:00:00",
+  "title": {
+    "rendered": "Website redesign"
+  },
+  "excerpt": {
+    "rendered": "<p>Redesign an outdated website without losing the search traffic you already have.</p>\n"
+  },
+  "content": {
+    "rendered": "<p>Most redesigns start with a site that still works. See <a href=\"/services/wordpress-maintenance\">maintenance</a>.</p>\n"
+  },
+  "acf_fields": {
+    "title_de": "Website-Relaunch",
+    "excerpt_de": "<p>Relaunch für veraltete Websites, ohne die Rankings zu verlieren.</p>\n",
+    "content_de": "<p>Die meisten Relaunches beginnen mit einer Seite, die noch funktioniert. Siehe <a href=\"/services/wordpress-maintenance\">Wartung</a>.</p>\n",
+    "seo_title": "Website Redesign and Relaunch | Edris Husein",
+    "seo_title_de": "Website-Relaunch in Vorarlberg | Edris Husein",
+    "seo_description": "Redesign or relaunch an outdated website: new structure, faster pages and redirects planned before launch to protect the search traffic you already have.",
+    "seo_description_de": "Relaunch für veraltete Websites: neue Struktur, schnellere Seiten und Weiterleitungen, die vor dem Livegang geplant sind, um Ihre Rankings zu schützen.",
+    "eyebrow": "Services",
+    "eyebrow_de": "Leistungen",
+    "headline": "Website redesign without starting from zero",
+    "headline_de": "Website-Relaunch in Vorarlberg",
+    "primary_keyword": "website redesign",
+    "primary_keyword_de": "website relaunch",
+    "sections": [
+      {
+        "heading": "Redesign or rebuild?",
+        "heading_de": "Wann sich ein Relaunch lohnt, und wann Überarbeiten reicht",
+        "body": "<p>Not every outdated site needs a rebuild. <a href=\"/projects/illwerke-vkw-website-relaunch\">illwerke vkw</a> did.</p>\n",
+        "body_de": "<p>Nicht jede veraltete Seite braucht einen Neubau. <a href=\"/projects/illwerke-vkw-website-relaunch\">illwerke vkw</a> schon.</p>\n"
+      },
+      {
+        "heading": "Keeping your rankings",
+        "heading_de": "",
+        "body": "<p>Redirects are planned before launch.</p>\n",
+        "body_de": ""
+      }
+    ],
+    "faq": [
+      {
+        "question": "Will a redesign hurt my SEO?",
+        "question_de": "Verliere ich bei einem Relaunch mein Google-Ranking?",
+        "answer": "<p>Not if every old URL redirects to its new page.</p>\n",
+        "answer_de": "<p>Nicht, wenn jede alte URL auf ihre neue Seite weiterleitet.</p>\n"
+      }
+    ],
+    "related_projects": [
+      101,
+      102
+    ],
+    "related_posts": [
+      201
+    ],
+    "service_type": "Website redesign",
+    "service_type_de": "Website-Relaunch",
+    "area_served": [
+      "vorarlberg",
+      "austria"
+    ],
+    "slug_de": "website-relaunch",
+    "cta_heading": "Planning a redesign?",
+    "cta_heading_de": "Relaunch geplant?",
+    "cta_text": "Tell me which site it is and what bothers you about it. Replies within a day.",
+    "cta_text_de": "Schreiben Sie mir, um welche Website es geht und was Sie daran stört. Antwort innerhalb eines Tages.",
+    "cta_label": "Start a project",
+    "cta_label_de": ""
+  }
+}

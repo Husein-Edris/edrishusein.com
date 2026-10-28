@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { serviceRedirectFor } from './src/lib/service-redirect'
 
 // Language routing for app/[lang]. English keeps its unprefixed public URLs and
 // is rewritten internally to /en/...; German lives at /de/... and passes
@@ -11,7 +12,16 @@ const ENGLISH = /^\/en(?:\/|$)/
 // it back to the public URL and loop.
 const REWRITTEN = 'x-lang-rewrite'
 
-export function proxy(req: NextRequest) {
+// Public URL of a path on the requested site, built from the Host header:
+// nextUrl carries the server's own host and port (localhost:3000 behind the
+// reverse proxy), see the www branch below.
+function publicUrl(req: NextRequest, pathWithSearch: string): URL {
+  const host = req.headers.get('host') ?? ''
+  const proto = req.headers.get('x-forwarded-proto')?.split(',')[0].trim() || req.nextUrl.protocol.replace(':', '')
+  return new URL(pathWithSearch, `${proto}://${host || req.nextUrl.host}`)
+}
+
+export async function proxy(req: NextRequest) {
   const host = req.headers.get('host') ?? ''
 
   // Fallback www -> apex 301 redirect. Preferred long-term fix is a Cloudflare
@@ -30,15 +40,18 @@ export function proxy(req: NextRequest) {
 
   const { pathname } = req.nextUrl
 
+  // The other language's service slug (e.g. an old or hand-edited link with
+  // the English slug on /de): 308 to the canonical URL of the requested
+  // language here, never from the ISR page, which would cache the redirect.
+  // Only /services/<slug> and /de/services/<slug> trigger the lookup.
+  const serviceTarget = await serviceRedirectFor(pathname)
+  if (serviceTarget) return NextResponse.redirect(publicUrl(req, serviceTarget + req.nextUrl.search), 308)
+
   if (GERMAN.test(pathname)) return NextResponse.next()
 
   if (ENGLISH.test(pathname)) {
     if (req.headers.get(REWRITTEN) === '1') return NextResponse.next()
-    // Built from the Host header: nextUrl carries the server's own host and
-    // port (localhost:3000 behind the reverse proxy), see the www branch above.
-    const proto = req.headers.get('x-forwarded-proto')?.split(',')[0].trim() || req.nextUrl.protocol.replace(':', '')
-    const target = new URL((pathname.replace(/^\/en/, '') || '/') + req.nextUrl.search, `${proto}://${host || req.nextUrl.host}`)
-    return NextResponse.redirect(target, 308)
+    return NextResponse.redirect(publicUrl(req, (pathname.replace(/^\/en/, '') || '/') + req.nextUrl.search), 308)
   }
 
   const url = req.nextUrl.clone()

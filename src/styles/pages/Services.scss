@@ -1,0 +1,113 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// Service pages (/services and /services/<slug>). The detail page sits inside
+// .case-study, so its hero, container and body copy reuse CaseStudy.scss; this
+// file only adds what a service page has and a case study does not.
+
+// Index: subline under the H1, outside it (the H1 is the page name only).
+.projects-hero .services-hero__subtitle {
+  font-family: $font-family-base;
+  font-size: clamp(1rem, 0.9rem + 0.4vw, 1.25rem);
+  line-height: $line-height-base;
+  color: $text-lighter-gray;
+  max-width: 40ch;
+  margin: $spacing-md 0 0;
+}
+
+.service-page {
+  &__eyebrow {
+    font-family: $font-family-syncopate;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: $color-beige;
+    margin: 0 0 $spacing-md;
+  }
+
+  &__body {
+    max-width: 800px;
+  }
+
+  .service-section {
+    margin-bottom: $spacing-3xl;
+
+    @include mobile {
+      margin-bottom: $spacing-2xl;
+    }
+
+    h2 {
+      margin-bottom: $spacing-lg;
+    }
+
+    h3 {
+      font-size: $font-size-lg;
+      font-weight: $font-weight-semibold;
+      margin: $spacing-lg 0 $spacing-sm;
+    }
+
+    .content {
+      color: $text-light-gray;
+      line-height: 1.8;
+
+      p,
+      ul,
+      ol {
+        margin-bottom: $spacing-md;
+      }
+
+      ul,
+      ol {
+        margin-left: $spacing-lg;
+      }
+
+      a {
+        color: $color-beige;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+    }
+  }
+
+  .service-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+      padding: $spacing-md 0;
+      border-bottom: 1px solid rgba($white, 0.15);
+    }
+
+    a {
+      color: $white;
+      font-weight: $font-weight-semibold;
+      font-size: $font-size-lg;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    p {
+      color: $text-light-gray;
+      margin: $spacing-sm 0 0;
+    }
+  }
+
+  .service-cta {
+    border-top: 1px solid rgba($white, 0.15);
+    padding-top: $spacing-2xl;
+
+    p {
+      color: $text-light-gray;
+      margin-bottom: $spacing-lg;
+    }
+
+    &__button {
+      @include button-primary;
+      @include button-size('md');
+      display: inline-flex;
+      text-decoration: none;
+    }
+  }
+}

@@ -1,6 +1,8 @@
 import type { MetadataRoute } from 'next';
 import { cmsRest, isTransientCmsError } from './rest-client';
 import { localePath } from './i18n/paths';
+import { servicePath } from './services';
+import type { Service } from './transform/transformService';
 
 export interface SitemapContentItem {
   slug: string;
@@ -80,4 +82,49 @@ export function withLanguageVersions(entries: MetadataRoute.Sitemap, baseUrl: st
       { ...entry, url: de, alternates },
     ];
   });
+}
+
+// Service pages are the commercial pages of the site, ranked with the case studies.
+const SERVICE_PRIORITY = 0.9;
+
+const serviceDate = (service: Service): Date | undefined =>
+  service.modified ? new Date(service.modified) : undefined;
+
+/**
+ * Sitemap entries of the service pages: the English and the German URL of each
+ * service, which use different slugs, both naming the pair as alternates.
+ * Not routed through withLanguageVersions, which assumes one path per pair.
+ */
+export function toServiceSitemapEntries(services: Service[], baseUrl: string): MetadataRoute.Sitemap {
+  return services.flatMap((service) => {
+    const en = `${baseUrl}${servicePath(service, 'en')}`;
+    const de = `${baseUrl}${servicePath(service, 'de')}`;
+    const alternates = { languages: { en, de, 'x-default': en } };
+    const shared = {
+      lastModified: serviceDate(service),
+      changeFrequency: 'monthly' as const,
+      priority: SERVICE_PRIORITY,
+      alternates,
+    };
+    return [
+      { url: en, ...shared },
+      { url: de, ...shared },
+    ];
+  });
+}
+
+/**
+ * The /services index as a static entry (for withLanguageVersions), dated by its
+ * newest service. Empty while there are no services: the index is a 404 then.
+ */
+export function servicesIndexEntries(services: Service[], baseUrl: string): MetadataRoute.Sitemap {
+  if (services.length === 0) return [];
+  return [
+    {
+      url: `${baseUrl}/services`,
+      lastModified: latestModified(services),
+      changeFrequency: 'monthly',
+      priority: SERVICE_PRIORITY,
+    },
+  ];
 }
