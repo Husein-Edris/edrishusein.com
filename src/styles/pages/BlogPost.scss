@@ -1027,3 +1027,218 @@ nav.breadcrumbs a {
     }
   }
 }
+
+// Data-margin article layout (2026-10-28, chosen from docs/post-template-mocks/2-data-margin.html):
+// a narrow reading column plus a wide margin. Paragraphs that cite a reference carry the
+// source and the paragraph's figure in the margin (src/lib/article-sidenotes.ts).
+$post-lime: #c4fc38;
+$post-measure: 680px;
+$post-margin-col: 320px;
+
+.case-study.blog-post.post-margin {
+  // The container already pads the sides; the section's own padding pushed the header
+  // 24px right of the body on mobile.
+  .hero-section {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  // Same left edge as the article grid below: grid width plus the container's side padding.
+  .hero-section .container {
+    max-width: calc(#{$post-measure} + #{$post-margin-col} + #{$spacing-4xl} * 0.84 + #{$spacing-xl} * 2);
+    text-align: left;
+  }
+
+  .hero-section .breadcrumbs {
+    justify-content: flex-start;
+    margin-left: 0;
+    text-align: left;
+  }
+
+  .article-header__meta {
+    justify-content: flex-start;
+    padding-bottom: $spacing-md;
+    border-bottom: 1px solid rgba($white, 0.1);
+  }
+
+  .title {
+    margin: $spacing-2xl 0 $spacing-lg;
+    // CaseStudy.scss pads title and overview on mobile; this layout aligns them with the body.
+    padding-left: 0;
+    padding-right: 0;
+    max-width: 22ch;
+    font-family: $font-family-syncopate;
+    font-size: clamp(1.75rem, 1rem + 2.6vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    text-align: left;
+    text-transform: uppercase;
+    color: $white;
+  }
+
+  .overview {
+    max-width: $post-measure;
+    margin: 0;
+    padding-left: 0;
+    padding-right: 0;
+    font-size: clamp(1.125rem, 1rem + 0.35vw, 1.3125rem);
+    line-height: 1.55;
+    text-align: left;
+    color: $text-light-gray;
+  }
+
+  .featured-image {
+    max-width: none;
+    margin: $spacing-2xl 0 $spacing-3xl;
+  }
+
+  .post-margin__grid {
+    max-width: calc(#{$post-measure} + #{$post-margin-col} + #{$spacing-4xl} * 0.84);
+    margin: 0 auto;
+
+    .article-content {
+      max-width: none;
+    }
+  }
+
+  .article-content .content {
+    display: grid;
+    grid-template-columns: minmax(0, $post-measure) $post-margin-col;
+    column-gap: calc($spacing-4xl * 0.84);
+    align-items: start;
+
+    @include tablet {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    > *,
+    .post-margin__flow > * {
+      grid-column: 1;
+    }
+
+    .post-margin__flow {
+      display: contents;
+    }
+
+    // A cited paragraph (or a run of them) with its note pinned beside the first line.
+    // Absolute, so a tall note never stretches the text column.
+    .sidenote-row {
+      position: relative;
+
+      @include tablet {
+        position: static;
+      }
+    }
+
+    h2 {
+      margin-top: $spacing-3xl;
+
+      &::before {
+        content: '';
+        display: block;
+        width: 32px;
+        height: 3px;
+        margin-bottom: $spacing-md;
+        background: $post-lime;
+      }
+
+      // The old heading underline is replaced by the lime bar above.
+      &::after {
+        display: none;
+      }
+    }
+  }
+
+  .sidenote {
+    position: absolute;
+    top: 0;
+    left: calc(100% + #{$spacing-4xl} * 0.84);
+    width: $post-margin-col;
+    margin-top: $spacing-xs;
+    padding: $spacing-xs 0 $spacing-xs $spacing-lg;
+    border-left: 1px solid $text-dark-gray;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: $text-light-gray;
+
+    @include tablet {
+      position: static;
+      width: auto;
+      margin: 0 0 $spacing-lg;
+    }
+
+    &__figure {
+      display: block;
+      margin-bottom: $spacing-sm;
+      font-size: 3.5rem;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      color: $post-lime;
+
+      & + & {
+        margin-top: $spacing-md;
+      }
+
+      &--down {
+        color: $color-beige;
+      }
+    }
+
+    &__source {
+      display: block;
+      overflow-wrap: anywhere;
+
+      & + & {
+        margin-top: $spacing-sm;
+      }
+
+      a {
+        color: inherit;
+      }
+    }
+  }
+
+  .post-margin__takeaways {
+    grid-column: 1;
+    margin: $spacing-2xl 0;
+    padding: $spacing-xl;
+    border: 1px solid $post-lime;
+
+    ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    li {
+      position: relative;
+      margin: 0;
+      padding: $spacing-sm 0 $spacing-sm $spacing-lg;
+      border-top: 1px solid rgba($white, 0.08);
+      font-size: 1.0625rem;
+      line-height: 1.5;
+      color: $white;
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: calc($spacing-sm + 0.45em);
+        width: 10px;
+        height: 10px;
+        background: $post-lime;
+      }
+    }
+  }
+
+  .post-margin__takeaways-title {
+    margin: 0 0 $spacing-md;
+    font-family: $font-family-syncopate;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: $post-lime;
+  }
+}

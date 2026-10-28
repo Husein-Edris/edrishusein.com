@@ -12,7 +12,7 @@ import { cmsRest, isTransientCmsError } from '@/src/lib/rest-client';
 import { safeJsonLd, metaDescriptionFrom, generateBreadcrumbStructuredData } from '@/src/lib/seo-utils';
 import { getSiteContent } from '@/src/lib/site-content';
 import { buildArticleToc } from '@/src/lib/article-toc';
-import ArticleToc from '@/src/components/ArticleToc/ArticleToc';
+import { withSidenotes, splitLead } from '@/src/lib/article-sidenotes';
 import PostMeta from '@/src/components/PostMeta/PostMeta';
 import { selectRelatedByRotation } from '@/src/lib/related-content';
 import {
@@ -138,6 +138,9 @@ export default async function BlogPostPage({ params }: PostParams) {
   const canonical = absoluteUrl(`/notebook/${slug}`, lang);
   // Ids on every h2 for the contents links; items stay empty below two headings.
   const toc = buildArticleToc(post.content || '');
+  // Data-margin layout: cited paragraphs carry their source and figure in the margin column.
+  const body = splitLead(withSidenotes(toc.html));
+  const takeaways = post.conclusionSection?.conclusionPoints.filter((p) => p.pointText) ?? [];
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -184,7 +187,7 @@ export default async function BlogPostPage({ params }: PostParams) {
         dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbJsonLd) }}
       />
       <Header />
-      <main id="main-content" tabIndex={-1} className="case-study blog-post">
+      <main id="main-content" tabIndex={-1} className="case-study blog-post post-margin">
         {/* Hero Section */}
         <div className="hero-section">
           <div className="container">
@@ -231,18 +234,22 @@ export default async function BlogPostPage({ params }: PostParams) {
         </div>
 
         <div className="container">
-          {/* Article content, centered, with the sticky contents column on desktop (design C1). */}
-          <div className={`article-layout${toc.items.length > 0 ? ' article-layout--with-toc' : ''}`}>
-            {toc.items.length > 0 && (
-              <aside className="article-layout__toc">
-                <ArticleToc items={toc.items} heading={copy.tocHeading} lang={langAttr} />
-              </aside>
-            )}
+          <div className="post-margin__grid">
             <section className="article-content" lang={langAttr}>
-              <div
-                className="content"
-                dangerouslySetInnerHTML={{ __html: toc.html }}
-              />
+              <div className="content">
+                {body.lead && <div className="post-margin__flow" dangerouslySetInnerHTML={{ __html: body.lead }} />}
+                {takeaways.length > 0 && (
+                  <aside className="post-margin__takeaways" aria-label={post.conclusionSection?.conclusionTitle || undefined}>
+                    <p className="post-margin__takeaways-title">{post.conclusionSection?.conclusionTitle}</p>
+                    <ul>
+                      {takeaways.map((point) => (
+                        <li key={point.pointText}>{point.pointText}</li>
+                      ))}
+                    </ul>
+                  </aside>
+                )}
+                <div className="post-margin__flow" dangerouslySetInnerHTML={{ __html: body.rest }} />
+              </div>
             </section>
           </div>
 

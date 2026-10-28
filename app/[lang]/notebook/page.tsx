@@ -6,6 +6,7 @@ import Footer from '@/src/components/Footer/Footer';
 import { rewriteImageUrls } from '@/src/lib/image-utils';
 import { cmsRest, isTransientCmsError } from '@/src/lib/rest-client';
 import { localizedPostListItem } from '@/src/lib/transform/transformPost';
+import { coverFocus } from '@/src/lib/coverFocus';
 import { getSiteContent } from '@/src/lib/site-content';
 import { decodeEntities } from '@/src/lib/transform/decodeEntities';
 import PostMeta from '@/src/components/PostMeta/PostMeta';
@@ -123,6 +124,7 @@ export default async function BlogArchivePage({ params }: LangParams) {
                                                     sizes={THUMB_SIZES}
                                                     priority={index === 0}
                                                     className="notebook-list__image"
+                                                    style={{ objectPosition: coverFocus(post.slug) }}
                                                 />
                                             </div>
                                         )}
