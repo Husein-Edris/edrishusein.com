@@ -6,8 +6,8 @@ import { DEFAULT_LANG, type Lang } from '@/src/lib/i18n/lang';
 // Code defaults for the hero copy. Each one renders until its ACF field in the
 // homepage `hero_section` group is filled (theme inc/acf-fields/homepage.php).
 export const HERO_DEFAULTS = {
-  eyebrow: 'Edris Husein, Dornbirn, Austria',
-  heading: 'Servus. I build websites, fix them and help you plan what comes next.',
+  eyebrow: 'Servus from Dornbirn 👋 🇦🇹',
+  heading: 'Websites built with Gründlichkeit. Fixed properly, planned ahead.',
   primaryCtaLabel: 'Email me',
   primaryCtaUrl: 'mailto:kontakt@edrishusein.com',
   secondaryCtaLabel: 'See all projects',
@@ -17,7 +17,7 @@ export const HERO_DEFAULTS = {
 // German code defaults (register: Sie); the URLs stay the same and are
 // localized when resolved.
 export const HERO_DEFAULTS_DE: { readonly [K in keyof typeof HERO_DEFAULTS]: string } = {
-  eyebrow: 'Edris Husein, Dornbirn, Österreich',
+  eyebrow: 'Servus aus Dornbirn 👋 🇦🇹',
   heading: 'Servus. Ich baue Websites, repariere sie und helfe Ihnen zu planen, was als Nächstes kommt.',
   primaryCtaLabel: 'E-Mail schreiben',
   primaryCtaUrl: HERO_DEFAULTS.primaryCtaUrl,
