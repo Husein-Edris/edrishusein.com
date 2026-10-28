@@ -40,7 +40,7 @@ describe('resolveHeroContent on German pages', () => {
   it('renders German defaults and links site paths to the German pages', () => {
     expect(resolveHeroContent(undefined, 'de')).toEqual({
       eyebrow: 'Servus aus Dornbirn 👋 🇦🇹',
-      heading: 'Servus. Ich baue Websites, repariere sie und helfe Ihnen zu planen, was als Nächstes kommt.',
+      heading: 'Websites mit Gründlichkeit gebaut. Sauber repariert, vorausschauend geplant.',
       primaryCta: { label: 'E-Mail schreiben', url: 'mailto:kontakt@edrishusein.com' },
       secondaryCta: { label: 'Alle Projekte ansehen', url: '/de/projects' },
     });

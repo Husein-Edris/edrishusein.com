@@ -18,7 +18,7 @@ export const HERO_DEFAULTS = {
 // localized when resolved.
 export const HERO_DEFAULTS_DE: { readonly [K in keyof typeof HERO_DEFAULTS]: string } = {
   eyebrow: 'Servus aus Dornbirn 👋 🇦🇹',
-  heading: 'Servus. Ich baue Websites, repariere sie und helfe Ihnen zu planen, was als Nächstes kommt.',
+  heading: 'Websites mit Gründlichkeit gebaut. Sauber repariert, vorausschauend geplant.',
   primaryCtaLabel: 'E-Mail schreiben',
   primaryCtaUrl: HERO_DEFAULTS.primaryCtaUrl,
   secondaryCtaLabel: 'Alle Projekte ansehen',
