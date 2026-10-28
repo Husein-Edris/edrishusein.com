@@ -10,8 +10,14 @@ import {
   pageOpenGraph,
   metaDescriptionFrom,
   safeJsonLd,
+  generateServicePageStructuredData,
+  articleLanguageVersions,
+  AREA_SERVED,
   type RankMathSEO,
 } from './seo-utils';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { transformService, type RestService } from './transform/transformService';
 import { mockRankMathSEO, mockPartialSEO } from '../__mocks__/fixtures/wordpress-data';
 
 describe('generateEnhancedMetadata', () => {
@@ -737,5 +743,178 @@ describe('German pages', () => {
     expect(
       generateCollectionPageStructuredData({ name: 'N', description: 'D', path: '/de/notebook', items: [], lang: 'de' })
     ).toMatchObject({ url: 'https://edrishusein.com/de/notebook', inLanguage: 'de' });
+  });
+});
+
+describe('metaDescriptionFrom (155 limit, word boundary, entities)', () => {
+  const long =
+    '<p>Annual report platform for the Vorarlberg state hospitals, built on WordPress with a custom plugin that turns structured data into accessible pages and printable documents for every year.</p>';
+
+  it('cuts at 155 characters or less by default', () => {
+    expect(metaDescriptionFrom(long).length).toBeLessThanOrEqual(155);
+  });
+
+  it('ends on a whole word, never mid-word', () => {
+    const plain = long.replace(/<[^>]*>/g, '');
+    const result = metaDescriptionFrom(long);
+    expect(plain.startsWith(result)).toBe(true);
+    expect(plain.charAt(result.length)).toBe(' ');
+  });
+
+  it('decodes HTML entities such as &#8217; and &amp;', () => {
+    expect(metaDescriptionFrom('<p>VLKH&#8217;s report &amp; archive</p>')).toBe('VLKH’s report & archive');
+  });
+
+  it('measures the limit on the decoded text', () => {
+    const encoded = `<p>${'it&#8217;s '.repeat(40)}</p>`;
+    const result = metaDescriptionFrom(encoded);
+    expect(result).not.toContain('&#');
+    expect(result.length).toBeLessThanOrEqual(155);
+    expect(result.endsWith('it’s')).toBe(true);
+  });
+
+  it('hard-cuts a single word longer than the limit', () => {
+    expect(metaDescriptionFrom(`<p>${'x'.repeat(200)}</p>`)).toHaveLength(155);
+  });
+
+  it('keeps text exactly at the limit unchanged', () => {
+    const exact = `${'abcd '.repeat(30)}abcde`;
+    expect(exact).toHaveLength(155);
+    expect(metaDescriptionFrom(`<p>${exact}</p>`)).toBe(exact);
+  });
+});
+
+describe('articleLanguageVersions', () => {
+  const germanPost = {
+    id: 1,
+    slug: 'wordpress-website-kosten-oesterreich',
+    title: { rendered: 'Was kostet eine WordPress-Website in Österreich?' },
+    excerpt: { rendered: '<p>Die Kosten für eine Website hängen von vielen Faktoren ab, und hier ist eine ehrliche Übersicht.</p>' },
+  };
+  const englishPost = {
+    id: 2,
+    slug: 'why-i-choose-wordpress-for-most-client-projects',
+    title: { rendered: 'Why I choose WordPress for most client projects' },
+    excerpt: { rendered: '<p>What the client needs is a site they can edit, and this is how I decide.</p>' },
+  };
+
+  it('returns only de for a German-only post', () => {
+    expect(articleLanguageVersions(germanPost)).toEqual(['de']);
+  });
+
+  it('returns both languages for an English post', () => {
+    expect(articleLanguageVersions(englishPost)).toEqual(['en', 'de']);
+  });
+
+  it('returns both languages for an English post that has a German translation', () => {
+    const translated = {
+      ...englishPost,
+      acf_fields: { content_de: '<p>Warum ich für die meisten Projekte WordPress wähle, und wie ich das entscheide.</p>' },
+    };
+    expect(articleLanguageVersions(translated)).toEqual(['en', 'de']);
+  });
+});
+
+describe('generateServicePageStructuredData', () => {
+  const fixture: RestService = JSON.parse(
+    readFileSync(resolve(__dirname, 'transform/__fixtures__/service.json'), 'utf-8'),
+  );
+  const labels = { de: { home: 'Home', services: 'Leistungen' }, en: { home: 'Home', services: 'Services' } };
+  type Node = Record<string, unknown>;
+  const graphOf = (data: object) => (data as { '@graph': Node[] })['@graph'];
+  const nodeOf = (data: object, type: string) => graphOf(data).find((node) => node['@type'] === type);
+
+  const de = generateServicePageStructuredData(transformService(fixture, 'de'), 'de', labels.de);
+  const en = generateServicePageStructuredData(transformService(fixture, 'en'), 'en', labels.en);
+
+  it('emits one @graph with the schema.org context', () => {
+    expect(de).toMatchObject({ '@context': 'https://schema.org' });
+    expect(graphOf(de).map((node) => node['@type'])).toEqual(['Service', 'FAQPage', 'BreadcrumbList']);
+  });
+
+  it('links the provider to the homepage ProfessionalService @id', () => {
+    const home = nodeOf(generateHomepageStructuredData(), 'ProfessionalService') as Node;
+    const service = nodeOf(de, 'Service') as Node;
+    expect((service.provider as Node)['@id']).toBe(home['@id']);
+    expect(service.provider).toMatchObject({ '@type': 'ProfessionalService', name: home.name, url: home.url });
+  });
+
+  it('describes the German service with its own URL, language and areas', () => {
+    expect(nodeOf(de, 'Service')).toMatchObject({
+      '@id': 'https://edrishusein.com/de/services/website-relaunch#service',
+      name: 'Website-Relaunch in Vorarlberg',
+      serviceType: 'Website-Relaunch',
+      url: 'https://edrishusein.com/de/services/website-relaunch',
+      inLanguage: 'de-AT',
+      areaServed: [AREA_SERVED.vorarlberg, AREA_SERVED.austria],
+    });
+    expect((nodeOf(de, 'Service') as Node).description).toMatch(/^Relaunch für veraltete Websites/);
+  });
+
+  it('uses the English slug and inLanguage en on the English page', () => {
+    expect(nodeOf(en, 'Service')).toMatchObject({
+      url: 'https://edrishusein.com/services/website-redesign',
+      inLanguage: 'en',
+    });
+  });
+
+  it('shares the area objects with the homepage ProfessionalService', () => {
+    const home = nodeOf(generateHomepageStructuredData(), 'ProfessionalService') as Node;
+    expect(home.areaServed).toEqual(Object.values(AREA_SERVED));
+  });
+
+  it('never states offers, a price range or ratings', () => {
+    const json = JSON.stringify(de);
+    expect(json).not.toContain('offers');
+    expect(json).not.toContain('priceRange');
+    expect(json).not.toContain('aggregateRating');
+  });
+
+  it('builds the FAQPage from the visible FAQ with plain-text answers', () => {
+    expect(nodeOf(de, 'FAQPage')).toEqual({
+      '@type': 'FAQPage',
+      '@id': 'https://edrishusein.com/de/services/website-relaunch#faq',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'Verliere ich bei einem Relaunch mein Google-Ranking?',
+          acceptedAnswer: { '@type': 'Answer', text: 'Nicht, wenn jede alte URL auf ihre neue Seite weiterleitet.' },
+        },
+      ],
+    });
+  });
+
+  it('omits the FAQPage when the service has no FAQ entries', () => {
+    const noFaq = { ...transformService(fixture, 'en'), faq: [] };
+    const data = generateServicePageStructuredData(noFaq, 'en', labels.en);
+    expect(nodeOf(data, 'FAQPage')).toBeUndefined();
+  });
+
+  it('omits areaServed when no area is selected', () => {
+    const noArea = { ...transformService(fixture, 'en'), areaServed: [] };
+    expect(nodeOf(generateServicePageStructuredData(noArea, 'en', labels.en), 'Service')).not.toHaveProperty('areaServed');
+  });
+
+  it('adds a BreadcrumbList without its own @context', () => {
+    expect(nodeOf(de, 'BreadcrumbList')).toEqual({
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://edrishusein.com/de' },
+        { '@type': 'ListItem', position: 2, name: 'Leistungen', item: 'https://edrishusein.com/de/services' },
+        { '@type': 'ListItem', position: 3, name: 'Website-Relaunch', item: 'https://edrishusein.com/de/services/website-relaunch' },
+      ],
+    });
+    expect((nodeOf(en, 'BreadcrumbList') as { itemListElement: Node[] }).itemListElement[0].item).toBe('https://edrishusein.com');
+  });
+
+  it('stays safe when serialized with safeJsonLd and an answer contains </script>', () => {
+    const hostile = {
+      ...transformService(fixture, 'en'),
+      faq: [{ question: 'Q', answerHtml: '<p>a &lt;/script&gt;&lt;script&gt;alert(1)&lt;/script&gt;</p>' }],
+    };
+    const serialized = safeJsonLd(generateServicePageStructuredData(hostile, 'en', labels.en));
+    expect(serialized).not.toContain('</script>');
+    expect(serialized).not.toContain('<script');
+    expect(JSON.parse(serialized)['@graph'][1].mainEntity[0].acceptedAnswer.text).toBe('a </script><script>alert(1)</script>');
   });
 });

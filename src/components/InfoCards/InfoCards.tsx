@@ -32,6 +32,8 @@ interface InfoCardsProps {
   columns?: 1 | 2 | 3;
   sectionNumber?: string;
   sectionTitle?: string;
+  /** Plain-text line under the section heading; nothing renders when empty. */
+  intro?: string;
   skin?: CardSkin;
   className?: string;
   variant?: CardVariant;
@@ -215,6 +217,7 @@ function InfoCards({
   columns = 1,
   sectionNumber,
   sectionTitle,
+  intro,
   skin = 'default',
   className = '',
   variant = 'dark',
@@ -246,6 +249,7 @@ function InfoCards({
             {viewMoreLink && <ViewMore href={viewMoreLink} text={viewMoreText} fallback={text.viewMore} className="view-more-desktop" />}
           </div>
         )}
+        {intro && <p className="section-intro">{intro}</p>}
         {featuredCards.length > 0 && (
           <div className="featured-grid">
             {featuredCards.map((card, index) => (

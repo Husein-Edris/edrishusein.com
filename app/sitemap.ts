@@ -1,5 +1,13 @@
 import { MetadataRoute } from 'next'
-import { fetchSitemapContent, toSitemapEntries, latestModified, withLanguageVersions } from '@/src/lib/sitemap-content';
+import {
+  fetchSitemapContent,
+  toSitemapEntries,
+  latestModified,
+  withLanguageVersions,
+  toServiceSitemapEntries,
+  servicesIndexEntries,
+} from '@/src/lib/sitemap-content';
+import { getServices } from '@/src/lib/services';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://edrishusein.com';
@@ -7,9 +15,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Fetch dynamic content first so static index pages can derive an honest
   // lastmod from their freshest child. A CMS outage throws, so ISR keeps the last
   // good sitemap instead of caching one without posts and projects.
-  const [posts, projects] = await Promise.all([
+  // Services carry both slugs, so they come from getServices (same outage rule:
+  // transient throws, no post type yet yields none).
+  const [posts, projects, services] = await Promise.all([
     fetchSitemapContent('/posts?per_page=100&orderby=date&order=desc&_fields=slug,modified,date'),
     fetchSitemapContent('/project?per_page=100&orderby=date&order=desc&_fields=slug,modified,date'),
+    getServices('en'),
   ]);
 
   const latestPost = latestModified(posts);
@@ -22,6 +33,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // it rather than fake a build-time date, which would train Google to distrust it.
   const staticPages: MetadataRoute.Sitemap = [
     { url: baseUrl, lastModified: latestOverall, changeFrequency: 'monthly', priority: 1 },
+    // /services only while services exist; without them the index is a 404.
+    ...servicesIndexEntries(services, baseUrl),
     { url: `${baseUrl}/about`, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${baseUrl}/projects`, lastModified: latestProject, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${baseUrl}/notebook`, lastModified: latestPost, changeFrequency: 'weekly', priority: 0.8 },
@@ -36,6 +49,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const projectPages = toSitemapEntries(projects, baseUrl, 'projects', 'monthly', 0.8);
 
   // Every page exists in English and German (/de + same path); each entry
-  // lists both with hreflang alternates.
-  return withLanguageVersions([...staticPages, ...postPages, ...projectPages], baseUrl);
+  // lists both with hreflang alternates. Service pages use a different slug per
+  // language and bring their own pairs.
+  return [
+    ...withLanguageVersions([...staticPages, ...postPages, ...projectPages], baseUrl),
+    ...toServiceSitemapEntries(services, baseUrl),
+  ];
 }

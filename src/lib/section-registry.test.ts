@@ -13,6 +13,7 @@ import {
   mockProjectsResponse,
   mockPostsResponse,
 } from '../__mocks__/fixtures/wordpress-data';
+import type { Service } from './transform/transformService';
 
 describe('SectionTransformers', () => {
   describe('transformProjects', () => {
@@ -577,3 +578,52 @@ describe('SectionFactory on German pages', () => {
     expect(SectionTransformers.createStaticInfoCards('de').map((card) => card.title)).toEqual(['BÜCHERREGAL', 'TECHNOLOGIEN']);
   });
 });
+
+describe('SectionFactory services section', () => {
+  const service = (slug: string, slugDe: string, title: string) =>
+    ({ slug, slugDe, title, excerpt: `<p>${title} teaser</p>` }) as Service;
+  const services = [
+    service('website-development', 'website-erstellen-lassen', 'Website development'),
+    service('website-redesign', 'website-relaunch', 'Website redesign'),
+  ];
+
+  it('renders no services section while the CMS has no services', () => {
+    const result = SectionFactory.createHomepageSections(mockHomepageSections, mockProjectsResponse, mockPostsResponse, 'en', []);
+    expect(result.find((s) => s.id === 'services')).toBeUndefined();
+    expect(result).toHaveLength(6);
+  });
+
+  it('links each service card to its page in the page language, right after the testimonials', () => {
+    const en = SectionFactory.createHomepageSections(mockHomepageSections, mockProjectsResponse, mockPostsResponse, 'en', services);
+    const section = en.find((s) => s.id === 'services');
+    const cards = section?.props.cards as Array<{ title: string; link: string; description: string }>;
+
+    expect(en).toHaveLength(7);
+    expect(cards.map((card) => card.link)).toEqual(['/services/website-development', '/services/website-redesign']);
+    expect(cards[0]).toMatchObject({ title: 'Website development', description: '<p>Website development teaser</p>' });
+    expect(section?.props.viewMoreLink).toBe('/services');
+
+    const order = [...en].sort((a, b) => a.order - b.order).map((s) => s.id);
+    expect(order.slice(0, 3)).toEqual(['hero', 'testimonials', 'services']);
+
+    const de = SectionFactory.createHomepageSections(mockHomepageSections, mockProjectsResponse, mockPostsResponse, 'de', services);
+    const deCards = de.find((s) => s.id === 'services')?.props.cards as Array<{ link: string }>;
+    expect(deCards.map((card) => card.link)).toEqual(['/de/services/website-erstellen-lassen', '/de/services/website-relaunch']);
+    expect(de.find((s) => s.id === 'services')?.props.viewMoreLink).toBe('/de/services');
+  });
+
+  it('takes title and text from the homepage ACF group, the code title only as fallback', () => {
+    const blank = SectionFactory.createHomepageSections(mockHomepageSections, undefined, undefined, 'de', services);
+    expect(blank.find((s) => s.id === 'services')?.props).toMatchObject({ sectionTitle: 'LEISTUNGEN', intro: '' });
+
+    const filled = SectionFactory.createHomepageSections(
+      { ...mockHomepageSections, servicesSection: { title: 'What I do', text: 'Three things.' } },
+      undefined,
+      undefined,
+      'en',
+      services,
+    );
+    expect(filled.find((s) => s.id === 'services')?.props).toMatchObject({ sectionTitle: 'What I do', intro: 'Three things.' });
+  });
+});
+

@@ -33,6 +33,7 @@ interface HomeAcfFields {
   techstack_section?: { title?: string; description?: string; featured_image?: RestMedia };
   notebook_section?: { title?: string; view_all_label?: string; view_all_url?: string };
   contact_section?: { sub_title?: string; title?: string; email?: string };
+  services_section?: { title?: string; text?: string };
 }
 
 /**
@@ -50,6 +51,7 @@ export function transformHomepage(page: { acf_fields?: unknown }, lang: Lang = '
   const notebook = acf.notebook_section ?? {};
   const contact = acf.contact_section ?? {};
   const projects = acf.projects_section ?? {};
+  const services = acf.services_section ?? {};
 
   return {
     heroSection: {
@@ -96,6 +98,11 @@ export function transformHomepage(page: { acf_fields?: unknown }, lang: Lang = '
       // Blank values fall back in SectionFactory (src/lib/section-registry.ts).
       viewAllLabel: notebook.view_all_label ?? '',
       viewAllUrl: notebook.view_all_url ?? '',
+    },
+    servicesSection: {
+      // Blank values fall back in SectionFactory (src/lib/section-registry.ts).
+      title: services.title ?? '',
+      text: services.text ?? '',
     },
     contactSection: {
       subTitle: contact.sub_title ?? '',

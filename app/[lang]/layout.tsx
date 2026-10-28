@@ -4,6 +4,7 @@ import CookieBanner from "@/src/components/CookieBanner/CookieBanner";
 import Analytics from "@/src/components/Analytics/Analytics";
 import LangProvider from "@/src/components/LangProvider/LangProvider";
 import { getSiteContentOrDefaults } from "@/src/lib/site-content";
+import { getServicesOrEmpty } from "@/src/lib/services";
 import { dictionary } from "@/src/lib/i18n/dictionary";
 import { OG_LOCALE, otherLang } from "@/src/lib/i18n/lang";
 import { localePath } from "@/src/lib/i18n/paths";
@@ -82,7 +83,9 @@ export default async function RootLayout({
   // every route, so a rethrown transient CMS error would break every page (and
   // every route of a build) for a few labels. On error the code defaults show.
   // The fetch is ISR-cached (revalidate 60) and deduped with page-level calls.
-  const siteContent = await getSiteContentOrDefaults(lang);
+  // Same never-throwing rule for the Services nav link: it shows only once the
+  // CMS has service pages, so the header never links to a 404 index.
+  const [siteContent, services] = await Promise.all([getSiteContentOrDefaults(lang), getServicesOrEmpty(lang)]);
 
   return (
     <html lang={lang} className={`${inter.variable} ${syncopate.variable}`} suppressHydrationWarning={true}>
@@ -111,7 +114,7 @@ export default async function RootLayout({
         <link rel="https://api.w.org/" href="https://cms.edrishusein.com/wp-json/" />
       </head>
       <body suppressHydrationWarning={true}>
-        <LangProvider lang={lang} nav={siteContent.nav}>
+        <LangProvider lang={lang} nav={siteContent.nav} serviceSlugs={services.map((service) => ({ en: service.slug, de: service.slugDe }))}>
           <a href="#main-content" className="skip-link">{siteContent.chrome.skipToContent}</a>
           {children}
           <CookieBanner copy={siteContent.cookieBanner} />

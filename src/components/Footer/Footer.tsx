@@ -2,22 +2,25 @@ import Image from 'next/image';
 import Link from 'next/link';
 import CookieSettingsLink from '@/src/components/CookieSettingsLink/CookieSettingsLink';
 import { getSiteContentOrDefaults } from '@/src/lib/site-content';
+import { getServicesOrEmpty } from '@/src/lib/services';
 import { localePath } from '@/src/lib/i18n/paths';
 import { DEFAULT_LANG, type Lang } from '@/src/lib/i18n/lang';
 import { dictionary } from '@/src/lib/i18n/dictionary';
 import './Footer.scss';
 
 // Server component. Link labels come from Site Content (page names and legal
-// links) in the page language; the fetch never throws (getSiteContentOrDefaults)
-// because every page renders it.
+// links) in the page language; the fetches never throw (getSiteContentOrDefaults,
+// getServicesOrEmpty) because every page renders it. The Services link shows
+// only once the CMS has service pages.
 const Footer = async ({ lang = DEFAULT_LANG }: { lang?: Lang }) => {
-    const siteContent = await getSiteContentOrDefaults(lang);
+    const [siteContent, services] = await Promise.all([getSiteContentOrDefaults(lang), getServicesOrEmpty(lang)]);
     const copy = siteContent.footer;
     const nav = siteContent.nav;
     const text = dictionary(lang);
     const currentYear = new Date().getFullYear();
     const href = (path: string) => localePath(path, lang);
     const mainLinks = [
+        ...(services.length > 0 ? [{ href: href('/services'), label: nav.services }] : []),
         { href: href('/projects'), label: nav.projects },
         { href: href('/about'), label: nav.about },
     ];

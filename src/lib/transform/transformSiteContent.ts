@@ -40,6 +40,20 @@ export const SITE_CONTENT_DEFAULTS = {
     lightboxPreviousLabel: 'Previous image',
     lightboxNextLabel: 'Next image',
     lightboxCounterFormat: '{current} / {total}',
+    // Before the link(s) to the service page(s) that list this case study.
+    serviceLabel: 'Service',
+  },
+  // /services index (no CMS page exists for it).
+  servicesPage: {
+    title: 'SERVICES',
+    subtitle: 'New websites, relaunches and WordPress maintenance',
+  },
+  // Headings of the blocks every service page shares. The closing call to
+  // action is per service (ACF cta_* on the service itself).
+  serviceTemplate: {
+    faqHeading: 'FAQ',
+    projectsHeading: 'Case studies',
+    postsHeading: 'Further reading',
   },
   contactPage: {
     subtitle: 'Freelance WordPress and Next.js work',
@@ -113,6 +127,7 @@ export const SITE_CONTENT_DEFAULTS = {
     bookshelf: 'Bookshelf',
     notebook: 'Notebook',
     techStack: 'Tech Stack',
+    services: 'Services',
     contact: 'Contact',
   },
   chrome: {
@@ -144,6 +159,9 @@ export const SITE_CONTENT_DEFAULTS = {
       'Contact Edris Husein, a freelance web developer in Vorarlberg, Austria, for WordPress sites, maintenance, fixes and Next.js projects. Replies within a day.',
     cookieSettingsTitle: 'Cookie Settings - Edris Husein',
     cookieSettingsDescription: 'Manage your cookie preferences and privacy settings.',
+    servicesTitle: 'Web Development Services | Edris Husein',
+    servicesDescription:
+      'Services by Edris Husein, web developer in Dornbirn: new websites, relaunches, WordPress maintenance, custom WordPress development and headless builds.',
   },
 } as const;
 
@@ -182,6 +200,16 @@ export const SITE_CONTENT_DEFAULTS_DE: SiteContentShape = {
     lightboxPreviousLabel: 'Vorheriges Bild',
     lightboxNextLabel: 'Nächstes Bild',
     lightboxCounterFormat: '{current} / {total}',
+    serviceLabel: 'Leistung',
+  },
+  servicesPage: {
+    title: 'LEISTUNGEN',
+    subtitle: 'Neue Websites, Relaunches und WordPress-Wartung',
+  },
+  serviceTemplate: {
+    faqHeading: 'Häufige Fragen',
+    projectsHeading: 'Fallstudien',
+    postsHeading: 'Weiterlesen',
   },
   contactPage: {
     subtitle: 'Freelance-Arbeit mit WordPress und Next.js',
@@ -250,6 +278,7 @@ export const SITE_CONTENT_DEFAULTS_DE: SiteContentShape = {
     bookshelf: 'Bücher',
     notebook: 'Notizbuch',
     techStack: 'Tech-Stack',
+    services: 'Leistungen',
     contact: 'Kontakt',
   },
   chrome: {
@@ -280,6 +309,9 @@ export const SITE_CONTENT_DEFAULTS_DE: SiteContentShape = {
       'Kontaktieren Sie Edris Husein, freiberuflicher Webentwickler in Vorarlberg, für WordPress-Websites, Wartung, Fehlerbehebung und Next.js-Projekte. Antwort innerhalb eines Tages.',
     cookieSettingsTitle: 'Cookie-Einstellungen - Edris Husein',
     cookieSettingsDescription: 'Verwalten Sie Ihre Cookie-Einstellungen und Datenschutzoptionen.',
+    servicesTitle: 'Leistungen: Websites, Relaunch, WordPress | Edris Husein',
+    servicesDescription:
+      'Leistungen von Edris Husein, Webentwickler in Dornbirn: Websites erstellen, Relaunch, WordPress-Wartung, WordPress-Entwicklung und Headless WordPress.',
   },
 };
 
@@ -314,6 +346,16 @@ export const SITE_CONTENT_FIELDS: { readonly [S in keyof Sections]: Strings<Sect
     lightboxPreviousLabel: 'case_study_lightbox_previous_label',
     lightboxNextLabel: 'case_study_lightbox_next_label',
     lightboxCounterFormat: 'case_study_lightbox_counter_format',
+    serviceLabel: 'case_study_service_label',
+  },
+  servicesPage: {
+    title: 'services_page_title',
+    subtitle: 'services_page_subtitle',
+  },
+  serviceTemplate: {
+    faqHeading: 'service_faq_heading',
+    projectsHeading: 'service_projects_heading',
+    postsHeading: 'service_posts_heading',
   },
   contactPage: {
     subtitle: 'contact_page_subtitle',
@@ -377,6 +419,7 @@ export const SITE_CONTENT_FIELDS: { readonly [S in keyof Sections]: Strings<Sect
     bookshelf: 'nav_bookshelf',
     notebook: 'nav_notebook',
     techStack: 'nav_tech_stack',
+    services: 'nav_services',
     contact: 'nav_contact',
   },
   chrome: {
@@ -400,6 +443,8 @@ export const SITE_CONTENT_FIELDS: { readonly [S in keyof Sections]: Strings<Sect
     contactDescription: 'meta_contact_description',
     cookieSettingsTitle: 'meta_cookie_settings_title',
     cookieSettingsDescription: 'meta_cookie_settings_description',
+    servicesTitle: 'meta_services_title',
+    servicesDescription: 'meta_services_description',
   },
 };
 

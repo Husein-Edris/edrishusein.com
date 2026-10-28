@@ -131,8 +131,16 @@ export interface ContactSection {
   email?: string;
 }
 
+// Homepage teaser of the service pages (ACF group services_section). The cards
+// come from the service CPT, not from this group.
+export interface ServicesSection {
+  title?: string;
+  text?: string;
+}
+
 export interface HomepageSections {
   heroSection?: HeroSection;
+  servicesSection?: ServicesSection;
   projectsSection?: ProjectsSection;
   aboutSection?: AboutSection;
   bookshelfSection?: BookshelfSection;

@@ -1,5 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { toSitemapEntries, fetchSitemapContent, latestModified, withLanguageVersions } from './sitemap-content';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import {
+  toSitemapEntries,
+  fetchSitemapContent,
+  latestModified,
+  withLanguageVersions,
+  toServiceSitemapEntries,
+  servicesIndexEntries,
+} from './sitemap-content';
+import { transformService, type RestService, type Service } from './transform/transformService';
 
 describe('toSitemapEntries', () => {
   const items = [
@@ -120,5 +130,75 @@ describe('withLanguageVersions', () => {
       },
     });
     expect(entries[2].alternates).toEqual(entries[3].alternates);
+  });
+});
+
+describe('toServiceSitemapEntries', () => {
+  const base = 'https://edrishusein.com';
+  const fixture: RestService = JSON.parse(
+    readFileSync(resolve(__dirname, 'transform/__fixtures__/service.json'), 'utf-8'),
+  );
+  const redesign: Service = transformService(fixture, 'en');
+  const headless: Service = { ...redesign, id: '7', slug: 'headless-wordpress-nextjs', slugDe: 'headless-wordpress-nextjs', modified: '' };
+
+  it('emits the English and the German slug of each service, naming each other as alternates', () => {
+    const entries = toServiceSitemapEntries([redesign], base);
+    const alternates = {
+      languages: {
+        en: `${base}/services/website-redesign`,
+        de: `${base}/de/services/website-relaunch`,
+        'x-default': `${base}/services/website-redesign`,
+      },
+    };
+
+    expect(entries).toEqual([
+      {
+        url: `${base}/services/website-redesign`,
+        lastModified: new Date('2026-10-28T10:00:00'),
+        changeFrequency: 'monthly',
+        priority: 0.9,
+        alternates,
+      },
+      {
+        url: `${base}/de/services/website-relaunch`,
+        lastModified: new Date('2026-10-28T10:00:00'),
+        changeFrequency: 'monthly',
+        priority: 0.9,
+        alternates,
+      },
+    ]);
+  });
+
+  it('never lists the other language slug under /de or the German slug without it', () => {
+    const urls = toServiceSitemapEntries([redesign], base).map((entry) => entry.url);
+    expect(urls).not.toContain(`${base}/de/services/website-redesign`);
+    expect(urls).not.toContain(`${base}/services/website-relaunch`);
+  });
+
+  it('omits lastModified when the service carries no date and keeps one pair per service', () => {
+    const entries = toServiceSitemapEntries([redesign, headless], base);
+    expect(entries).toHaveLength(4);
+    expect(entries[2].url).toBe(`${base}/services/headless-wordpress-nextjs`);
+    expect(entries[3].url).toBe(`${base}/de/services/headless-wordpress-nextjs`);
+    expect(entries[2].lastModified).toBeUndefined();
+  });
+
+  it('emits nothing when the CMS has no services', () => {
+    expect(toServiceSitemapEntries([], base)).toEqual([]);
+  });
+});
+
+describe('servicesIndexEntries', () => {
+  const base = 'https://edrishusein.com';
+  const service = { slug: 'website-redesign', modified: '2026-10-28T10:00:00' } as Service;
+
+  it('lists /services with the newest service date once services exist', () => {
+    expect(servicesIndexEntries([service, { ...service, modified: '2026-09-01T00:00:00' }], base)).toEqual([
+      { url: `${base}/services`, lastModified: new Date('2026-10-28T10:00:00'), changeFrequency: 'monthly', priority: 0.9 },
+    ]);
+  });
+
+  it('lists no index page while there are no services (the index is a 404 then)', () => {
+    expect(servicesIndexEntries([], base)).toEqual([]);
   });
 });

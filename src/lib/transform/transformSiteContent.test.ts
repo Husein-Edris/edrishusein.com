@@ -48,6 +48,9 @@ describe('transformSiteContent', () => {
       contact_page_heading: 'Write me',
       contact_page_intro: 'Intro',
       contact_page_email: 'a@b.c',
+      case_study_service_label: 'Offer',
+      services_page_title: 'OFFERS',
+      service_faq_heading: 'Questions',
     });
 
     expect(result).toEqual({
@@ -77,7 +80,10 @@ describe('transformSiteContent', () => {
         lightboxPreviousLabel: 'Previous image',
         lightboxNextLabel: 'Next image',
         lightboxCounterFormat: '{current} / {total}',
+        serviceLabel: 'Offer',
       },
+      servicesPage: { ...SITE_CONTENT_DEFAULTS.servicesPage, title: 'OFFERS' },
+      serviceTemplate: { ...SITE_CONTENT_DEFAULTS.serviceTemplate, faqHeading: 'Questions' },
       contactPage: { subtitle: 'Hi', heading: 'Write me', intro: 'Intro', email: 'a@b.c' },
       notebookPage: SITE_CONTENT_DEFAULTS.notebookPage,
       bookshelfPage: SITE_CONTENT_DEFAULTS.bookshelfPage,
@@ -316,12 +322,37 @@ describe('transformSiteContent languages and new keys', () => {
 describe('siteContentFlatDefaults', () => {
   it('lists every REST option name once with its English default', () => {
     const flat = siteContentFlatDefaults();
-    // 64 options existed before the German site; 24 were added with it.
-    expect(Object.keys(flat)).toHaveLength(88);
+    // 64 options existed before the German site; 24 were added with it and 9
+    // with the service pages.
+    expect(Object.keys(flat)).toHaveLength(97);
     expect(flat.projects_archive_title).toBe('PROJECTS');
     expect(flat.case_study_lightbox_counter_format).toBe('{current} / {total}');
     expect(flat.nav_tech_stack).toBe('Tech Stack');
     expect(flat.meta_cookie_settings_title).toBe('Cookie Settings - Edris Husein');
+  });
+
+  it('lists the service page options', () => {
+    const flat = siteContentFlatDefaults();
+    expect(flat).toMatchObject({
+      nav_services: 'Services',
+      meta_services_title: 'Web Development Services | Edris Husein',
+      services_page_title: 'SERVICES',
+      service_faq_heading: 'FAQ',
+      case_study_service_label: 'Service',
+    });
+    expect(Object.keys(flat)).toEqual(
+      expect.arrayContaining([
+        'meta_services_description',
+        'services_page_subtitle',
+        'service_projects_heading',
+        'service_posts_heading',
+      ]),
+    );
+    expect(siteContentFlatDefaults('de')).toMatchObject({
+      nav_services: 'Leistungen',
+      meta_services_title: 'Leistungen: Websites, Relaunch, WordPress | Edris Husein',
+      service_faq_heading: 'Häufige Fragen',
+    });
   });
 
   it('round-trips: the flat defaults transform back into the code defaults', () => {

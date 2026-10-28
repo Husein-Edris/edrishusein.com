@@ -48,6 +48,19 @@
       }
     }
 
+    // "Service: Website-Relaunch" link(s) to the service page(s) listing this case study.
+    .case-study__service {
+      margin: 0 0 $spacing-md;
+      color: $text-light-gray;
+      font-size: $font-size-sm;
+
+      a {
+        color: $color-beige;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+    }
+
     .overview {
       max-width: 700px;
       margin: 0 auto $spacing-lg;

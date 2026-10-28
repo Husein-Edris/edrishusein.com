@@ -1,5 +1,6 @@
 // Server Component for project pages with SSG
 import Image from 'next/image';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
@@ -12,6 +13,7 @@ import { getSiteContent } from '@/src/lib/site-content';
 import { galleryLightboxLabels, projectCardLabels } from '@/src/lib/transform/transformSiteContent';
 import { decodeEntities } from '@/src/lib/transform/decodeEntities';
 import { cmsRest, isTransientCmsError } from '@/src/lib/rest-client';
+import { getServices, servicePath, servicesForProject } from '@/src/lib/services';
 import { transformProject, extractTechIds } from '@/src/lib/transform/transformProject';
 import { transformProjects } from '@/src/lib/transform/transformProjects';
 import { transformMedia } from '@/src/lib/transform/transformMedia';
@@ -168,10 +170,13 @@ export default async function ProjectPage({ params }: ProjectParams) {
 
   // Fetch both current project and all projects for "More Projects" section
   // Template headings and labels: CMS "Site Content" options page.
-  const [project, allProjectsData, siteContent] = await Promise.all([
+  // Services feed the reverse link (services whose related_projects list this
+  // case study); a transient CMS failure rethrows like the other fetches.
+  const [project, allProjectsData, siteContent, services] = await Promise.all([
     getProject(slug, lang),
     getAllProjectsForMoreProjects(lang),
     getSiteContent(lang),
+    getServices(lang),
   ]);
   const copy = siteContent.caseStudy;
 
@@ -182,6 +187,7 @@ export default async function ProjectPage({ params }: ProjectParams) {
   }
 
   const factRows = buildFactRows(project, copy);
+  const projectServices = servicesForProject(services, Number(project.id));
 
   // Structured data: mark the case study as a CreativeWork and expose a
   // Home > Projects > Title breadcrumb trail (project pages previously had none).
@@ -208,6 +214,17 @@ export default async function ProjectPage({ params }: ProjectParams) {
         <div className="hero-section hero-section--left">
           <div className="container">
             <h1 className="title">{project.title}</h1>
+            {projectServices.length > 0 && (
+              <p className="case-study__service">
+                {copy.serviceLabel}:{' '}
+                {projectServices.map((service, index) => (
+                  <span key={service.id}>
+                    {index > 0 && ', '}
+                    <Link href={servicePath(service, lang)}>{service.title}</Link>
+                  </span>
+                ))}
+              </p>
+            )}
             {project.excerpt && (
               <div
                 className="overview"
