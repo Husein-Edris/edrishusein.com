@@ -4,8 +4,8 @@ import { HERO_DEFAULTS, isInternalPath, resolveHeroContent } from './heroContent
 describe('resolveHeroContent', () => {
   it('renders the code defaults when no CMS data exists', () => {
     expect(resolveHeroContent(undefined)).toEqual({
-      eyebrow: 'Edris Husein, Dornbirn, Austria',
-      heading: 'Servus. I build websites, fix them and help you plan what comes next.',
+      eyebrow: 'Servus from Dornbirn 👋 🇦🇹',
+      heading: 'Websites built with Gründlichkeit. Fixed properly, planned ahead.',
       primaryCta: { label: 'Email me', url: 'mailto:kontakt@edrishusein.com' },
       secondaryCta: { label: 'See all projects', url: '/projects' },
     });
@@ -39,8 +39,8 @@ describe('resolveHeroContent', () => {
 describe('resolveHeroContent on German pages', () => {
   it('renders German defaults and links site paths to the German pages', () => {
     expect(resolveHeroContent(undefined, 'de')).toEqual({
-      eyebrow: 'Edris Husein, Dornbirn, Österreich',
-      heading: 'Servus. Ich baue Websites, repariere sie und helfe Ihnen zu planen, was als Nächstes kommt.',
+      eyebrow: 'Servus aus Dornbirn 👋 🇦🇹',
+      heading: 'Websites mit Gründlichkeit gebaut. Sauber repariert, vorausschauend geplant.',
       primaryCta: { label: 'E-Mail schreiben', url: 'mailto:kontakt@edrishusein.com' },
       secondaryCta: { label: 'Alle Projekte ansehen', url: '/de/projects' },
     });
