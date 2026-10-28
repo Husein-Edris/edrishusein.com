@@ -133,8 +133,8 @@
       min-width: 0;
     }
 
-    // Covers come in mixed ratios (4:5, 1:1, 16:9) and some carry their headline
-    // as text, so they are fitted, never cropped.
+    // Covers are 16:9 figures (docs/blog-cover-style.md). The square thumb crops each one
+    // to its key figure; the crop position per post lives in src/lib/coverFocus.ts.
     &__thumb {
       position: relative;
       aspect-ratio: 1 / 1;
@@ -150,7 +150,7 @@
     }
 
     &__image {
-      object-fit: contain;
+      object-fit: cover;
     }
 
     &__title {
