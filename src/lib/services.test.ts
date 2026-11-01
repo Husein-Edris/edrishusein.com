@@ -3,6 +3,8 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import {
   getServiceRelations,
+  getServiceTestimonial,
+  hasScreenshot,
   getServices,
   getServicesOrEmpty,
   resolveServiceSlug,
@@ -203,7 +205,16 @@ describe('getServiceRelations', () => {
       slug: 'fhe-gastro-website-relaunch',
       title: { rendered: 'FHE Gastro &#8211; relaunch' },
       excerpt: { rendered: '<p>Gastro relaunch.</p>' },
-      acf_fields: { title_de: 'FHE Gastro Relaunch', excerpt_de: 'Relaunch für FHE Gastro.' },
+      acf_fields: {
+        title_de: 'FHE Gastro Relaunch',
+        excerpt_de: 'Relaunch für FHE Gastro.',
+        project_links: { live_site: 'https://www.fhe.at/' },
+      },
+      _embedded: {
+        'wp:featuredmedia': [
+          { source_url: 'https://cms.example/fhe.png', alt_text: 'FHE start page', mime_type: 'image/png', media_details: { width: 1600, height: 1000 } },
+        ],
+      },
     },
     {
       id: 101,
@@ -255,12 +266,54 @@ describe('getServiceRelations', () => {
     ]);
     expect(en.projects[1].title).toBe('FHE Gastro \u2013 relaunch');
     expect(en.posts).toEqual([
-      { id: 201, title: 'Checklist', excerpt: '', path: '/notebook/website-relaunch-checklist' },
+      { id: 201, title: 'Checklist', excerpt: '', path: '/notebook/website-relaunch-checklist', domain: '', image: null, language: 'en' },
     ]);
 
     const de = await getServiceRelations(redesign, 'de');
     expect(de.projects[1]).toMatchObject({ title: 'FHE Gastro Relaunch', path: '/de/projects/fhe-gastro-website-relaunch' });
     expect(de.projects[0].title).toBe('illwerke vkw');
+  });
+
+  it('requests the featured image and live site of projects only', async () => {
+    respond();
+
+    await getServiceRelations(redesign, 'en');
+
+    const urls = mockFetch.mock.calls.map(([url]) => url as string);
+    const projectUrl = urls.find((url) => url.includes('/project?')) ?? '';
+    expect(projectUrl).toContain('_embed=wp:featuredmedia');
+    expect(projectUrl).toContain('acf_fields.project_links');
+    expect(urls.find((url) => url.includes('/posts?'))).not.toContain('_embed');
+  });
+
+  it('maps the screenshot and the live-site domain of a project, empty when missing', async () => {
+    respond();
+
+    const { projects } = await getServiceRelations(redesign, 'en');
+
+    expect(projects[1]).toMatchObject({
+      domain: 'fhe.at',
+      image: { url: 'https://cms.example/fhe.png', alt: 'FHE start page', width: 1600, height: 1000 },
+    });
+    expect(projects[0]).toMatchObject({ domain: '', image: null });
+  });
+
+  it('detects the language of each related item from its title and teaser', async () => {
+    mockFetch.mockImplementation((url: string) =>
+      Promise.resolve({
+        ok: true,
+        json: () =>
+          Promise.resolve(
+            url.includes('/posts?')
+              ? [{ id: 201, slug: 'kosten', title: { rendered: 'Was kostet eine Website und wie lange dauert es?' }, excerpt: { rendered: '<p>Die ehrlichen Zahlen aus der Praxis.</p>' } }]
+              : projectItems,
+          ),
+      }),
+    );
+
+    const { posts } = await getServiceRelations(redesign, 'en');
+
+    expect(posts[0].language).toBe('de');
   });
 
   it('makes no request when the service has no relations', async () => {
@@ -290,5 +343,66 @@ describe('getServiceRelations', () => {
     expect(result.projects).toHaveLength(2);
     expect(result.posts).toEqual([]);
     expect(console.error).toHaveBeenCalledWith(expect.stringContaining('related posts'), expect.stringContaining('400'));
+  });
+});
+
+describe('getServiceTestimonial', () => {
+  const mockFetch = vi.fn();
+
+  beforeEach(() => {
+    mockFetch.mockReset();
+    global.fetch = mockFetch as unknown as typeof fetch;
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('fetches the one picked testimonial and maps it', async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve([
+          { id: 746, title: { rendered: 'Martina Velmeden' }, acf_fields: { quote: 'Great work.', name: 'Martina Velmeden', lang: 'en' } },
+        ]),
+    });
+
+    const testimonial = await getServiceTestimonial(redesign);
+
+    expect(mockFetch.mock.calls[0][0]).toMatch(/\/testimonial\?include=746&/);
+    expect(testimonial).toMatchObject({ quote: 'Great work.', name: 'Martina Velmeden' });
+  });
+
+  it('makes no request and returns null when no testimonial is picked', async () => {
+    await expect(getServiceTestimonial({ ...redesign, testimonialId: null })).resolves.toBeNull();
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
+
+  it('returns null for a post without a quote or a permanent failure', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve([{ id: 746, acf_fields: false }]) });
+    await expect(getServiceTestimonial(redesign)).resolves.toBeNull();
+
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 404, json: () => Promise.resolve({}) });
+    await expect(getServiceTestimonial(redesign)).resolves.toBeNull();
+    expect(console.error).toHaveBeenCalledWith(expect.stringContaining('testimonial'), expect.stringContaining('404'));
+  });
+
+  it('rethrows a transient failure so ISR keeps the last good render', async () => {
+    mockFetch.mockResolvedValue({ ok: false, status: 503, json: () => Promise.resolve({}) });
+    await expect(getServiceTestimonial(redesign)).rejects.toMatchObject({ isTransient: true });
+  });
+});
+
+describe('hasScreenshot', () => {
+  const link = { id: 1, title: 'x', excerpt: '', path: '/projects/x', domain: '', language: 'en' as const };
+
+  it('accepts a featured image at least 800px wide', () => {
+    expect(hasScreenshot({ ...link, image: { url: 'a.png', alt: '', width: 1600, height: 1000 } })).toBe(true);
+  });
+
+  it('rejects a missing image and a narrow one such as a logo', () => {
+    expect(hasScreenshot({ ...link, image: null })).toBe(false);
+    expect(hasScreenshot({ ...link, image: { url: 'logo.png', alt: '', width: 336, height: 120 } })).toBe(false);
   });
 });

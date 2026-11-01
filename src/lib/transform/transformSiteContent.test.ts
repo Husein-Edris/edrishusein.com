@@ -48,6 +48,7 @@ describe('transformSiteContent', () => {
       contact_page_heading: 'Write me',
       contact_page_intro: 'Intro',
       contact_page_email: 'a@b.c',
+      contact_whatsapp_number: '+43 660 1234567',
       case_study_service_label: 'Offer',
       services_page_title: 'OFFERS',
       service_faq_heading: 'Questions',
@@ -84,7 +85,7 @@ describe('transformSiteContent', () => {
       },
       servicesPage: { ...SITE_CONTENT_DEFAULTS.servicesPage, title: 'OFFERS' },
       serviceTemplate: { ...SITE_CONTENT_DEFAULTS.serviceTemplate, faqHeading: 'Questions' },
-      contactPage: { subtitle: 'Hi', heading: 'Write me', intro: 'Intro', email: 'a@b.c' },
+      contactPage: { subtitle: 'Hi', heading: 'Write me', intro: 'Intro', email: 'a@b.c', whatsapp: '+43 660 1234567' },
       notebookPage: SITE_CONTENT_DEFAULTS.notebookPage,
       bookshelfPage: SITE_CONTENT_DEFAULTS.bookshelfPage,
       techStackPage: SITE_CONTENT_DEFAULTS.techStackPage,
@@ -312,7 +313,10 @@ describe('transformSiteContent languages and new keys', () => {
     const en = siteContentFlatDefaults('en');
     const de = siteContentFlatDefaults('de');
     expect(Object.keys(de).sort()).toEqual(Object.keys(en).sort());
-    for (const value of [...Object.values(en), ...Object.values(de)]) {
+    // Settings, not text: empty by default turns their feature off.
+    const optional = new Set(['contact_whatsapp_number']);
+    for (const [key, value] of [...Object.entries(en), ...Object.entries(de)]) {
+      if (optional.has(key)) continue;
       expect(value.trim()).not.toBe('');
       expect(value).not.toContain('—');
     }
@@ -322,9 +326,9 @@ describe('transformSiteContent languages and new keys', () => {
 describe('siteContentFlatDefaults', () => {
   it('lists every REST option name once with its English default', () => {
     const flat = siteContentFlatDefaults();
-    // 64 options existed before the German site; 24 were added with it and 9
-    // with the service pages.
-    expect(Object.keys(flat)).toHaveLength(97);
+    // 64 options existed before the German site; 24 were added with it, 9
+    // with the service pages and 6 with their visual redesign.
+    expect(Object.keys(flat)).toHaveLength(103);
     expect(flat.projects_archive_title).toBe('PROJECTS');
     expect(flat.case_study_lightbox_counter_format).toBe('{current} / {total}');
     expect(flat.nav_tech_stack).toBe('Tech Stack');
@@ -346,6 +350,12 @@ describe('siteContentFlatDefaults', () => {
         'services_page_subtitle',
         'service_projects_heading',
         'service_posts_heading',
+        'service_deliverables_heading',
+        'service_process_heading',
+        'service_portrait_caption',
+        'service_email_label',
+        'service_whatsapp_label',
+        'contact_whatsapp_number',
       ]),
     );
     expect(siteContentFlatDefaults('de')).toMatchObject({

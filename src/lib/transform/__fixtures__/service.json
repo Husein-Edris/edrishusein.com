@@ -66,6 +66,51 @@
     "cta_text": "Tell me which site it is and what bothers you about it. Replies within a day.",
     "cta_text_de": "Schreiben Sie mir, um welche Website es geht und was Sie daran stört. Antwort innerhalb eines Tages.",
     "cta_label": "Start a project",
-    "cta_label_de": ""
+    "cta_label_de": "",
+    "icon": "layout",
+    "hero_note": "Replies within one working day.",
+    "hero_note_de": "Antwort innerhalb eines Werktags.",
+    "deliverables": [
+      {
+        "icon": "redirect",
+        "title": "Rankings kept",
+        "title_de": "Rankings bleiben",
+        "text": "Every old URL redirects to its new page.",
+        "text_de": "Jede alte URL leitet auf ihre neue Seite weiter."
+      },
+      {
+        "icon": "rocket",
+        "title": "Unknown icon",
+        "title_de": "",
+        "text": "Falls back to the default icon.",
+        "text_de": ""
+      },
+      {
+        "icon": "speed",
+        "title": "",
+        "title_de": "",
+        "text": "",
+        "text_de": ""
+      }
+    ],
+    "process": [
+      {
+        "title": "Audit",
+        "title_de": "Bestandsaufnahme",
+        "text": "I look at what still works.",
+        "text_de": "Ich schaue, was noch funktioniert."
+      },
+      {
+        "title": "",
+        "title_de": "",
+        "text": "",
+        "text_de": ""
+      }
+    ],
+    "testimonial": [
+      746
+    ],
+    "contact_message": "Hi Edris, my current website is: …\nWhat bothers me about it: …",
+    "contact_message_de": ""
   }
 }
