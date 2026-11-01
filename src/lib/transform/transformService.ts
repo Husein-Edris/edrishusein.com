@@ -3,6 +3,7 @@ import { decodeEntities } from './decodeEntities';
 import { asArray } from './asArray';
 import { localizeContentLinks, localizeRestItem } from '../i18n/localize';
 import type { Lang } from '../i18n/lang';
+import { serviceIconKey, type ServiceIconKey } from '../service-icons';
 
 // Service pages (CPT `service`, theme inc/acf-fields/service-page.php). Every
 // text field `x` has a German twin `x_de`; `slug_de` is the German URL slug and
@@ -38,6 +39,12 @@ interface ServiceAcf {
   cta_heading?: unknown;
   cta_text?: unknown;
   cta_label?: unknown;
+  icon?: unknown;
+  hero_note?: unknown;
+  deliverables?: unknown;
+  process?: unknown;
+  testimonial?: unknown;
+  contact_message?: unknown;
   [key: string]: unknown;
 }
 
@@ -59,6 +66,19 @@ export interface ServiceSection {
 export interface ServiceFaqEntry {
   question: string;
   answerHtml: string;
+}
+
+/** One "What you get" item: an icon, a short title and one sentence. */
+export interface ServiceDeliverable {
+  icon: ServiceIconKey;
+  title: string;
+  text: string;
+}
+
+/** One numbered "How it works" step. */
+export interface ServiceStep {
+  title: string;
+  text: string;
 }
 
 /** Closing call to action of a service page (ACF cta_*, one set per service). */
@@ -93,6 +113,16 @@ export interface Service {
   serviceType: string;
   areaServed: AreaServedKey[];
   cta: ServiceCta;
+  /** Icon of the card on /services. */
+  icon: ServiceIconKey;
+  /** Short line under the hero button, e.g. the reply time; '' hides it. */
+  heroNote: string;
+  deliverables: ServiceDeliverable[];
+  process: ServiceStep[];
+  /** The one testimonial post shown on the page, null for none. */
+  testimonialId: number | null;
+  /** Text prefilled in the email and WhatsApp message; line breaks kept. */
+  contactMessage: string;
   modified: string;
 }
 
@@ -163,6 +193,18 @@ export function transformService(item: RestService, lang: Lang): Service {
     serviceType: text(acf.service_type),
     areaServed: areaKeys(acf.area_served),
     cta: { heading: text(acf.cta_heading), text: text(acf.cta_text), label: text(acf.cta_label) },
+    icon: serviceIconKey(acf.icon),
+    heroNote: text(acf.hero_note),
+    deliverables: asArray<PlainObject>(acf.deliverables)
+      .filter(isPlainObject)
+      .map((row) => ({ icon: serviceIconKey(row.icon), title: text(row.title), text: text(row.text) }))
+      .filter((row) => row.title !== '' || row.text !== ''),
+    process: asArray<PlainObject>(acf.process)
+      .filter(isPlainObject)
+      .map((row) => ({ title: text(row.title), text: text(row.text) }))
+      .filter((row) => row.title !== '' || row.text !== ''),
+    testimonialId: relationIds(acf.testimonial)[0] ?? null,
+    contactMessage: text(acf.contact_message),
     modified: item.modified ?? '',
   };
 }

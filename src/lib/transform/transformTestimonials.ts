@@ -203,7 +203,8 @@ function withDefaultBrand(entry: Testimonial): Testimonial {
   };
 }
 
-function toItem(post: RestTestimonialPost): Testimonial | null {
+/** One testimonial post to the view model; null when it has no quote. */
+export function toItem(post: RestTestimonialPost): Testimonial | null {
   const acf = post?.acf_fields || {};
   const quote = asText(acf.quote);
   if (!quote) return null;

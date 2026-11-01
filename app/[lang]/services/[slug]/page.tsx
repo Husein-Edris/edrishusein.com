@@ -6,12 +6,21 @@ import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
 import { getSiteContent } from '@/src/lib/site-content';
 import { loadServicePage, serviceMetadata, serviceStaticParams } from '@/src/lib/service-page';
-import { getServiceRelations, type ServiceLink } from '@/src/lib/services';
+import { getServiceRelations, getServiceTestimonial, type ServiceLink } from '@/src/lib/services';
 import { generateServicePageStructuredData, safeJsonLd } from '@/src/lib/seo-utils';
 import { localePath } from '@/src/lib/i18n/paths';
 import { isLang } from '@/src/lib/i18n/lang';
 import { langFromParams } from '@/src/lib/i18n/route';
-import '@/src/styles/pages/CaseStudy.scss';
+import type { Lang } from '@/src/lib/i18n/lang';
+import ServiceHero from '@/src/components/Service/ServiceHero';
+import ServiceDeliverables from '@/src/components/Service/ServiceDeliverables';
+import ServiceWork from '@/src/components/Service/ServiceWork';
+import ServiceProcess from '@/src/components/Service/ServiceProcess';
+import ServiceTestimonial from '@/src/components/Service/ServiceTestimonial';
+import ServiceFaq from '@/src/components/Service/ServiceFaq';
+import ScrollStory from '@/src/components/Service/ScrollStory';
+import ServiceContact from '@/src/components/Service/ServiceContact';
+import { directContactLinks } from '@/src/lib/contact-links';
 import '@/src/styles/pages/Services.scss';
 
 type ServiceParams = { params: Promise<{ lang: string; slug: string }> };
@@ -33,19 +42,43 @@ export async function generateMetadata({ params }: ServiceParams): Promise<Metad
   return result.kind === 'page' ? serviceMetadata(result.service, lang) : {};
 }
 
-function RelatedLinks({ heading, links }: { heading: string; links: ServiceLink[] }) {
+interface FurtherReadingProps {
+  heading: string;
+  links: ServiceLink[];
+  lang: Lang;
+  /** Notebook labels for an article in the other language, e.g. DE. */
+  languageLabels: { de: string; en: string };
+}
+
+function FurtherReading({ heading, links, lang, languageLabels }: FurtherReadingProps) {
   if (links.length === 0) return null;
   return (
-    <section className="service-section">
-      <h2>{heading}</h2>
-      <ul className="service-links">
-        {links.map((link) => (
-          <li key={link.id}>
-            <Link href={link.path}>{link.title}</Link>
-            {link.excerpt && <p>{link.excerpt}</p>}
-          </li>
-        ))}
-      </ul>
+    <section className="service-block service-reading" aria-labelledby="service-reading-heading">
+      <div className="service-wrap service-split">
+        <h2 id="service-reading-heading" className="service-heading service-heading--small">
+          {heading}
+        </h2>
+        <ul className="service-reading__list">
+          {links.map((link) => {
+            const other = link.language !== lang;
+            return (
+              <li key={link.id}>
+                <Link href={link.path} className="service-reading__link">
+                  <span className="service-reading__title" lang={other ? link.language : undefined}>
+                    {link.title}
+                    {other && <span className="service-reading__lang">{languageLabels[link.language]}</span>}
+                  </span>
+                  {link.excerpt && (
+                    <span className="service-reading__excerpt" lang={other ? link.language : undefined}>
+                      {link.excerpt}
+                    </span>
+                  )}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
     </section>
   );
 }
@@ -62,8 +95,25 @@ export default async function ServicePage({ params }: ServiceParams) {
   if (result.kind === 'not-found') notFound();
 
   const { service } = result;
-  const relations = await getServiceRelations(service, lang);
+  const [relations, testimonial] = await Promise.all([
+    getServiceRelations(service, lang),
+    getServiceTestimonial(service),
+  ]);
   const template = siteContent.serviceTemplate;
+  const contact = (
+    <ServiceContact
+      links={directContactLinks({
+        email: siteContent.contactPage.email,
+        whatsapp: siteContent.contactPage.whatsapp,
+        subject: service.title,
+        message: service.contactMessage,
+      })}
+      emailLabel={template.emailLabel}
+      whatsappLabel={template.whatsappLabel}
+      fallbackHref={localePath('/contact', lang)}
+      fallbackLabel={service.cta.label || siteContent.contactPage.heading}
+    />
+  );
 
   const structuredData = generateServicePageStructuredData(service, lang, {
     home: siteContent.chrome.breadcrumbHome,
@@ -73,52 +123,50 @@ export default async function ServicePage({ params }: ServiceParams) {
   return (
     <>
       <Header />
-      <main id="main-content" tabIndex={-1} className="case-study service-page">
-        <div className="hero-section hero-section--left">
-          <div className="container">
-            {service.eyebrow && <p className="service-page__eyebrow">{service.eyebrow}</p>}
-            <h1 className="title">{service.headline}</h1>
-            {service.introHtml && (
-              <div className="overview" dangerouslySetInnerHTML={{ __html: service.introHtml }} />
-            )}
-          </div>
-        </div>
+      <main id="main-content" tabIndex={-1} className="service-page">
+        <ServiceHero
+          headline={service.headline}
+          introHtml={service.introHtml}
+          contact={contact}
+          note={service.heroNote}
+          portraitCaption={template.portraitCaption}
+        />
+        <ServiceDeliverables heading={template.deliverablesHeading} items={service.deliverables} />
+        <ServiceWork heading={template.projectsHeading} projects={relations.projects} />
+        <ServiceProcess heading={template.processHeading} steps={service.process} />
+        <ServiceTestimonial testimonial={testimonial} />
 
-        <div className="container service-page__body">
-          {service.sections.map((section, index) => (
-            <section key={`${section.heading}-${index}`} className="service-section">
-              {section.heading && <h2>{section.heading}</h2>}
-              {section.bodyHtml && (
-                <div className="content" dangerouslySetInnerHTML={{ __html: section.bodyHtml }} />
-              )}
-            </section>
-          ))}
-
-          <RelatedLinks heading={template.projectsHeading} links={relations.projects} />
-
-          {/* Rendered open, never collapsed: the FAQPage JSON-LD describes it. */}
-          {service.faq.length > 0 && (
-            <section className="service-section service-faq">
-              <h2>{template.faqHeading}</h2>
-              {service.faq.map((entry, index) => (
-                <div key={`${entry.question}-${index}`}>
-                  <h3>{entry.question}</h3>
-                  <div className="content" dangerouslySetInnerHTML={{ __html: entry.answerHtml }} />
+        {service.sections.length > 0 && (
+          <section className="service-block service-notes">
+            <div className={`service-wrap service-notes__grid service-notes__grid--${Math.min(service.sections.length, 2)}`}>
+              {service.sections.map((section, index) => (
+                <div key={`${section.heading}-${index}`} className="service-notes__item">
+                  {section.heading && <h2 className="service-heading service-heading--small">{section.heading}</h2>}
+                  {section.bodyHtml && (
+                    <div className="service-prose" dangerouslySetInnerHTML={{ __html: section.bodyHtml }} />
+                  )}
                 </div>
               ))}
-            </section>
-          )}
-
-          <RelatedLinks heading={template.postsHeading} links={relations.posts} />
-
-          <section className="service-section service-cta">
-            {service.cta.heading && <h2>{service.cta.heading}</h2>}
-            {service.cta.text && <p>{service.cta.text}</p>}
-            <Link href={localePath('/contact', lang)} className="service-cta__button">
-              {service.cta.label || siteContent.contactPage.heading}
-            </Link>
+            </div>
           </section>
-        </div>
+        )}
+
+        <ServiceFaq heading={template.faqHeading} entries={service.faq} />
+        <FurtherReading
+          heading={template.postsHeading}
+          links={relations.posts}
+          lang={lang}
+          languageLabels={{ de: siteContent.notebookPage.languageDeLabel, en: siteContent.notebookPage.languageEnLabel }}
+        />
+
+        <section className="service-block service-cta">
+          <div className="service-wrap service-cta__inner">
+            {service.cta.heading && <h2 className="service-cta__heading">{service.cta.heading}</h2>}
+            {service.cta.text && <p className="service-cta__text">{service.cta.text}</p>}
+            {contact}
+          </div>
+        </section>
+        <ScrollStory root=".service-page" />
       </main>
       <Footer lang={lang} />
 

@@ -2,6 +2,10 @@ import { cmsRest, isTransientCmsError } from './rest-client';
 import { transformService, type RestService, type Service } from './transform/transformService';
 import { rendered } from './transform/transformProjects';
 import { decodeEntities } from './transform/decodeEntities';
+import { transformMedia, type RestMedia } from './transform/transformMedia';
+import { linkText } from './case-study-facts';
+import { detectContentLanguage, type ContentLanguage } from './detect-language';
+import { toItem, type RestTestimonialPost, type Testimonial } from './transform/transformTestimonials';
 import { localePath, type LanguageAlternates } from './i18n/paths';
 import { localizeRestItem } from './i18n/localize';
 import { otherLang, type Lang } from './i18n/lang';
@@ -62,6 +66,27 @@ export interface ServiceLink {
   excerpt: string;
   /** Public path in the page language. */
   path: string;
+  /** Live-site domain of a project (e.g. fhe.at), '' for posts or no link. */
+  domain: string;
+  /** Featured image of a project (the screenshot), null for posts or none. */
+  image: ServiceLinkImage | null;
+  /** Language of the title and teaser as shown (the CMS stores none, so it is detected). */
+  language: ContentLanguage;
+}
+
+// Narrower featured images are logos or icons, not screenshots of a site.
+const MIN_SCREENSHOT_WIDTH = 800;
+
+/** True when a related project has a featured image wide enough to be a site screenshot. */
+export function hasScreenshot(link: ServiceLink): boolean {
+  return link.image !== null && link.image.width >= MIN_SCREENSHOT_WIDTH;
+}
+
+export interface ServiceLinkImage {
+  url: string;
+  alt: string;
+  width: number;
+  height: number;
 }
 
 export interface ServiceRelations {
@@ -75,12 +100,34 @@ interface RelatedRestItem {
   title?: { rendered?: string } | string;
   excerpt?: { rendered?: string } | string;
   acf_fields?: unknown;
+  _embedded?: { 'wp:featuredmedia'?: unknown[] };
 }
 
+const LINK_FIELDS = 'id,slug,title,excerpt,acf_fields.title_de,acf_fields.excerpt_de';
+
+// Projects also bring their screenshot and live site for the browser frames.
 const RELATED_KINDS = {
-  projects: { restPath: '/project', segment: '/projects', label: 'related projects' },
-  posts: { restPath: '/posts', segment: '/notebook', label: 'related posts' },
+  projects: {
+    restPath: '/project',
+    segment: '/projects',
+    label: 'related projects',
+    query: `_embed=wp:featuredmedia&_fields=${LINK_FIELDS},acf_fields.project_links,_links,_embedded`,
+  },
+  posts: { restPath: '/posts', segment: '/notebook', label: 'related posts', query: `_fields=${LINK_FIELDS}` },
 } as const;
+
+function liveDomain(acf: unknown): string {
+  const links = (acf as { project_links?: { live_site?: unknown } } | null)?.project_links;
+  const url = typeof links?.live_site === 'string' ? links.live_site.trim() : '';
+  return /^https?:\/\//i.test(url) ? linkText(url) : '';
+}
+
+function featuredImage(item: RelatedRestItem): ServiceLinkImage | null {
+  const media = transformMedia((item._embedded?.['wp:featuredmedia']?.[0] ?? null) as RestMedia);
+  if (!media) return null;
+  const { sourceUrl, altText, mediaDetails } = media.node;
+  return { url: sourceUrl, alt: altText, width: mediaDetails.width, height: mediaDetails.height };
+}
 
 const plainText = (html: string): string => decodeEntities(html.replace(/<[^>]*>/g, ' ')).replace(/\s+/g, ' ').trim();
 
@@ -90,24 +137,30 @@ const plainText = (html: string): string => decodeEntities(html.replace(/<[^>]*>
  */
 async function fetchRelated(kind: keyof ServiceRelations, ids: number[], lang: Lang): Promise<ServiceLink[]> {
   if (ids.length === 0) return [];
-  const { restPath, segment, label } = RELATED_KINDS[kind];
-  const fields = 'id,slug,title,excerpt,acf_fields.title_de,acf_fields.excerpt_de';
+  const { restPath, segment, label, query } = RELATED_KINDS[kind];
 
   try {
     const items = await cmsRest<unknown>(
-      `${restPath}?include=${ids.join(',')}&per_page=${ids.length}&_fields=${fields}`
+      `${restPath}?include=${ids.join(',')}&per_page=${ids.length}&${query}`
     );
     if (!Array.isArray(items)) return [];
     const byId = new Map((items as RelatedRestItem[]).map((item) => [Number(item.id), localizeRestItem(item, lang)]));
     return ids
       .map((id) => byId.get(id))
       .filter((item): item is RelatedRestItem => Boolean(item?.slug))
-      .map((item) => ({
+      .map((item) => {
+        const title = decodeEntities(rendered(item.title));
+        const excerpt = plainText(rendered(item.excerpt));
+        return {
         id: Number(item.id),
-        title: decodeEntities(rendered(item.title)),
-        excerpt: plainText(rendered(item.excerpt)),
+        title,
+        excerpt,
         path: localePath(`${segment}/${item.slug}`, lang),
-      }));
+        domain: liveDomain(item.acf_fields),
+        image: featuredImage(item),
+        language: detectContentLanguage(`${title} ${excerpt}`),
+        };
+      });
   } catch (error: unknown) {
     // A CMS fault must not be cached as a page without its proof: rethrow so ISR
     // keeps the last good render. A permanent answer drops only this block.
@@ -124,6 +177,23 @@ export async function getServiceRelations(service: Service, lang: Lang): Promise
     fetchRelated('posts', service.relatedPostIds, lang),
   ]);
   return { projects, posts };
+}
+
+/**
+ * The one testimonial a service page shows (ACF `testimonial`), null when none
+ * is picked or the post has no quote. Quotes stay in the client's own language.
+ */
+export async function getServiceTestimonial(service: Service): Promise<Testimonial | null> {
+  if (service.testimonialId === null) return null;
+  try {
+    const items = await cmsRest<unknown>(`/testimonial?include=${service.testimonialId}&per_page=1&_fields=id,title,acf_fields`);
+    const post = Array.isArray(items) ? (items[0] as RestTestimonialPost | undefined) : undefined;
+    return post ? toItem(post) : null;
+  } catch (error: unknown) {
+    if (isTransientCmsError(error)) throw error;
+    console.error('Error fetching the testimonial for a service page:', error instanceof Error ? error.message : error);
+    return null;
+  }
 }
 
 /** The slug of a service in a language. */

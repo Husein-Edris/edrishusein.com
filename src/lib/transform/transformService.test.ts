@@ -42,6 +42,24 @@ describe('transformService (English)', () => {
     expect(service.areaServed).toEqual(['vorarlberg', 'austria']);
   });
 
+  it('maps the hero note, card icon, testimonial id and contact message', () => {
+    expect(service.heroNote).toBe('Replies within one working day.');
+    expect(service.contactMessage).toBe('Hi Edris, my current website is: …\nWhat bothers me about it: …');
+    expect(service.icon).toBe('layout');
+    expect(service.testimonialId).toBe(746);
+  });
+
+  it('maps deliverables, drops empty rows and falls back to the default icon for an unknown key', () => {
+    expect(service.deliverables).toEqual([
+      { icon: 'redirect', title: 'Rankings kept', text: 'Every old URL redirects to its new page.' },
+      { icon: 'code', title: 'Unknown icon', text: 'Falls back to the default icon.' },
+    ]);
+  });
+
+  it('maps process steps and drops empty rows', () => {
+    expect(service.process).toEqual([{ title: 'Audit', text: 'I look at what still works.' }]);
+  });
+
   it('maps the per-service call to action', () => {
     expect(service.cta).toEqual({
       heading: 'Planning a redesign?',
@@ -82,6 +100,18 @@ describe('transformService (German)', () => {
     expect(service.cta.label).toBe('Start a project');
   });
 
+  it('uses German deliverables, process and hero note, falling back to English for an empty twin', () => {
+    expect(service.heroNote).toBe('Antwort innerhalb eines Werktags.');
+    expect(service.deliverables[0]).toEqual({
+      icon: 'redirect',
+      title: 'Rankings bleiben',
+      text: 'Jede alte URL leitet auf ihre neue Seite weiter.',
+    });
+    expect(service.deliverables[1].title).toBe('Unknown icon');
+    expect(service.process[0]).toEqual({ title: 'Bestandsaufnahme', text: 'Ich schaue, was noch funktioniert.' });
+    expect(service.contactMessage).toMatch(/^Hi Edris/);
+  });
+
   it('points site links in the German intro and section bodies at /de', () => {
     expect(service.introHtml).toContain('href="/de/services/wordpress-maintenance"');
     expect(service.sections[0].bodyHtml).toContain('href="/de/projects/illwerke-vkw-website-relaunch"');
@@ -102,6 +132,9 @@ describe('transformService with empty ACF fields', () => {
       related_projects: false,
       related_posts: false,
       area_served: false,
+      deliverables: false,
+      process: false,
+      testimonial: false,
       slug_de: '',
     },
   };
@@ -113,6 +146,16 @@ describe('transformService with empty ACF fields', () => {
     expect(service.relatedProjectIds).toEqual([]);
     expect(service.relatedPostIds).toEqual([]);
     expect(service.areaServed).toEqual([]);
+  });
+
+  it('leaves the new visual blocks empty when their fields are missing', () => {
+    const service = transformService(empty, 'en');
+    expect(service.deliverables).toEqual([]);
+    expect(service.process).toEqual([]);
+    expect(service.testimonialId).toBeNull();
+    expect(service.heroNote).toBe('');
+    expect(service.contactMessage).toBe('');
+    expect(service.icon).toBe('code');
   });
 
   it('leaves the call to action empty when its fields are missing', () => {

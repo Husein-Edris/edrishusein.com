@@ -54,6 +54,11 @@ export const SITE_CONTENT_DEFAULTS = {
     faqHeading: 'FAQ',
     projectsHeading: 'Case studies',
     postsHeading: 'Further reading',
+    deliverablesHeading: 'What you get',
+    processHeading: 'How it works',
+    portraitCaption: 'Edris Husein, web developer in Dornbirn',
+    emailLabel: 'Email me',
+    whatsappLabel: 'WhatsApp',
   },
   contactPage: {
     subtitle: 'Freelance WordPress and Next.js work',
@@ -61,6 +66,8 @@ export const SITE_CONTENT_DEFAULTS = {
     intro:
       'Open to freelance projects, collaborations, or just a chat about web development. I build WordPress sites, headless setups, and React or Next.js applications, mostly for agencies and small teams in Austria and Germany, though remote work anywhere is fine. If you are writing about a project, a rough scope and timeline helps me give you a useful answer instead of a vague one. I usually reply within a day.',
     email: 'kontakt@edrishusein.com',
+    // e.g. +43 676 1234567 or 0676 1234567 (gets +43). Empty hides the WhatsApp button.
+    whatsapp: '',
   },
   notebookPage: {
     title: 'NOTEBOOK',
@@ -210,6 +217,11 @@ export const SITE_CONTENT_DEFAULTS_DE: SiteContentShape = {
     faqHeading: 'Häufige Fragen',
     projectsHeading: 'Fallstudien',
     postsHeading: 'Weiterlesen',
+    deliverablesHeading: 'Das bekommen Sie',
+    processHeading: 'So läuft es ab',
+    portraitCaption: 'Edris Husein, Webentwickler in Dornbirn',
+    emailLabel: 'E-Mail schreiben',
+    whatsappLabel: 'WhatsApp',
   },
   contactPage: {
     subtitle: 'Freelance-Arbeit mit WordPress und Next.js',
@@ -217,6 +229,8 @@ export const SITE_CONTENT_DEFAULTS_DE: SiteContentShape = {
     intro:
       'Ich bin offen für Freelance-Projekte, Zusammenarbeit oder einfach ein Gespräch über Webentwicklung. Ich baue WordPress-Websites, Headless-Setups und Anwendungen mit React oder Next.js, meist für Agenturen und kleine Teams in Österreich und Deutschland, arbeite aber auch gerne remote. Wenn Sie mir zu einem Projekt schreiben, helfen mir ein grober Umfang und ein Zeitrahmen, Ihnen eine brauchbare Antwort statt einer vagen zu geben. Ich antworte in der Regel innerhalb eines Tages.',
     email: 'kontakt@edrishusein.com',
+    // e.g. +43 676 1234567 or 0676 1234567 (gets +43). Empty hides the WhatsApp button.
+    whatsapp: '',
   },
   notebookPage: {
     title: 'NOTIZBUCH',
@@ -356,12 +370,18 @@ export const SITE_CONTENT_FIELDS: { readonly [S in keyof Sections]: Strings<Sect
     faqHeading: 'service_faq_heading',
     projectsHeading: 'service_projects_heading',
     postsHeading: 'service_posts_heading',
+    deliverablesHeading: 'service_deliverables_heading',
+    processHeading: 'service_process_heading',
+    portraitCaption: 'service_portrait_caption',
+    emailLabel: 'service_email_label',
+    whatsappLabel: 'service_whatsapp_label',
   },
   contactPage: {
     subtitle: 'contact_page_subtitle',
     heading: 'contact_page_heading',
     intro: 'contact_page_intro',
     email: 'contact_page_email',
+    whatsapp: 'contact_whatsapp_number',
   },
   notebookPage: {
     title: 'notebook_page_title',
