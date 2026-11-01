@@ -6,7 +6,7 @@ import Header from '@/src/components/Header/Header';
 import Footer from '@/src/components/Footer/Footer';
 import { getSiteContent } from '@/src/lib/site-content';
 import { loadServicePage, serviceMetadata, serviceStaticParams } from '@/src/lib/service-page';
-import { getServiceRelations, getServiceTestimonial, type ServiceLink } from '@/src/lib/services';
+import { getServiceRelations, getServiceTestimonial, hasScreenshot, type ServiceLink } from '@/src/lib/services';
 import { generateServicePageStructuredData, safeJsonLd } from '@/src/lib/seo-utils';
 import { localePath } from '@/src/lib/i18n/paths';
 import { isLang } from '@/src/lib/i18n/lang';
@@ -20,6 +20,7 @@ import ServiceTestimonial from '@/src/components/Service/ServiceTestimonial';
 import ServiceFaq from '@/src/components/Service/ServiceFaq';
 import ScrollStory from '@/src/components/Service/ScrollStory';
 import ServiceContact from '@/src/components/Service/ServiceContact';
+import ServiceShowcase from '@/src/components/Service/ServiceShowcase';
 import { directContactLinks } from '@/src/lib/contact-links';
 import '@/src/styles/pages/Services.scss';
 
@@ -133,6 +134,8 @@ export default async function ServicePage({ params }: ServiceParams) {
         />
         <ServiceDeliverables heading={template.deliverablesHeading} items={service.deliverables} />
         <ServiceWork heading={template.projectsHeading} projects={relations.projects} />
+        {/* No case study with a screenshot: show the service's own artefact instead. */}
+        <ServiceShowcase showcase={relations.projects.some(hasScreenshot) ? null : service.showcase} />
         <ServiceProcess heading={template.processHeading} steps={service.process} />
         <ServiceTestimonial testimonial={testimonial} />
 

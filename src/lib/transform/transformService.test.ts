@@ -49,6 +49,13 @@ describe('transformService (English)', () => {
     expect(service.testimonialId).toBe(746);
   });
 
+  it('maps the showcase image and caption', () => {
+    expect(service.showcase).toEqual({
+      image: { url: 'https://cms.example/report.jpg', alt: 'Monthly maintenance report', width: 1600, height: 1000 },
+      caption: 'Monthly maintenance report, September 2026',
+    });
+  });
+
   it('maps deliverables, drops empty rows and falls back to the default icon for an unknown key', () => {
     expect(service.deliverables).toEqual([
       { icon: 'redirect', title: 'Rankings kept', text: 'Every old URL redirects to its new page.' },
@@ -110,6 +117,7 @@ describe('transformService (German)', () => {
     expect(service.deliverables[1].title).toBe('Unknown icon');
     expect(service.process[0]).toEqual({ title: 'Bestandsaufnahme', text: 'Ich schaue, was noch funktioniert.' });
     expect(service.contactMessage).toMatch(/^Hi Edris/);
+    expect(service.showcase?.caption).toBe('Monatlicher Wartungsbericht, September 2026');
   });
 
   it('points site links in the German intro and section bodies at /de', () => {
@@ -155,6 +163,7 @@ describe('transformService with empty ACF fields', () => {
     expect(service.testimonialId).toBeNull();
     expect(service.heroNote).toBe('');
     expect(service.contactMessage).toBe('');
+    expect(service.showcase).toBeNull();
     expect(service.icon).toBe('code');
   });
 

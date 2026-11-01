@@ -1090,3 +1090,22 @@ $ease-arrive: cubic-bezier(0.16, 1, 0.3, 1);
     color: $color-beige;
   }
 }
+
+// A single artefact (maintenance report) in place of the case-study frames.
+// The report is a document, so it is shown whole, never cropped.
+.service-showcase {
+  &__frame {
+    margin: 0;
+    max-width: 960px;
+  }
+
+  &__image {
+    object-fit: contain;
+    background: $white;
+  }
+
+  &__caption {
+    font-size: $font-size-sm;
+    color: $text-light-gray;
+  }
+}

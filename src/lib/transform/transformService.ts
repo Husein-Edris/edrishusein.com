@@ -4,6 +4,7 @@ import { asArray } from './asArray';
 import { localizeContentLinks, localizeRestItem } from '../i18n/localize';
 import type { Lang } from '../i18n/lang';
 import { serviceIconKey, type ServiceIconKey } from '../service-icons';
+import { transformMedia, type RestMedia } from './transformMedia';
 
 // Service pages (CPT `service`, theme inc/acf-fields/service-page.php). Every
 // text field `x` has a German twin `x_de`; `slug_de` is the German URL slug and
@@ -45,6 +46,8 @@ interface ServiceAcf {
   process?: unknown;
   testimonial?: unknown;
   contact_message?: unknown;
+  showcase_image?: unknown;
+  showcase_caption?: unknown;
   [key: string]: unknown;
 }
 
@@ -79,6 +82,15 @@ export interface ServiceDeliverable {
 export interface ServiceStep {
   title: string;
   text: string;
+}
+
+/**
+ * An image the service page and its /services row show when no linked case
+ * study has a screenshot, e.g. a real maintenance report (ACF showcase_*).
+ */
+export interface ServiceShowcase {
+  image: { url: string; alt: string; width: number; height: number };
+  caption: string;
 }
 
 /** Closing call to action of a service page (ACF cta_*, one set per service). */
@@ -123,6 +135,7 @@ export interface Service {
   testimonialId: number | null;
   /** Text prefilled in the email and WhatsApp message; line breaks kept. */
   contactMessage: string;
+  showcase: ServiceShowcase | null;
   modified: string;
 }
 
@@ -151,6 +164,13 @@ function areaKeys(value: unknown): AreaServedKey[] {
     .map((entry) => (isPlainObject(entry) ? entry.value : entry))
     .filter((entry): entry is AreaServedKey => typeof entry === 'string' && known.has(entry));
   return AREA_SERVED_KEYS.filter((key) => picked.includes(key));
+}
+
+function showcaseOf(value: unknown, caption: string): ServiceShowcase | null {
+  const media = isPlainObject(value) ? transformMedia(value as RestMedia) : null;
+  if (!media) return null;
+  const { sourceUrl, altText, mediaDetails } = media.node;
+  return { image: { url: sourceUrl, alt: altText, width: mediaDetails.width, height: mediaDetails.height }, caption };
 }
 
 function germanSlug(value: unknown, fallback: string): string {
@@ -205,6 +225,7 @@ export function transformService(item: RestService, lang: Lang): Service {
       .filter((row) => row.title !== '' || row.text !== ''),
     testimonialId: relationIds(acf.testimonial)[0] ?? null,
     contactMessage: text(acf.contact_message),
+    showcase: showcaseOf(acf.showcase_image, text(acf.showcase_caption)),
     modified: item.modified ?? '',
   };
 }
