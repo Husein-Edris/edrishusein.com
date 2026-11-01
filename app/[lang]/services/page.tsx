@@ -61,7 +61,12 @@ export default async function ServicesPage({ params }: LangParams) {
     description: service.excerpt,
     link: servicePath(service, lang),
     icon: service.icon,
-    project: leadProjects[index],
+    // A case-study screenshot, else the service's showcase image (e.g. a report).
+    proof: leadProjects[index]?.image
+      ? { image: leadProjects[index]!.image!, label: leadProjects[index]!.title }
+      : service.showcase
+        ? { image: service.showcase.image, label: service.showcase.caption }
+        : null,
   }));
 
   const collectionJsonLd = generateCollectionPageStructuredData({
@@ -103,12 +108,12 @@ export default async function ServicesPage({ params }: LangParams) {
                       <div className="service-row__excerpt" dangerouslySetInnerHTML={{ __html: card.description }} />
                     )}
                   </div>
-                  {card.project?.image ? (
+                  {card.proof ? (
                     <span className="service-row__proof">
                       <span className="service-row__shot" aria-hidden="true">
-                        <Image src={card.project.image.url} alt="" fill sizes="(max-width: 768px) 100vw, 320px" />
+                        <Image src={card.proof.image.url} alt="" fill sizes="(max-width: 768px) 100vw, 320px" />
                       </span>
-                      <span className="service-row__project">{card.project.title}</span>
+                      {card.proof.label && <span className="service-row__project">{card.proof.label}</span>}
                     </span>
                   ) : (
                     <span className="service-row__proof" aria-hidden="true" />

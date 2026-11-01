@@ -111,6 +111,16 @@
       746
     ],
     "contact_message": "Hi Edris, my current website is: …\nWhat bothers me about it: …",
-    "contact_message_de": ""
+    "contact_message_de": "",
+    "showcase_image": {
+      "ID": 901,
+      "id": 901,
+      "url": "https://cms.example/report.jpg",
+      "alt": "Monthly maintenance report",
+      "width": 1600,
+      "height": 1000
+    },
+    "showcase_caption": "Monthly maintenance report, September 2026",
+    "showcase_caption_de": "Monatlicher Wartungsbericht, September 2026"
   }
 }
