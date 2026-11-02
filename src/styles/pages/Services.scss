@@ -958,8 +958,15 @@ $ease-arrive: cubic-bezier(0.16, 1, 0.3, 1);
     flex-direction: column;
     gap: $spacing-sm;
 
+    // Narrow screens: the screenshot sits under the text, in the text column.
     @include tablet {
-      display: none;
+      grid-column: 2;
+      grid-row: 2;
+      max-width: 420px;
+
+      &:empty {
+        display: none;
+      }
     }
   }
 
@@ -1002,10 +1009,6 @@ $ease-arrive: cubic-bezier(0.16, 1, 0.3, 1);
       object-position: top;
       transition: transform 600ms $ease-arrive;
     }
-
-    @include tablet {
-      display: none;
-    }
   }
 
   &__arrow {
@@ -1022,6 +1025,7 @@ $ease-arrive: cubic-bezier(0.16, 1, 0.3, 1);
 
     @include tablet {
       grid-column: 3;
+      grid-row: 1;
     }
   }
 
