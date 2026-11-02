@@ -48,6 +48,7 @@ interface ServiceAcf {
   contact_message?: unknown;
   showcase_image?: unknown;
   showcase_caption?: unknown;
+  showcase_alt?: unknown;
   [key: string]: unknown;
 }
 
@@ -166,11 +167,13 @@ function areaKeys(value: unknown): AreaServedKey[] {
   return AREA_SERVED_KEYS.filter((key) => picked.includes(key));
 }
 
-function showcaseOf(value: unknown, caption: string): ServiceShowcase | null {
+// The media library holds one alt text; showcase_alt (with its German twin)
+// overrides it so each language describes the image in its own words.
+function showcaseOf(value: unknown, caption: string, altOverride: string): ServiceShowcase | null {
   const media = isPlainObject(value) ? transformMedia(value as RestMedia) : null;
   if (!media) return null;
   const { sourceUrl, altText, mediaDetails } = media.node;
-  return { image: { url: sourceUrl, alt: altText, width: mediaDetails.width, height: mediaDetails.height }, caption };
+  return { image: { url: sourceUrl, alt: altOverride || altText, width: mediaDetails.width, height: mediaDetails.height }, caption };
 }
 
 function germanSlug(value: unknown, fallback: string): string {
@@ -225,7 +228,7 @@ export function transformService(item: RestService, lang: Lang): Service {
       .filter((row) => row.title !== '' || row.text !== ''),
     testimonialId: relationIds(acf.testimonial)[0] ?? null,
     contactMessage: text(acf.contact_message),
-    showcase: showcaseOf(acf.showcase_image, text(acf.showcase_caption)),
+    showcase: showcaseOf(acf.showcase_image, text(acf.showcase_caption), text(acf.showcase_alt)),
     modified: item.modified ?? '',
   };
 }

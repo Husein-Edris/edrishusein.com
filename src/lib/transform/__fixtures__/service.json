@@ -121,6 +121,8 @@
       "height": 1000
     },
     "showcase_caption": "Monthly maintenance report, September 2026",
-    "showcase_caption_de": "Monatlicher Wartungsbericht, September 2026"
+    "showcase_caption_de": "Monatlicher Wartungsbericht, September 2026",
+    "showcase_alt": "",
+    "showcase_alt_de": "Monatlicher Wartungsbericht"
   }
 }

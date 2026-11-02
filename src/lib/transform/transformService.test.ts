@@ -49,6 +49,10 @@ describe('transformService (English)', () => {
     expect(service.testimonialId).toBe(746);
   });
 
+  it('keeps the media library alt when no alt override is set', () => {
+    expect(service.showcase?.image.alt).toBe('Monthly maintenance report');
+  });
+
   it('maps the showcase image and caption', () => {
     expect(service.showcase).toEqual({
       image: { url: 'https://cms.example/report.jpg', alt: 'Monthly maintenance report', width: 1600, height: 1000 },
@@ -118,6 +122,7 @@ describe('transformService (German)', () => {
     expect(service.process[0]).toEqual({ title: 'Bestandsaufnahme', text: 'Ich schaue, was noch funktioniert.' });
     expect(service.contactMessage).toMatch(/^Hi Edris/);
     expect(service.showcase?.caption).toBe('Monatlicher Wartungsbericht, September 2026');
+    expect(service.showcase?.image.alt).toBe('Monatlicher Wartungsbericht');
   });
 
   it('points site links in the German intro and section bodies at /de', () => {
