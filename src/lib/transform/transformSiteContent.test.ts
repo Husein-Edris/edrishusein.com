@@ -296,7 +296,7 @@ describe('transformSiteContent languages and new keys', () => {
 
   it('keeps the English defaults equal to the text the pages rendered before', () => {
     const d = transformSiteContent({});
-    expect(d.meta.homeTitle).toBe('Edris Husein - Web Developer & WordPress, Vorarlberg');
+    expect(d.meta.homeTitle).toBe('Edris Husein - Web Developer for WordPress Sites & Web Apps');
     expect(d.chrome.skipToContent).toBe('Skip to main content');
     expect(d.nav.techStack).toBe('Tech Stack');
   });
@@ -306,7 +306,15 @@ describe('transformSiteContent languages and new keys', () => {
     const result = transformSiteContent({ nav_about: 'Über uns' }, 'de');
     expect(result.nav.about).toBe('Über uns');
     expect(result.nav.projects).toBe('Projekte');
-    expect(result.meta.homeTitle).toBe('WordPress-Entwickler in Vorarlberg | Edris Husein, Dornbirn');
+    expect(result.meta.homeTitle).toBe('Edris Husein - WordPress-Entwickler und Webentwickler');
+  });
+
+  it('targets no region in any title or description default', () => {
+    for (const defaults of [SITE_CONTENT_DEFAULTS, SITE_CONTENT_DEFAULTS_DE]) {
+      for (const value of Object.values(defaults.meta)) {
+        expect(value).not.toMatch(/Vorarlberg/);
+      }
+    }
   });
 
   it('has a German default for every English key, and no em dash in either', () => {

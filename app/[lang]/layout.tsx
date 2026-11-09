@@ -61,10 +61,10 @@ export async function generateMetadata({ params }: LangParams): Promise<Metadata
         },
       ],
     },
+    // Card type and image only: a title here is inherited by every page that
+    // sets its own openGraph but no twitter block, and X falls back to og:title.
     twitter: {
       card: "summary_large_image",
-      title: meta.homeTitle,
-      description: text.homeOgDescription,
       images: ["/images/Edris-Husein-Hero.png"],
     },
   };
