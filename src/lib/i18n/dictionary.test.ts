@@ -24,6 +24,13 @@ describe('dictionary', () => {
     }
   });
 
+  it('targets no region in the keywords or the share description', () => {
+    for (const lang of ['en', 'de'] as const) {
+      expect(DICTIONARY[lang].keywords, lang).not.toMatch(/Vorarlberg|Dornbirn/);
+      expect(DICTIONARY[lang].homeOgDescription, lang).not.toMatch(/Vorarlberg/);
+    }
+  });
+
   it('keeps the placeholders of each entry in both languages', () => {
     const placeholders = (text: string) => (text.match(/\{\w+\}/g) ?? []).sort();
     const de = Object.fromEntries(leaves(DICTIONARY.de));

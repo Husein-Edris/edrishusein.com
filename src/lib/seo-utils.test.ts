@@ -526,10 +526,18 @@ describe('generateHomepageStructuredData', () => {
     expect(service.founder).toEqual({ '@id': 'https://edrishusein.com/#person' });
     expect(service.address.addressLocality).toBe('Dornbirn');
     expect(service.address.addressRegion).toBe('Vorarlberg');
-    expect(service.areaServed.map((a: any) => a.name)).toEqual(
-      expect.arrayContaining(['Vorarlberg', 'Austria', 'Switzerland', 'Germany'])
-    );
+    expect(service.areaServed.map((a: any) => a.name)).toEqual(['Austria', 'Germany', 'Switzerland']);
     expect(service.knowsLanguage).toEqual(['de', 'en']);
+  });
+
+  it('names Dornbirn only as the base, never Vorarlberg as a market', () => {
+    const graph = (generateHomepageStructuredData() as any)['@graph'];
+    const person = graph.find((n: any) => n['@type'] === 'Person');
+    const service = graph.find((n: any) => n['@type'] === 'ProfessionalService');
+
+    expect(person.description).not.toMatch(/Vorarlberg/);
+    expect(service.description).not.toMatch(/Vorarlberg/);
+    expect(person.description).toMatch(/Dornbirn/);
   });
 
   it('should never publish a price or hourly rate in the service schema', () => {
@@ -860,7 +868,9 @@ describe('generateServicePageStructuredData', () => {
 
   it('shares the area objects with the homepage ProfessionalService', () => {
     const home = nodeOf(generateHomepageStructuredData(), 'ProfessionalService') as Node;
-    expect(home.areaServed).toEqual(Object.values(AREA_SERVED));
+    const areas = home.areaServed as unknown[];
+    expect(areas).toEqual([AREA_SERVED.austria, AREA_SERVED.germany, AREA_SERVED.switzerland]);
+    expect(areas[0]).toBe(AREA_SERVED.austria);
   });
 
   it('never states offers, a price range or ratings', () => {

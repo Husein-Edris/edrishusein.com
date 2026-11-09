@@ -3,7 +3,7 @@ import { alternatesFor, absoluteUrl, localePath } from './i18n/paths';
 import { DEFAULT_LANG, OG_LOCALE, otherLang, type Lang } from './i18n/lang';
 import { decodeEntities } from './transform/decodeEntities';
 import { transformPostListItem, type RestPost } from './transform/transformPost';
-import { AREA_SERVED_KEYS, type AreaServedKey, type Service } from './transform/transformService';
+import { type AreaServedKey, type Service } from './transform/transformService';
 import { servicePath } from './services';
 
 // Enhanced SEO types for RankMath
@@ -197,6 +197,10 @@ export const AREA_SERVED: Readonly<Record<AreaServedKey, AreaServedNode>> = Obje
   germany: Object.freeze({ "@type": "Country", name: "Germany" }),
 });
 
+// The homepage names countries only: Vorarlberg is the base (see address), not a
+// market. Service pages still pick their own areas via `area_served`.
+const HOMEPAGE_AREAS_SERVED: readonly AreaServedKey[] = ['austria', 'germany', 'switzerland'];
+
 const SERVICE_ID = `${SITE_URL}/#service`;
 const SERVICE_NAME = "Edris Husein, Web Development";
 
@@ -226,7 +230,7 @@ export function generateHomepageStructuredData(lang: Lang = DEFAULT_LANG): objec
         jobTitle: "Web Developer",
         url: SITE_URL,
         image: `${SITE_URL}/images/Edris-Husein-Hero.png`,
-        description: "Web developer in Dornbirn, Vorarlberg, Austria. Builds, fixes and maintains WordPress sites and web apps for businesses and agencies.",
+        description: "Web developer based in Dornbirn, Austria. Builds, fixes and maintains WordPress sites and web apps for businesses and agencies.",
         knowsAbout: ["Web Development", "React", "Next.js", "TypeScript", "WordPress", "UI/UX Design", "SEO"],
         knowsLanguage: ["en", "de"],
         // Public business address, identical to the live imprint page.
@@ -248,7 +252,7 @@ export function generateHomepageStructuredData(lang: Lang = DEFAULT_LANG): objec
         url: SITE_URL,
         image: `${SITE_URL}/images/Edris-Husein-Hero.png`,
         email: "kontakt@edrishusein.com",
-        description: "WordPress websites, maintenance, fixes and web apps for businesses and agencies in Vorarlberg, Austria, Switzerland and Germany.",
+        description: "WordPress websites, maintenance, fixes and web apps for businesses and agencies in Austria, Germany, Switzerland and beyond.",
         founder: { "@id": `${SITE_URL}/#person` },
         address: {
           "@type": "PostalAddress",
@@ -257,7 +261,7 @@ export function generateHomepageStructuredData(lang: Lang = DEFAULT_LANG): objec
           postalCode: "6850",
           addressCountry: "AT"
         },
-        areaServed: AREA_SERVED_KEYS.map((key) => AREA_SERVED[key]),
+        areaServed: HOMEPAGE_AREAS_SERVED.map((key) => AREA_SERVED[key]),
         knowsAbout: ["WordPress", "WooCommerce", "Website maintenance", "Web Development", "Next.js", "React"],
         knowsLanguage: ["de", "en"],
         sameAs: [

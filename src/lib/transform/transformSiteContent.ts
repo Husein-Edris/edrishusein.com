@@ -143,12 +143,12 @@ export const SITE_CONTENT_DEFAULTS = {
   },
   // <title> and meta description per page.
   meta: {
-    homeTitle: 'Edris Husein - Web Developer & WordPress, Vorarlberg',
+    homeTitle: 'Edris Husein - Web Developer for WordPress Sites & Web Apps',
     homeDescription:
-      'Web developer in Dornbirn, Vorarlberg. I build, fix and maintain WordPress sites and web apps for businesses and agencies in Austria, Switzerland and Germany.',
-    aboutTitle: 'About Edris Husein - Web Developer in Vorarlberg, Austria',
+      'Web developer based in Dornbirn, Austria. I build, fix and maintain WordPress sites and web apps for businesses and agencies in Austria, Germany, Switzerland and beyond.',
+    aboutTitle: 'About Edris Husein - Web Developer from Austria',
     aboutDescription:
-      'About Edris Husein, a web developer from Dornbirn, Vorarlberg, building and maintaining WordPress sites and web apps for businesses and agencies.',
+      'About Edris Husein, a web developer based in Dornbirn, Austria, building and maintaining WordPress sites and web apps for businesses and agencies.',
     projectsTitle: 'Web Development Projects & Case Studies - Edris Husein',
     projectsDescription:
       'Web development projects and case studies by Edris Husein: client websites and web apps built with Next.js, React and WordPress in Austria and Germany.',
@@ -161,9 +161,9 @@ export const SITE_CONTENT_DEFAULTS = {
     techStackTitle: 'Tech Stack: Next.js, React & WordPress - Edris Husein',
     techStackDescription:
       'The tech stack Edris Husein builds with: Next.js, React, TypeScript and WordPress, plus the tools, apps and devices behind his web development work.',
-    contactTitle: 'Contact Edris Husein - Web Developer in Vorarlberg',
+    contactTitle: 'Contact Edris Husein - Web Developer',
     contactDescription:
-      'Contact Edris Husein, a freelance web developer in Vorarlberg, Austria, for WordPress sites, maintenance, fixes and Next.js projects. Replies within a day.',
+      'Contact Edris Husein, a freelance web developer, for WordPress sites, maintenance, fixes and Next.js projects. Replies within a day.',
     cookieSettingsTitle: 'Cookie Settings - Edris Husein',
     cookieSettingsDescription: 'Manage your cookie preferences and privacy settings.',
     servicesTitle: 'Web Development Services | Edris Husein',
@@ -300,12 +300,12 @@ export const SITE_CONTENT_DEFAULTS_DE: SiteContentShape = {
     skipToContent: 'Zum Hauptinhalt springen',
   },
   meta: {
-    homeTitle: 'WordPress-Entwickler in Vorarlberg | Edris Husein, Dornbirn',
+    homeTitle: 'Edris Husein - WordPress-Entwickler und Webentwickler',
     homeDescription:
-      'Webentwickler in Dornbirn: Ich erstelle WordPress-Websites in Vorarlberg, übernehme Wartung und Updates in ganz Österreich und repariere bestehende Seiten.',
-    aboutTitle: 'Über Edris Husein - Webentwickler in Vorarlberg, Österreich',
+      'Webentwickler mit Sitz in Dornbirn: Ich erstelle WordPress-Websites, übernehme Wartung und Updates und repariere bestehende Seiten, für Unternehmen in Österreich, Deutschland und der Schweiz.',
+    aboutTitle: 'Über Edris Husein - Webentwickler aus Österreich',
     aboutDescription:
-      'Über Edris Husein, Webentwickler aus Dornbirn in Vorarlberg: WordPress-Websites und Webanwendungen für Unternehmen und Agenturen, gebaut und betreut.',
+      'Edris Husein ist Webentwickler mit Sitz in Dornbirn, Österreich. Er baut und betreut WordPress-Websites und Webanwendungen für Unternehmen und Agenturen.',
     projectsTitle: 'Projekte und Fallstudien zur Webentwicklung - Edris Husein',
     projectsDescription:
       'Projekte und Fallstudien von Edris Husein: Kundenwebsites und Webanwendungen mit Next.js, React und WordPress in Österreich und Deutschland.',
@@ -318,9 +318,9 @@ export const SITE_CONTENT_DEFAULTS_DE: SiteContentShape = {
     techStackTitle: 'Technologien: Next.js, React und WordPress - Edris Husein',
     techStackDescription:
       'Die Technologien, mit denen Edris Husein arbeitet: Next.js, React, TypeScript und WordPress, dazu die Werkzeuge, Apps und Geräte hinter seiner Arbeit.',
-    contactTitle: 'Kontakt - Edris Husein, Webentwickler in Vorarlberg',
+    contactTitle: 'Kontakt - Edris Husein, Webentwickler',
     contactDescription:
-      'Kontaktieren Sie Edris Husein, freiberuflicher Webentwickler in Vorarlberg, für WordPress-Websites, Wartung, Fehlerbehebung und Next.js-Projekte. Antwort innerhalb eines Tages.',
+      'Kontakt zu Edris Husein, Freelance-Webentwickler: WordPress-Websites, Wartung, Fehlerbehebung und Next.js-Projekte. Antwort innerhalb eines Tages.',
     cookieSettingsTitle: 'Cookie-Einstellungen - Edris Husein',
     cookieSettingsDescription: 'Verwalten Sie Ihre Cookie-Einstellungen und Datenschutzoptionen.',
     servicesTitle: 'Leistungen: Websites, Relaunch, WordPress | Edris Husein',

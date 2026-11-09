@@ -27,9 +27,9 @@ const en = {
   contactHeading: 'Contact Edris Husein',
   ogImageAlt: 'Edris Husein - Web Developer',
   homeOgDescription:
-    'Web developer in Dornbirn, Vorarlberg. WordPress sites, maintenance, fixes and web apps for businesses and agencies.',
+    'Web developer based in Dornbirn, Austria. WordPress sites, maintenance, fixes and web apps for businesses and agencies.',
   keywords:
-    'Edris Husein, web developer Vorarlberg, WordPress developer Austria, WordPress Entwickler Vorarlberg, Webentwickler Dornbirn, WordPress maintenance, Next.js',
+    'Edris Husein, web developer, WordPress developer, WordPress maintenance, website redesign, Next.js',
   untitled: 'Untitled',
   projectFallbackTitle: 'Project | Projects - Edris Husein',
   projectFallbackDescription: 'View this project by Edris Husein',
@@ -119,9 +119,9 @@ const de: Dictionary = {
   contactHeading: 'Kontakt zu Edris Husein',
   ogImageAlt: 'Edris Husein, Webentwickler',
   homeOgDescription:
-    'Webentwickler in Dornbirn, Vorarlberg: WordPress-Websites, Wartung, Fehlerbehebung und Webanwendungen für Unternehmen und Agenturen.',
+    'Webentwickler mit Sitz in Dornbirn: WordPress-Websites, Wartung, Fehlerbehebung und Webanwendungen für Unternehmen und Agenturen.',
   keywords:
-    'Edris Husein, WordPress Entwickler Vorarlberg, Webentwickler Dornbirn, WordPress Wartung Österreich, Website erstellen Vorarlberg, Next.js',
+    'Edris Husein, Webentwickler, WordPress Entwickler, WordPress Wartung, Website erstellen lassen, Website-Relaunch, Next.js',
   untitled: 'Ohne Titel',
   projectFallbackTitle: 'Projekt | Projekte - Edris Husein',
   projectFallbackDescription: 'Ein Projekt von Edris Husein',
